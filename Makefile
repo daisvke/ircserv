@@ -16,9 +16,6 @@ OBJS			=	$(addprefix $(OBJS_DIR), $(OBJS_FILES))
 
 
 INC_DIR			=	incs/
-INC_FILES		=	headers.hpp \
-					server.hpp
-HEADERS			=	$(addprefix $(INC_DIR), $(INC_FILES))
 
 .PHONY: all clean fclean re
 
@@ -27,9 +24,9 @@ all: $(NAME)
 $(NAME): $(OBJS)
 		$(CXX) -o $@ $(OBJS)
 
-$(OBJS): $(SRCS) $(HEADERS)
+$(OBJS): $(SRCS)
 		mkdir -p $(OBJS_DIR)
-		$(CXX) $(CXXFLAGS) $(DEBUG) -c $< -o $@
+		$(CXX) $(CXXFLAGS) -I$(INC_DIR) $(DEBUG) -c $< -o $@
 
 clean:
 	rm -rf $(OBJS_DIR)

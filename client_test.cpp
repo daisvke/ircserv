@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   client.cpp                                         :+:      :+:    :+:   */
+/*   client_test.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/07 14:51:40 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/08 14:56:18 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/15 18:23:22 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	client(){
 	int					opt = 1;
 	char				buffer[BUFFER_SIZE] = { 0 };
 
-	if ((socketClient = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == SOCKET_ERROR)
+	if ((socketClient = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == ERROR)
 		throw std::invalid_argument("client socket fail");
 	else
 		std::cout << "socket success" << std::endl;
@@ -34,9 +34,9 @@ void	client(){
 		std::cout << "socketopt success" << std::endl;
 	addrClient.sin_family = AF_INET;
 	addrClient.sin_addr.s_addr = inet_addr(LOCAL_HOST);
-	addrClient.sin_port = htons(PORT);
+	addrClient.sin_port = htons(SERVER_SERVER_SERVER_SERVER_PORT);
 
-	if (connect(socketClient, (sockaddr *) &addrClient, sizeof(addrClient)) == SOCKET_ERROR)
+	if (connect(socketClient, (sockaddr *) &addrClient, sizeof(addrClient)) == ERROR)
 		throw std::invalid_argument("client connect fail");
 	else
 		std::cout << "now connected" << std::endl;

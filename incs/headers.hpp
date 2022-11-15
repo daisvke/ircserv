@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/07 14:50:56 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/08 14:12:31 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/15 18:23:22 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,11 +34,12 @@
 # include <poll.h>
 
 # define LOCAL_HOST "127.0.0.1"
-# define PORT 8084
+# define SERVER_PORT 8084
 # define BUFFER_SIZE 1024
 
-# define SOCKET_ERROR -1
+# define ERROR -1
 # define POLL_DELAY 5000
+
 // # define TRUE 0
 // # define ERROR -1 
 

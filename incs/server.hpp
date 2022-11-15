@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/08 16:03:10 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/15 18:34:30 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,12 +16,12 @@
 #include "headers.hpp"
 
 enum e_socket{
-	SOCK_SUCCESS,
-	SOCKET_ERR,
-	SETSOCKOPT_ERR,
-	BIND_ERR,
-	LISTEN_ERR,
-	ACCEPT_ERR,
+	E_SOCK_SUCCESS,
+	E_SOCKET_ERR,
+	E_SETSOCKOPT_ERR,
+	E_BIND_ERR,
+	E_LISTEN_ERR,
+	E_ACCEPT_ERR,
 };
 
 class Server{
@@ -38,7 +38,7 @@ class Server{
 
 	private :
 		struct sockaddr_in	_sockAddr;
-		int					_socket;
+		int					_listenSd;
 		int					_addrlen;
 		char				_buffer[BUFFER_SIZE];
 		int					_opt;
@@ -50,6 +50,7 @@ class Server{
 
 		int					setSocket();
 		int					setSocketopt();
+		int					setNonBlocking();
 		int					bindSocket();
 		int					listenSocket();
 

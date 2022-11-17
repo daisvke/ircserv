@@ -27,6 +27,7 @@ class Channel
 		// setters
 		void	setTopic(std::string name);
 
+		// commands
 		void	join(User *user);
 		void	part(User *user);
 

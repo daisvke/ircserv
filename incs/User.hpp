@@ -6,7 +6,7 @@
 /*   By: dtanigaw <dtanigaw@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 18:47:16 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/11/17 06:42:24 by dtanigaw         ###   ########.fr       */
+/*   Updated: 2022/11/17 08:44:51 by dtanigaw         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #ifndef USER_HPP
@@ -28,7 +28,6 @@ class User
 		void	setAsOperator(void);
 		void	connect(void);
 		void	disconnect(void);
-
 
 		// getters
 		std::string	getNickName(void) const;

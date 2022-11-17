@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/17 17:24:19 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/17 20:43:43 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,6 +170,9 @@ int	Server::findReadableFd(){
 	int	i;
 
 	std::cout << "inside find readable fd" << std::endl;
+
+	for (i = 0; i < _nfds; i++)
+		std::cout << _fds[i].fd << std::endl;
 	for (i = 0; i < _nfds;  i++){
 		if (_fds[i].revents == 0)
 			continue;						//do next loop,
@@ -185,11 +188,12 @@ int	Server::findReadableFd(){
 }
 
 void	Server::reactToEvent(int fd){
-	serverPrint("server is here" + fd);
 	if (fd == POLL_FAILURE)
 		return ;
+	else if (_listenSd)
+		serverPrint("_listenSd is readable !!! new connection incoming");
 	else
-		serverPrint("server is here" + fd);
+		serverPrint("fd is readable, a new message has been received");
 }
 
 /*******************************************
@@ -206,7 +210,7 @@ void	Server::waitForConn(){
 			break ;
 		else
 			reactToEvent(findReadableFd());
-		std::cout << "caught and event" << std::endl;
+		std::cout << "waitForConn caught an event" << std::endl;
 	}
 	while (_status == SERVER_ON);
 }

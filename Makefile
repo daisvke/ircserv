@@ -14,7 +14,9 @@ DEBUG			=	-g3
 
 SRCS_DIR		=	srcs/
 SRCS_FILES		=	main.cpp \
-					server.cpp
+					server.cpp \
+					User.cpp \
+					Channel.cpp
 SRCS			=	$(addprefix $(SRCS_DIR), $(SRCS_FILES))
 
 
@@ -30,8 +32,11 @@ OBJS			=	$(addprefix $(OBJS_DIR), $(OBJS_FILES))
 INC				=	-I incs/
 INC_DIR			=	incs/
 INC_FILES		=	headers.hpp \
-					server.hpp
+					server.hpp \
+					User.hpp \
+					Channel.hpp
 INCS			=	$(addprefix $(INC_DIR), $(INC_FILES))
+
 
 #  B U I L D  R U L E S #
 

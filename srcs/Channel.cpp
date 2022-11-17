@@ -6,7 +6,7 @@
 /*   By: dtanigaw <dtanigaw@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 05:34:57 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/11/17 06:35:29 by dtanigaw         ###   ########.fr       */
+/*   Updated: 2022/11/17 06:53:58 by dtanigaw         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,10 @@ userDirectory	Channel::getUserDirectory(void) const { return _users; }
 void	Channel::join(User *user)
 {
 	if (user->isOperator() || _users.empty()) {
-		_users[user] += "+o";
+		_users[user] |= OP;
 	}
+	else
+		_users[user] = 0;
 	std::cout << user->getNickName() << " has joined channel"
 		<< getName() << "!" << std::endl;
 }

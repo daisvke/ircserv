@@ -6,9 +6,12 @@
 
 # include "User.hpp"
 
+// modes
+# define OP	1
+
 // a map including a pointer to the users and indicating
 // whether the user is an operator
-typedef typename std::map<User *, std::string>	userDirectory;
+typedef typename std::map<User *, int>	userDirectory;
 
 class Channel
 {
@@ -27,6 +30,7 @@ class Channel
 	private:
 
 		std::string		_name;
+		int				_modes;
 		userDirectory	_users;
 };
 

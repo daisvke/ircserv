@@ -6,11 +6,15 @@
 
 # include "User.hpp"
 
-// modes
+/*************************************************************
+* modes
+*************************************************************/
 # define OP	1
 
-// a map including a pointer to the users and indicating
-// whether the user is an operator or a regular user on this channel
+/*************************************************************
+* A map including a pointer to the users and indicating
+* whether the user is an operator or a regular user on this channel
+*************************************************************/
 typedef typename std::map<User *, int>	userDirectory;
 
 class Channel

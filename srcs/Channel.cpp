@@ -6,13 +6,13 @@
 /*   By: dtanigaw <dtanigaw@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 05:34:57 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/11/17 06:53:58 by dtanigaw         ###   ########.fr       */
+/*   Updated: 2022/11/17 08:33:55 by dtanigaw         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Channel.hpp"
 
-Channel::Channel(std::string name): _name(name) {}
+Channel::Channel(std::string name, std::string key): _name(name), _userLimit() {}
 Channel::~Channel() {}
 
 // getters
@@ -20,7 +20,9 @@ Channel::~Channel() {}
 std::string		Channel::getName(void) const { return _name; };
 userDirectory	Channel::getUserDirectory(void) const { return _users; }
 
+void	Channel::setTopic(std::string name) { _topic = name; }
 
+// add user to the user directory of the channel with its mode
 void	Channel::join(User *user)
 {
 	if (user->isOperator() || _users.empty()) {
@@ -32,6 +34,7 @@ void	Channel::join(User *user)
 		<< getName() << "!" << std::endl;
 }
 
+// delete user from the user directory of the channel
 void	Channel::part(User *user)
 {
 	_users.erase(user);

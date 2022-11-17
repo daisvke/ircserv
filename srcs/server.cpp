@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/17 14:36:46 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/17 16:27:10 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,24 +145,40 @@ void	Server::initServer()
 		if ((this->*funkTab[i])() == ERROR)
 			throw std::invalid_argument(names[i] + " error");
 	_status = SERVER_ON;
-	std::cout << SERVER_START_MESS << std::endl;
+	serverPrint(SERVER_START_MESS);
 }
 
 
-/*
-	*/
+int	Server::checkPollRet( int ret ){
+
+	switch (ret){
+		case -1:
+			serverPrint(POLL_ERR_MESS);
+			return (POLL_FAILURE);
+		case 0:
+			serverPrint(TIMEOUT_MESS);
+			return (POLL_FAILURE);
+		default:
+			_status = SERVER_ON;
+			return (POLL_OK);
+	}
+}
+
+/*******************************************
+* poll is blocking until
+	-> it catchs an event(new fds or listening socket is readable)
+	-> it fails
+	-> it times out
+* poll has to be in the loop (recalled each time). it actes like a reset
+********************************************/
 void	Server::waitForConn(){
-	int	ret = poll(_fds, _nfds, TIMEOUT);
 
 	do {
-		if (ret < 0)
+		if (checkPollRet(poll(_fds, _nfds, TIMEOUT)) == POLL_FAILURE)
 			break ;
-		else if (ret == 0)
-		{
-			std::cout << TIMEOUT_MESS << std::endl;
-			_status = SERVER_OFF;
-		}
-		//checkListensd();
+		else
+			reactToEvent(findReadableFds())
+		std::cout << "caught and event" << std::endl;
 	}
 	while (_status == SERVER_ON);
 }
@@ -177,6 +193,13 @@ void	Server::startServer(){
 	}
 }
 
+/******************************************
+	Server Utils
+*******************************************/
+void	Server::serverPrint(const char * str){
+
+	std::cout << "[+] " << str << std::endl;
+}
 
 //  do
 //   {

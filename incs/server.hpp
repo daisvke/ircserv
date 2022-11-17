@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/17 14:39:38 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/17 16:27:19 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,8 @@
 # define TIMEOUT 5000
 # define TIMEOUT_MESS "time out - server automatic shutdown has been requested"
 # define ACCEPTED "the server has accepted your connection"
-# define SERVER_START_MESS "[+] Server lauched"
+# define SERVER_START_MESS "Server lauched"
+# define POLL_ERR_MESS "Poll() failed"
 
 enum e_socket{
 	E_SOCK_SUCCESS,
@@ -33,6 +34,11 @@ enum e_socket{
 enum e_server_status{
 	SERVER_OFF,
 	SERVER_ON
+};
+
+enum e_return {
+	POLL_OK,
+	POLL_FAILURE,
 };
 
 class Server{
@@ -63,8 +69,9 @@ class Server{
 		int					bindSocket();
 		int					setListenSocket();
 		void				waitForConn(); //Attendre un événement concernant un descripteur de fichier
-
-
+		int					checkPollRet( int ret );
+		void				serverPrint(const char * str);
+		
 
 };
 

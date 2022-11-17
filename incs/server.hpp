@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/17 16:27:19 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/17 17:22:31 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,9 @@
 
 # include "headers.hpp"
 
+# define SERVER_PORT 8084
+# define BUFFER_SIZE 1024
+# define MAX_CLIENT 100
 # define TIMEOUT 5000
 # define TIMEOUT_MESS "time out - server automatic shutdown has been requested"
 # define ACCEPTED "the server has accepted your connection"
@@ -37,8 +40,8 @@ enum e_server_status{
 };
 
 enum e_return {
+	POLL_FAILURE = -1,
 	POLL_OK,
-	POLL_FAILURE,
 };
 
 class Server{
@@ -71,7 +74,8 @@ class Server{
 		void				waitForConn(); //Attendre un événement concernant un descripteur de fichier
 		int					checkPollRet( int ret );
 		void				serverPrint(const char * str);
-		
+		void				reactToEvent(int fd);
+		int					findReadableFd();
 
 };
 

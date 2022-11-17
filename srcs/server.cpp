@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/17 16:27:10 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/17 17:24:19 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,6 +145,7 @@ void	Server::initServer()
 		if ((this->*funkTab[i])() == ERROR)
 			throw std::invalid_argument(names[i] + " error");
 	_status = SERVER_ON;
+	_nfds++;
 	serverPrint(SERVER_START_MESS);
 }
 
@@ -164,6 +165,33 @@ int	Server::checkPollRet( int ret ){
 	}
 }
 
+int	Server::findReadableFd(){
+
+	int	i;
+
+	std::cout << "inside find readable fd" << std::endl;
+	for (i = 0; i < _nfds;  i++){
+		if (_fds[i].revents == 0)
+			continue;						//do next loop,
+		if (_fds[i].revents != POLLIN)		//If revents is not POLLIN it's an unexpected result;
+		{
+			_status = SERVER_OFF;
+			return (POLL_FAILURE);
+		}
+		else
+			return (i);
+	}
+	return (POLL_FAILURE);
+}
+
+void	Server::reactToEvent(int fd){
+	serverPrint("server is here" + fd);
+	if (fd == POLL_FAILURE)
+		return ;
+	else
+		serverPrint("server is here" + fd);
+}
+
 /*******************************************
 * poll is blocking until
 	-> it catchs an event(new fds or listening socket is readable)
@@ -177,7 +205,7 @@ void	Server::waitForConn(){
 		if (checkPollRet(poll(_fds, _nfds, TIMEOUT)) == POLL_FAILURE)
 			break ;
 		else
-			reactToEvent(findReadableFds())
+			reactToEvent(findReadableFd());
 		std::cout << "caught and event" << std::endl;
 	}
 	while (_status == SERVER_ON);

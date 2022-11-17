@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/07 14:50:56 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/17 14:38:58 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/17 17:22:29 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,15 +38,12 @@
 
 
 # define LOCAL_HOST "127.0.0.1"
-# define SERVER_PORT 8084
-# define BUFFER_SIZE 1024
-
 # define ERROR -1
 
 // # define TRUE 0
 // # define ERROR -1
 
-# define MAX_CLIENT 100
+
 
 
 

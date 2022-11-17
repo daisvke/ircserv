@@ -6,18 +6,21 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/07 14:50:56 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/15 18:23:22 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/17 14:38:58 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef HEADER_HPP
 # define HEADER_HPP
 
+
+# include "Utils.hpp"
 # include <iostream>
 # include <string>
 # include <cstring>
 # include <sys/types.h>
 # include <sys/socket.h>
+# include <sys/ioctl.h>
 # include <netinet/in.h>
 # include <stdio.h>
 # include <stdlib.h>
@@ -33,20 +36,18 @@
 # include <signal.h>
 # include <poll.h>
 
+
 # define LOCAL_HOST "127.0.0.1"
 # define SERVER_PORT 8084
 # define BUFFER_SIZE 1024
 
 # define ERROR -1
-# define POLL_DELAY 5000
 
 // # define TRUE 0
-// # define ERROR -1 
-
+// # define ERROR -1
 
 # define MAX_CLIENT 100
 
-# define ACCEPTED "the server has accepted your connection"
-# define SERVER_START_MESS "Server is ready to receive connection"
+
 
 #endif

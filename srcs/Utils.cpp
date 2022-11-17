@@ -1,23 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
+/*   Utils.cpp                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/11/14 15:55:19 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/17 13:16:44 by lchan            ###   ########.fr       */
+/*   Created: 2022/11/17 12:51:53 by lchan             #+#    #+#             */
+/*   Updated: 2022/11/17 12:58:48 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "headers.hpp"
-#include "server.hpp"
+#include "Utils.hpp"
 
-// #include "headers.hpp"
-// #include "server.hpp"
-int main(){
-	Server	Server;
+void	*IrcMemset(void *s, int c, size_t n)
+{
+	char	*str;
+	size_t	i;
 
-	Server.startServer();
+	str = (char *)s;
+	i = 0;
+	while (i < n)
+	{
+		*(str + i) = c;
+		++i;
+	}
+	return (s);
 }
-

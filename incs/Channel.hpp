@@ -3,19 +3,19 @@
 
 # include <map>
 # include <iostream>
+# include <algorithm>
+# include <cstring>
 
 # include "User.hpp"
 
-/*************************************************************
-* modes
-*************************************************************/
-# define OP	1
+# define SUCCESS	0
+# define ERROR		1
 
 /*************************************************************
 * A map including a pointer to the users and indicating
 * whether the user is an operator or a regular user on this channel
 *************************************************************/
-typedef typename std::map<User *, int>	userDirectory;
+typedef typename std::map<User *, std::string>	userDirectory;
 
 class Channel
 {
@@ -30,6 +30,10 @@ class Channel
 
 		// setters
 		void	setTopic(std::string name);
+		int		handleModes(char mode, std::string params);
+		void	setTargetMode(char c, std::string target);
+		void	setUserLimit(std::string limit);
+		void	setChannelMode(char c, std::string params);
 
 		// commands
 		void	join(User *user);
@@ -39,7 +43,8 @@ class Channel
 
 		std::string		_name;
 		std::string		_topic;
-		int				_modes;
+		std::string		_mode;
+		std::string		_key;
 		userDirectory	_users;
 		int				_userLimit;
 };

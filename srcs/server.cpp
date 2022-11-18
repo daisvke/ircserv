@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/18 15:41:16 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/18 15:44:53 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -169,13 +169,7 @@ int	Server::checkPollRet( int ret ){
 
 int	Server::findReadableFd(){
 
-	int	i;
-
-	std::cout << "inside find readable fd" << std::endl;
-
-	for (i = 0; i < _nfds; i++)
-		std::cout << "found : " << _fds[i].fd << " _listenSd = " << _listenSd << std::endl;
-	for (i = 0; i < _nfds;  i++){
+	for (int i = 0; i < _nfds;  i++){
 		if (_fds[i].revents == 0)
 			continue;						//do next loop,
 		if (_fds[i].revents != POLLIN)		//If revents is not POLLIN it's an unexpected result;
@@ -185,7 +179,7 @@ int	Server::findReadableFd(){
 		}
 		else
 		{
-			std::cout << "returning : " << i << std::endl;
+			printf("[DEBUG_MESS] findReadableFd : returning : = %d \n", i);
 			return (i);
 		}
 	}
@@ -196,7 +190,6 @@ int	Server::findReadableFd(){
 	Accept all incoming connections that are queued up on the listening socket
 	before we loop back and call poll again.
 	*****************************************************************************/
-
 int	Server::acceptNewSd(){
 	do{
 		_newSd = accept(_listenSd, NULL, NULL);	//ckeck on man to see if other argument are necessary or not
@@ -234,10 +227,11 @@ void	Server::readFds(){
 	int	closedFlag = OFF_STATUS;
 
 	do{
+		return ;
 		//recv function
 		//need to link on channel ??
 	}
-	while()
+	while(1);
 
 }
 

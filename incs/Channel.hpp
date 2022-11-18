@@ -24,10 +24,6 @@ class Channel
 		Channel(std::string name, std::string key);
 		~Channel();
 
-		// getters
-		std::string		getName(void) const;
-		userDirectory	getUserDirectory(void) const;
-
 		// setters
 		void	setTopic(std::string name);
 		int		handleModes(char mode, std::string params);
@@ -35,15 +31,26 @@ class Channel
 		void	setUserLimit(std::string limit);
 		void	setChannelMode(char c, std::string params);
 
+		// getters
+		std::string		getName(void) const;
+		userDirectory	getUserDirectory(void) const;
+		bool			isKeyProtected() const;
+		bool			isTopicProtected() const;
+		bool			isModerated() const;
+		bool			isMembersOnly() const;
+		bool			isSecret() const;
+		bool			isPrivate() const;
+
 		// commands
 		void	join(User *user);
 		void	part(User *user);
+		bool	checkMode(char c) const;
 
 	private:
 
 		std::string		_name;
 		std::string		_topic;
-		std::string		_mode;
+		std::string		_modes;
 		std::string		_key;
 		userDirectory	_users;
 		int				_userLimit;

@@ -6,7 +6,7 @@
 /*   By: dtanigaw <dtanigaw@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 05:34:57 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/11/18 05:16:33 by dtanigaw         ###   ########.fr       */
+/*   Updated: 2022/11/18 05:56:20 by dtanigaw         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ void	Channel::setTargetMode(char c, std::string target)
 void	Channel::setChannelMode(char c, std::string params)
 {
 	std::string	modes = "timnsp";
-	if (modes.find(c)) { _mode += c; return ; };
+	if (modes.find(c) != std::string::npos) { _modes += c; return ; };
 
 	switch(c)
 	{
@@ -55,8 +55,14 @@ void	Channel::setChannelMode(char c, std::string params)
 * Getters
 *************************************************************/
 
-std::string		Channel::getName(void) const { return _name; };
+std::string		Channel::getName(void) const { return _name; }
 userDirectory	Channel::getUserDirectory(void) const { return _users; }
+bool			Channel::isKeyProtected() const { return checkMode('k'); }
+bool			Channel::isTopicProtected() const { return checkMode('t'); }
+bool			Channel::isModerated() const { return checkMode('m'); }
+bool			Channel::isMembersOnly() const { return checkMode('n'); }
+bool			Channel::isSecret() const { return checkMode('s'); }
+bool			Channel::isPrivate() const { return checkMode('p'); }
 
 
 /*************************************************************
@@ -92,12 +98,22 @@ void	Channel::part(User *user)
 /*************************************************************
 * Interpret given commands			'b' on server.cpp ?
 *************************************************************/
-int	Channel::handleModes(char mode, std::string params)
+int	Channel::handleModes(char c, std::string params)
 {
-	if (mode == 'o' || mode == 'v'/* || mode == 'b'*/)
-		setTargetMode(mode, params);
-	else if (mode == 'l' || mode == 'k') setChannelMode(mode, params);
+	std::string	channelModes = "lktmnsp";
+
+	if (c == 'o' || c == 'v'/* || c == 'b'*/)
+		setTargetMode(c, params);
+	else if (channelModes.find(c) != std::string::npos)
+		setChannelMode(c, params);
 	else
 		return ERROR;
 	return SUCCESS;
+}
+
+bool	Channel::checkMode(char c) const
+{
+	if (_modes.find(c) != std::string::npos)
+		return true;
+	return false;
 }

@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/17 20:43:43 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/18 15:41:16 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@
 * 				Coplien Form
 *********************************************/
 
-Server::Server() : _addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(SERVER_OFF), _opt(1), _nfds(0), _pollRet(0){
+Server::Server() : _addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS), _opt(1), _nfds(0), _newSd(0)/*, _pollRet(0)*/{
 
 	IrcMemset((void *)_buffer, 0, sizeof(_buffer));
 	IrcMemset((void *)_fds, 0, sizeof(_fds));
@@ -54,9 +54,9 @@ Server	&Server::operator=(Server &rhs){
  * 				initServer
  *********************************************/
 
-/*************************************************************
- * Create stream socket to receive incoming connections
- *************************************************************/
+	/*************************************************************
+	* Create stream socket to receive incoming connections
+	*************************************************************/
 int		Server::setSocket()
 {
 	_listenSd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -67,9 +67,9 @@ int		Server::setSocket()
 	return (E_SOCK_SUCCESS);
 }
 
-/*************************************************************
- * Allow socket descriptor to be reuseable
- *************************************************************/
+	/*************************************************************
+	* Allow socket descriptor to be reuseable
+	*************************************************************/
 int		Server::setSocketopt()
 {
 	if (setsockopt(_listenSd, SOL_SOCKET, SO_REUSEADDR
@@ -79,11 +79,11 @@ int		Server::setSocketopt()
 	return (E_SOCK_SUCCESS);
 }
 
-/*************************************************************
- * Set socket to be nonblocking. (FIONDBIO )
- * 	--> (similar to O_NONBLOCK flag with the fcntl subroutine)
- * All incoming connections will inherit that state from listening socket
- *************************************************************/
+	/*************************************************************
+	* Set socket to be nonblocking. (FIONDBIO )
+	* 	--> (similar to O_NONBLOCK flag with the fcntl subroutine)
+	* All incoming connections will inherit that state from listening socket
+	*************************************************************/
 int		Server::setNonBlocking()
 {
 	int on = 1;
@@ -94,9 +94,9 @@ int		Server::setNonBlocking()
 	return (E_SOCK_SUCCESS);
 }
 
-/*************************************************************
- * Bind the socket
- *************************************************************/
+	/*************************************************************
+	* Bind the socket
+	*************************************************************/
 int		Server::bindSocket()
 {
 	_sockAddr.sin_family = AF_INET;
@@ -108,9 +108,9 @@ int		Server::bindSocket()
 	return (E_SOCK_SUCCESS);
 }
 
-/*************************************************************
- * Set the listen back log and initial listening socket
- *************************************************************/
+	/*************************************************************
+	* Set the listen back log and initial listening socket
+	*************************************************************/
 int		Server::setListenSocket()
 {
 	if (listen(_listenSd, MAX_CLIENT) == ERROR )
@@ -121,9 +121,9 @@ int		Server::setListenSocket()
 		return (E_SOCK_SUCCESS);
 }
 
-/*************************************************************
- * Server initialisation function
- *************************************************************/
+	/*************************************************************
+	* Server initialisation function
+	*************************************************************/
 void	Server::initServer()
 {
 	std::string names[5] = {
@@ -144,12 +144,14 @@ void	Server::initServer()
 	for (int i = 0; i < 5; i++)
 		if ((this->*funkTab[i])() == ERROR)
 			throw std::invalid_argument(names[i] + " error");
-	_status = SERVER_ON;
+	_status = ON_STATUS;
 	_nfds++;
 	serverPrint(SERVER_START_MESS);
 }
 
-
+/*************************************************************
+* Poll / wait for newconn
+*************************************************************/
 int	Server::checkPollRet( int ret ){
 
 	switch (ret){
@@ -160,7 +162,7 @@ int	Server::checkPollRet( int ret ){
 			serverPrint(TIMEOUT_MESS);
 			return (POLL_FAILURE);
 		default:
-			_status = SERVER_ON;
+			_status = ON_STATUS;
 			return (POLL_OK);
 	}
 }
@@ -172,172 +174,77 @@ int	Server::findReadableFd(){
 	std::cout << "inside find readable fd" << std::endl;
 
 	for (i = 0; i < _nfds; i++)
-		std::cout << _fds[i].fd << std::endl;
+		std::cout << "found : " << _fds[i].fd << " _listenSd = " << _listenSd << std::endl;
 	for (i = 0; i < _nfds;  i++){
 		if (_fds[i].revents == 0)
 			continue;						//do next loop,
 		if (_fds[i].revents != POLLIN)		//If revents is not POLLIN it's an unexpected result;
 		{
-			_status = SERVER_OFF;
+			_status = OFF_STATUS;
 			return (POLL_FAILURE);
 		}
 		else
+		{
+			std::cout << "returning : " << i << std::endl;
 			return (i);
+		}
 	}
 	return (POLL_FAILURE);
 }
 
+	/****************************************************************************
+	Accept all incoming connections that are queued up on the listening socket
+	before we loop back and call poll again.
+	*****************************************************************************/
+
+int	Server::acceptNewSd(){
+	do{
+		_newSd = accept(_listenSd, NULL, NULL);	//ckeck on man to see if other argument are necessary or not
+		if (_newSd < 0){
+			if (errno != EWOULDBLOCK)
+				return (turnOffServer("accept() failed"));
+			break ;
+		}
+		printf("[DEBUG_MESS] acceptNewSd : a new connection has been made ! fd = %d \n", _newSd);
+		_fds[_nfds].fd = _newSd;				//	check if it is necessary to find a way to use the new reusable fd. Maybe accept can do it automatically ?
+		_fds[_nfds].events = POLLIN;
+		_nfds++;
+	}
+	while (_newSd != -1);
+	return (POLL_OK);
+}
+
+/****************************************************************************
+ * if poll does not fail, it's either :
+	-> _listenSd (listen socket descriptor) is readable (a new connection is incomming)
+	-> _fds[i] (a pollfd) is readable
+ ****************************************************************************/
 void	Server::reactToEvent(int fd){
+
 	if (fd == POLL_FAILURE)
 		return ;
-	else if (_listenSd)
-		serverPrint("_listenSd is readable !!! new connection incoming");
+	else if (_fds[fd].fd == _listenSd)
+		acceptNewSd();
 	else
-		serverPrint("fd is readable, a new message has been received");
+		readFds();
 }
 
-/*******************************************
-* poll is blocking until
-	-> it catchs an event(new fds or listening socket is readable)
-	-> it fails
-	-> it times out
-* poll has to be in the loop (recalled each time). it actes like a reset
-********************************************/
-void	Server::waitForConn(){
+void	Server::readFds(){
+	serverPrint("reactToEvent : fd is readable, a new message has been received");
+	int	closedFlag = OFF_STATUS;
 
-	do {
-		if (checkPollRet(poll(_fds, _nfds, TIMEOUT)) == POLL_FAILURE)
-			break ;
-		else
-			reactToEvent(findReadableFd());
-		std::cout << "waitForConn caught an event" << std::endl;
+	do{
+		//recv function
+		//need to link on channel ??
 	}
-	while (_status == SERVER_ON);
+	while()
+
 }
-
-void	Server::startServer(){
-	try {
-			initServer();
-			waitForConn();
-	}
-	catch (std::exception &e){
-		std::cout << e.what() << std::endl;
-	}
-}
-
-/******************************************
-	Server Utils
-*******************************************/
-void	Server::serverPrint(const char * str){
-
-	std::cout << "[+] " << str << std::endl;
-}
-
-//  do
-//   {
-//     printf("Waiting on poll()...\n");
-
-//     rc = poll(fds, nfds, timeout);
-//     if (rc < 0)
-//     {
-//       perror("  poll() failed");
-//       break;
-//     }
-//     if (rc == 0)
-//     {
-//       printf("  poll() timed out.  End program.\n");
-//       break;
-//     }
-
-//     /***********************************************************/ //FIND READANLE FDS
-//     /* One or more descriptors are readable.  Need to          */
-//     /* determine which ones they are.                          */
-//     /***********************************************************/
-//     current_size = nfds;
-//     for (i = 0; i < current_size; i++)
-//     {
-//       /*********************************************************/
-//       /* Loop through to find the descriptors that returned    */
-//       /* POLLIN and determine whether it's the listening       */
-//       /* or the active connection.                             */
-//       /*********************************************************/
-//       if(fds[i].revents == 0)
-//         continue;
-
-
-
-
-//       /*********************************************************/
-//       /* If revents is not POLLIN, it's an unexpected result,  */
-//       /* log and end the server.                               */
-//       /*********************************************************/
-//       if(fds[i].revents != POLLIN)
-//       {
-//         printf("  Error! revents = %d\n", fds[i].revents);
-//         end_server = TRUE;
-//         break;
-
-//       }
-
-
-
-
-//       if (fds[i].fd == listen_sd)
-//       {
-//         /*******************************************************/
-//         /* Listening descriptor is readable.                   */
-//         /*******************************************************/
-//         printf("  Listening socket is readable\n");
-
-//         /*******************************************************/
-//         /* Accept all incoming connections that are            */
-//         /* queued up on the listening socket before we         */
-//         /* loop back and call poll again.                      */
-//         /*******************************************************/
-//         do
-//         {
-//           /*****************************************************/
-//           /* Accept each incoming connection. If               */
-//           /* accept fails with EWOULDBLOCK, then we            */
-//           /* have accepted all of them. Any other              */
-//           /* failure on accept will cause us to end the        */
-//           /* server.                                           */
-//           /*****************************************************/
-//           new_sd = accept(listen_sd, NULL, NULL);
-//           if (new_sd < 0)
-//           {
-//             if (errno != EWOULDBLOCK)
-//             {
-//               perror("  accept() failed");
-//               end_server = TRUE;
-//             }
-//             break;
-//           }
-
-//           /*****************************************************/
-//           /* Add the new incoming connection to the            */
-//           /* pollfd structure                                  */
-//           /*****************************************************/
-//           printf("  New incoming connection - %d\n", new_sd);
-//           fds[nfds].fd = new_sd;
-//           fds[nfds].events = POLLIN;
-//           nfds++;
-
-//           /*****************************************************/
-//           /* Loop back up and accept another incoming          */
-//           /* connection                                        */
-//           /*****************************************************/
-//         } while (new_sd != -1);
-//       }
 
 //       /*********************************************************/
 //       /* This is not the listening socket, therefore an        */
 //       /* existing connection must be readable                  */
 //       /*********************************************************/
-
-
-
-
 //       else
 //       {
 //         printf("  Descriptor %d is readable\n", fds[i].fd);
@@ -475,3 +382,51 @@ void	Server::serverPrint(const char * str){
 */
 
 //c++ srcs/main.cpp srcs/server.cpp incs/headers.hpp incs/server.hpp
+
+
+/*******************************************
+* poll is blocking until
+	-> it catchs an event(new fds or listening socket is readable)
+	-> it fails
+	-> it times out
+* poll has to be in the loop (recalled each time). it actes like a reset
+********************************************/
+void	Server::waitForConn(){
+
+	do {
+		if (checkPollRet(poll(_fds, _nfds, TIMEOUT)) == POLL_FAILURE)
+			break ;
+		else
+			reactToEvent(findReadableFd());
+	}
+	while (_status == ON_STATUS);
+}
+
+void	Server::startServer(){
+	try {
+			initServer();
+			waitForConn();
+	}
+	catch (std::exception &e){
+		std::cout << e.what() << std::endl;
+	}
+}
+
+/******************************************
+	Server Utils
+*******************************************/
+/*
+void	Server::serverPrint(std::string str){
+
+	std::cout << "[+] " << str << std::endl;
+}*/
+
+int		Server::turnOffServer(std::string str){
+	serverPrint(str);
+	_status = OFF_STATUS;
+	return (POLL_FAILURE);
+}
+
+
+
+

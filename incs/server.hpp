@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/17 17:22:31 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/18 15:34:52 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,8 @@ enum e_socket{
 };
 
 enum e_server_status{
-	SERVER_OFF,
-	SERVER_ON
+	OFF_STATUS,
+	ON_STATUS
 };
 
 enum e_return {
@@ -62,8 +62,9 @@ class Server{
 		char				_buffer[BUFFER_SIZE];
 		int					_opt;
 		int					_nfds;
+		int					_newSd;
 		struct pollfd		_fds[MAX_CLIENT];
-		int					_pollRet;
+		//int					_pollRet;
 
 		void				initServer();
 		int					setSocket();
@@ -73,10 +74,16 @@ class Server{
 		int					setListenSocket();
 		void				waitForConn(); //Attendre un événement concernant un descripteur de fichier
 		int					checkPollRet( int ret );
-		void				serverPrint(const char * str);
+		//void				serverPrint(const char * str);
 		void				reactToEvent(int fd);
 		int					findReadableFd();
+		int					acceptNewSd();
+		void				readFds();
 
+		int					turnOffServer(std::string str);
+
+		template <typename T>
+		void				serverPrint(T & str){	std::cout << "[+] " << str << std::endl;}
 };
 
 #endif

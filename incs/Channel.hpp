@@ -33,6 +33,7 @@ class Channel
 
 		// getters
 		std::string		getName(void) const;
+		std::string		getTopic(void) const;
 		userDirectory	getUserDirectory(void) const;
 		bool			isKeyProtected() const;
 		bool			isTopicProtected() const;

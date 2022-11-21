@@ -6,13 +6,13 @@
 /*   By: dtanigaw <dtanigaw@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 05:34:57 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/11/18 05:56:20 by dtanigaw         ###   ########.fr       */
+/*   Updated: 2022/11/21 07:40:43 by dtanigaw         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Channel.hpp"
 
-Channel::Channel(std::string name, std::string key): _name(name), _userLimit() {}
+Channel::Channel(std::string name, std::string key): _name(name), _modes(), _userLimit() {}
 Channel::~Channel() {}
 
 
@@ -56,6 +56,7 @@ void	Channel::setChannelMode(char c, std::string params)
 *************************************************************/
 
 std::string		Channel::getName(void) const { return _name; }
+std::string		Channel::getTopic(void) const { return _topic; }
 userDirectory	Channel::getUserDirectory(void) const { return _users; }
 bool			Channel::isKeyProtected() const { return checkMode('k'); }
 bool			Channel::isTopicProtected() const { return checkMode('t'); }

@@ -6,7 +6,7 @@
 /*   By: dtanigaw <dtanigaw@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/11/21 07:42:36 by dtanigaw         ###   ########.fr       */
+/*   Updated: 2022/11/21 07:44:59 by dtanigaw         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ void	Commands::list(void) const
 	std::vector<Channel *>	channelVect;
 	std::vector<Channel *>::iterator	it = channelVect.begin();
 
-	// need to go throught array of channels here
+	// need to go throught the real array of channels here
 	for (;it != channelVect.end(); ++it)
 	{
 		std::cout << (*it)->getName() << std::endl;

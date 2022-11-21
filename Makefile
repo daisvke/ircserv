@@ -17,7 +17,8 @@ SRCS_FILES		=	main.cpp \
 					server.cpp \
 					User.cpp \
 					Channel.cpp \
-					Utils.cpp
+					Utils.cpp \
+					Commands.cpp
 SRCS			=	$(addprefix $(SRCS_DIR), $(SRCS_FILES))
 
 
@@ -36,7 +37,8 @@ INC_FILES		=	headers.hpp \
 					server.hpp \
 					User.hpp \
 					Channel.hpp \
-					Utils.hpp
+					Utils.hpp \
+					Commands.hpp
 INCS			=	$(addprefix $(INC_DIR), $(INC_FILES))
 
 

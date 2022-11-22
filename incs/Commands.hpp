@@ -19,21 +19,32 @@
 # include "User.hpp"
 # include "Channel.hpp"
 
+typedef struct s_message
+{
+	std::string					cmd;
+	std::vector<std::string>	params;
+}	t_message;
+
+
 class Commands
 {
 	public:
 
-	Commands(Server *server, User *user);
+	Commands(Server *server, User *user, t_message msg);
 	~Commands();
 
 	void	nick(void);
+	void	user(void);
+	void	oper(void);
+	void	quit(void);
 	void	topic(void);
 	void	names(void) const;
 	void	list(void) const;
 
 	private:
-		Server	*_server;
-		User	*_user;
+		Server		*_server;
+		User		*_user;
+		t_message	_message;
 };
 
 #endif

@@ -16,7 +16,8 @@
 * 				Coplien Form
 *********************************************/
 
-Server::Server() : _addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS), _opt(1), _nfds(0), _newSd(0)/*, _pollRet(0)*/{
+Server::Server() : _addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS),
+	_opt(1), _nfds(0), _newSd(0), _password()/*, _pollRet(0)*/{
 
 	IrcMemset((void *)_buffer, 0, sizeof(_buffer));
 	IrcMemset((void *)_fds, 0, sizeof(_fds));
@@ -421,6 +422,20 @@ int		Server::turnOffServer(std::string str){
 	return (POLL_FAILURE);
 }
 
+Channel	*Server::findChannel(std::string name){
+	for (size_t i(0); i < _channels.size(); ++i) {
+		if (_channels[i]->getName() == name)
+			return _channels[i];
+	}
+	return 0;
+}
 
+User	*Server::findUser(std::string name){
+	for (size_t i(0); i < _users.size(); ++i) {
+		if (_users[i]->getNickName() == name)
+			return _users[i];
+	}
+	return 0;
+}
 
-
+std::string	Server::getPassword(void) const { return _password; }

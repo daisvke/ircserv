@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/18 15:34:52 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/21 23:03:07 by dtanigaw         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,12 @@ class Server{
 
 		void				startServer();
 
+		/* Note to delete: putting these functions here in public
+		to be able to use them with Command class */
+		std::string			getPassword(void) const;
+		Channel				*findChannel(std::string name);
+		User				*findUser(std::string name);
+
 	private :
 		struct sockaddr_in	_sockAddr;
 		int					_addrlen;
@@ -64,6 +70,10 @@ class Server{
 		int					_nfds;
 		int					_newSd;
 		struct pollfd		_fds[MAX_CLIENT];
+
+		std::string				_password;
+		std::vector<User *>		_users;
+		std::vector<Channel *>	_channels;
 		//int					_pollRet;
 
 		void				initServer();
@@ -81,6 +91,7 @@ class Server{
 		void				readFds();
 
 		int					turnOffServer(std::string str);
+
 
 		template <typename T>
 		void				serverPrint(T & str){	std::cout << "[+] " << str << std::endl;}

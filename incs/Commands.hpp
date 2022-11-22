@@ -37,6 +37,7 @@ class Commands
 	void	user(void);
 	void	oper(void);
 	void	quit(void);
+	void	join(void);
 	void	topic(void);
 	void	names(void) const;
 	void	list(void) const;

@@ -35,6 +35,7 @@ class Channel
 		std::string		getName(void) const;
 		std::string		getTopic(void) const;
 		userDirectory	getUserDirectory(void) const;
+		std::string		getKey(void) const;
 		bool			isKeyProtected() const;
 		bool			isTopicProtected() const;
 		bool			isModerated() const;

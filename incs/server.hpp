@@ -56,9 +56,10 @@ class Server{
 
 		/* Note to delete: putting these functions here in public
 		to be able to use them with Command class */
-		std::string			getPassword(void) const;
-		Channel				*findChannel(std::string name);
-		User				*findUser(std::string name);
+		std::string				getPassword(void) const;
+		std::vector<Channel *>	getChannels(void) const;
+		Channel					*findChannel(std::string name);
+		User					*findUser(std::string name);
 
 	private :
 		struct sockaddr_in	_sockAddr;

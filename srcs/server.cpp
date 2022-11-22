@@ -439,3 +439,5 @@ User	*Server::findUser(std::string name){
 }
 
 std::string	Server::getPassword(void) const { return _password; }
+
+std::vector<Channel *>	Server::getChannels(void) const { return _channels; }

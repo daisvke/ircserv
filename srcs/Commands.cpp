@@ -23,6 +23,7 @@ Commands::~Commands() {};
 void	Commands::nick(void)
 {
 	if (_message.params.size() < 1) { /* ERR_NONICKNAMEGIVEN */ }
+
 	std::string	newNick = _message.params[0];
 	if (_server->findUser(newNick) == false)
 		_user->setNickName(newNick);
@@ -37,6 +38,7 @@ void	Commands::nick(void)
 void	Commands::user(void)
 {
 	if (_message.params.size() < 1) { /*ERR_NEEDMOREPARAMS */}
+
 	std::string	newUserName = _message.params[0];
 	if (_server->findUser(newUserName) == false)
 		_user->setUserName(newUserName);
@@ -49,6 +51,7 @@ void	Commands::user(void)
 void	Commands::oper(void)
 {
 	if (_message.params.size() < 2) { /*ERR_NEEDMOREPARAMS */}
+
 	User		*user = _server->findUser(_message.params[0]);
 	if (!user) { return ;/* ERR not found */ }
 	if (_server->getPassword() != _message.params[1]) {
@@ -58,15 +61,45 @@ void	Commands::oper(void)
 }
 
 /*************************************************************
-*  
+* The user quits the network, which makes him leave all the channels as well
 *************************************************************/
 void	Commands::quit(void)
 {
 	_user->disconnect();
 	std::string	lastWords = _message.params[0];
-	if (lastWords.empty() == false)
-		std::cout << lastWords << std::endl; // replace by server printer function
 	// remove from all channels
+	std::vector<Channel *>	channels = _server->getChannels();
+	for (size_t i(0); i < channels.size(); ++i)
+	{
+		userDirectory	users = channels[i]->getUserDirectory();
+		userDirectory::iterator	it = users.begin();
+		for (; it != users.end(); ++it)
+			if ((*it).first->getNickName() == _user->getNickName()) { users.erase(it); }
+	}
+	if (lastWords.empty() == false)
+	std::cout << lastWords << std::endl; // replace by server printer function
+}
+
+/*************************************************************
+* The user begins listening to a channel
+*************************************************************/
+void	Commands::join(void) {
+	if (_message.params.size() < 1) { /*ERR_NEEDMOREPARAMS;*/ }
+	
+	std::string	channelName = _message.params[0];
+	Channel	*channel = _server->findChannel(channelName);
+	if (!channel) { return ; /* ERR_NOSUCHCHANNEL */ }
+	if (channel->isKeyProtected())
+		if (_message.params[1] != channel->getKey())
+			return ; /* ERR_BADCHANNELKEY */
+	channel->join(_user);
+
+	// handle? => user shouldn't be banned  ERR_BANNEDFROMCHAN
+	// handle ? => user should be invited if channel is invite only
+	//		ERR_INVITEONLYCHAN
+
+	// when join succeeds, chan sends to user the topic name + lsit of
+	// 	all users on the chan, with himself on the list as well
 }
 
 /*************************************************************
@@ -77,7 +110,7 @@ void	Commands::topic(void)
 	Channel	*channel;
 	std::string	newTopic; // need to get new topic name from cmd params
 
-	if (newTopic.size() <= 1) { /*ERR_NONICKNAMEGIVEN;*/ }
+	if (_message.params.size() < 1) { /*ERR_NONICKNAMEGIVEN;*/ }
 
 	if (channel->isTopicProtected() == false)
 		channel->setTopic(newTopic);

@@ -58,6 +58,7 @@ void	Channel::setChannelMode(char c, std::string params)
 std::string		Channel::getName(void) const { return _name; }
 std::string		Channel::getTopic(void) const { return _topic; }
 userDirectory	Channel::getUserDirectory(void) const { return _users; }
+std::string		Channel::getKey(void) const { return _key; }
 bool			Channel::isKeyProtected() const { return checkMode('k'); }
 bool			Channel::isTopicProtected() const { return checkMode('t'); }
 bool			Channel::isModerated() const { return checkMode('m'); }

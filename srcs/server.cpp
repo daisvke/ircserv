@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/18 15:44:53 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/22 12:18:53 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,20 +168,20 @@ int	Server::checkPollRet( int ret ){
 	}
 }
 
-int	Server::findReadableFd(){
-
-	for (int i = 0; i < _nfds;  i++){
-		if (_fds[i].revents == 0)
+int	Server::findReadableFd()
+{
+	for (int index = 0; index < _nfds;  index++){
+		if (_fds[index].revents == 0)
 			continue;						//do next loop,
-		if (_fds[i].revents != POLLIN)		//If revents is not POLLIN it's an unexpected result;
+		if (_fds[index].revents != POLLIN)		//If revents is not POLLIN it's an unexpected result;
 		{
 			_status = OFF_STATUS;
 			return (POLL_FAILURE);
 		}
 		else
 		{
-			printf("[DEBUG_MESS] findReadableFd : returning : = %d \n", i);
-			return (i);
+			printf("[DEBUG_MESS] findReadableFd : returning : = %d \n", index);
+			return (index);
 		}
 	}
 	return (POLL_FAILURE);
@@ -191,7 +191,8 @@ int	Server::findReadableFd(){
 	Accept all incoming connections that are queued up on the listening socket
 	before we loop back and call poll again.
 	*****************************************************************************/
-int	Server::acceptNewSd(){
+int	Server::acceptNewSd()
+{
 	do{
 		_newSd = accept(_listenSd, NULL, NULL);	//ckeck on man to see if other argument are necessary or not
 		if (_newSd < 0){
@@ -208,176 +209,82 @@ int	Server::acceptNewSd(){
 	return (POLL_OK);
 }
 
+
+/****************************************************************************
+	receive all incoming data that send by _fds[index]
+	before we loop back and call poll again.
+	recv returns the number of bytes received, -1 if an error occured and 0 for EOF
+	*****************************************************************************/
+void	Server::readExistingFds(int index){
+	serverPrint("readExistingFds : fd is readable, a new message has been received");
+	//int	sendRet;
+	int recvRet;
+
+	// do{
+	// 	//close()
+	// 	return ;
+	// 	//recv function
+	// 	//need to link on channel ??
+	// }
+	//while(1)
+	//{
+		recvRet = recv(_fds[index].fd, _buffer, sizeof(_buffer), 0);
+		(recvRet < BUFFER_SIZE - 1) ? _buffer[recvRet] = '\0' : _buffer[BUFFER_SIZE - 1] = '\0';
+		//_buffer[recvRet] = '\0';
+		if (recvRet < 0){
+			if (errno != EWOULDBLOCK){
+				serverPrint("recv() failed");
+				closeConn(index);
+			}
+			//break ;
+		}
+		else if (recvRet == 0){										// not sure about this one.
+			closeConn(index);
+			//break ;
+		}
+		else
+			serverPrint(_buffer);
+
+		// sendRet = send(_fds[index].fd, _buffer, sizeof(_buffer), 0);	// is it really usefull to send back a message to the client ?
+		// if (sendRet < 0){
+		// 	if (errno != EWOULDBLOCK){
+		// 		serverPrint("send() failed");
+		// 		closeConn(index);
+		// 	}
+		// 	break ;
+		// }
+	//}
+}
+
+void	Server::closeConn(int index){
+	std::cout << "[DEBUG_MESS] : closeConn has been called" << std::endl;
+	close(_fds[index].fd);
+	_fds[index].fd = -1;
+
+	for (int i = 0; i < _nfds; i++){
+		if(_fds[i].fd == -1){
+			for (int j = i; j < _nfds; j++)
+				_fds[j].fd = _fds[j+1].fd;
+			i--;
+			_nfds--;
+		}
+	}
+}
+
 /****************************************************************************
  * if poll does not fail, it's either :
 	-> _listenSd (listen socket descriptor) is readable (a new connection is incomming)
-	-> _fds[i] (a pollfd) is readable
+	-> _fds[i] (an existing connection) is readable
  ****************************************************************************/
-void	Server::reactToEvent(int fd){
+void	Server::reactToEvent(int index){
 
-	if (fd == POLL_FAILURE)
+	if (index == POLL_FAILURE)
 		return ;
-	else if (_fds[fd].fd == _listenSd)
+	else if (_fds[index].fd == _listenSd)
 		acceptNewSd();
 	else
-		readFds();
+		readExistingFds(index);
 }
-
-void	Server::readFds(){
-	serverPrint("reactToEvent : fd is readable, a new message has been received");
-	int	closedFlag = OFF_STATUS;
-
-	do{
-		return ;
-		//recv function
-		//need to link on channel ??
-	}
-	while(1);
-
-}
-
-//       /*********************************************************/
-//       /* This is not the listening socket, therefore an        */
-//       /* existing connection must be readable                  */
-//       /*********************************************************/
-//       else
-//       {
-//         printf("  Descriptor %d is readable\n", fds[i].fd);
-//         close_conn = FALSE;
-//         /*******************************************************/
-//         /* Receive all incoming data on this socket            */
-//         /* before we loop back and call poll again.            */
-//         /*******************************************************/
-
-//         do
-//         {
-//           /*****************************************************/
-//           /* Receive data on this connection until the         */
-//           /* recv fails with EWOULDBLOCK. If any other         */
-//           /* failure occurs, we will close the                 */
-//           /* connection.                                       */
-//           /*****************************************************/
-//           rc = recv(fds[i].fd, buffer, sizeof(buffer), 0);
-//           if (rc < 0)
-//           {
-//             if (errno != EWOULDBLOCK)
-//             {
-//               perror("  recv() failed");
-//               close_conn = TRUE;
-//             }
-//             break;
-//           }
-
-//           /*****************************************************/
-//           /* Check to see if the connection has been           */
-//           /* closed by the client                              */
-//           /*****************************************************/
-//           if (rc == 0)
-//           {
-//             printf("  Connection closed\n");
-//             close_conn = TRUE;
-//             break;
-//           }
-
-//           /*****************************************************/
-//           /* Data was received                                 */
-//           /*****************************************************/
-//           len = rc;
-//           printf("  %d bytes received\n", len);
-
-//           /*****************************************************/
-//           /* Echo the data back to the client                  */
-//           /*****************************************************/
-//           rc = send(fds[i].fd, buffer, len, 0);
-//           if (rc < 0)
-//           {
-//             perror("  send() failed");
-//             close_conn = TRUE;
-//             break;
-//           }
-
-//         } while(TRUE);
-
-//         /*******************************************************/
-//         /* If the close_conn flag was turned on, we need       */
-//         /* to clean up this active connection. This            */
-//         /* clean up process includes removing the              */
-//         /* descriptor.                                         */
-//         /*******************************************************/
-//         if (close_conn)
-//         {
-//           close(fds[i].fd);
-//           fds[i].fd = -1;
-//           compress_array = TRUE;
-//         }
-
-
-//       }  /* End of existing connection is readable             */
-//     } /* End of loop through pollable descriptors              */
-
-
-
-//     /***********************************************************/
-//     /* If the compress_array flag was turned on, we need       */
-//     /* to squeeze together the array and decrement the number  */
-//     /* of file descriptors. We do not need to move back the    */
-//     /* events and revents fields because the events will always*/
-//     /* be POLLIN in this case, and revents is output.          */
-//     /***********************************************************/
-//     if (compress_array)
-//     {
-//       compress_array = FALSE;
-//       for (i = 0; i < nfds; i++)
-//       {
-//         if (fds[i].fd == -1)
-//         {
-//           for(j = i; j < nfds; j++)
-//           {
-//             fds[j].fd = fds[j+1].fd;
-//           }
-//           i--;
-//           nfds--;
-//         }
-//       }
-//     }
-
-
-
-
-
-//   } while (end_server == FALSE); /* End of serving running.    */
-
-
-
-
-
-/**************************************
- * https://www.ibm.com/docs/en/i/7.2?topic=designs-using-poll-instead-select
- * https://www.geeksforgeeks.org/socket-programming-cc/
-
- * structure of a sockadd_in *
-
-	struct sockaddr_in {
-    	short            sin_family;   // e.g. AF_INET
-   	 	unsigned short   sin_port;     // e.g. htons(3490)
-   	 	struct in_addr   sin_addr;     // see struct in_addr, below
-	   	 	char             sin_zero[8];  // zero this if you want 	to
-			};
-
-	struct in_addr {
-    	unsigned long s_addr;  // load with inet_aton()
-	};
-
- * different type of communication *
-
-		SOCK_STREAM: TCP(reliable, connection oriented)
-		SOCK_DGRAM: UDP(unreliable, connectionless)
-
- * protocol : man protocol
-*/
-
-//c++ srcs/main.cpp srcs/server.cpp incs/headers.hpp incs/server.hpp
-
 
 /*******************************************
 * poll is blocking until
@@ -441,3 +348,36 @@ User	*Server::findUser(std::string name){
 std::string	Server::getPassword(void) const { return _password; }
 
 std::vector<Channel *>	Server::getChannels(void) const { return _channels; }
+
+
+
+
+
+
+
+/**************************************
+ * https://www.ibm.com/docs/en/i/7.2?topic=designs-using-poll-instead-select
+ * https://www.geeksforgeeks.org/socket-programming-cc/
+
+ * structure of a sockadd_in *
+
+	struct sockaddr_in {
+    	short            sin_family;   // e.g. AF_INET
+   	 	unsigned short   sin_port;     // e.g. htons(3490)
+   	 	struct in_addr   sin_addr;     // see struct in_addr, below
+	   	 	char             sin_zero[8];  // zero this if you want 	to
+			};
+
+	struct in_addr {
+    	unsigned long s_addr;  // load with inet_aton()
+	};
+
+ * different type of communication *
+
+		SOCK_STREAM: TCP(reliable, connection oriented)
+		SOCK_DGRAM: UDP(unreliable, connectionless)
+
+ * protocol : man protocol
+*/
+
+//c++ srcs/main.cpp srcs/server.cpp incs/headers.hpp incs/server.hpp

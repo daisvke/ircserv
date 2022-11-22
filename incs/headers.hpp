@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/07 14:50:56 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/21 23:04:18 by dtanigaw         ###   ########.fr       */
+/*   Updated: 2022/11/22 10:43:27 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@
 # include <vector>
 
 
-# define LOCAL_HOST "127.0.0.1"
-# define ERROR -1
+
+// # define ERROR -1
 
 // # define TRUE 0
 // # define ERROR -1

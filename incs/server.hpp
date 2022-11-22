@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/21 23:03:07 by dtanigaw         ###   ########.fr       */
+/*   Updated: 2022/11/22 12:03:08 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,11 @@
 
 # include "headers.hpp"
 
+# define LOCAL_HOST "127.0.0.1"
 # define SERVER_PORT 8084
 # define BUFFER_SIZE 1024
 # define MAX_CLIENT 100
-# define TIMEOUT 5000
+# define TIMEOUT 11000
 # define TIMEOUT_MESS "time out - server automatic shutdown has been requested"
 # define ACCEPTED "the server has accepted your connection"
 # define SERVER_START_MESS "Server lauched"
@@ -89,8 +90,10 @@ class Server{
 		void				reactToEvent(int fd);
 		int					findReadableFd();
 		int					acceptNewSd();
-		void				readFds();
+		void				readExistingFds(int fd);
 
+
+		void				closeConn(int index);
 		int					turnOffServer(std::string str);
 
 

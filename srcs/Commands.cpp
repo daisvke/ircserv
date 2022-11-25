@@ -13,11 +13,9 @@
 #include "Commands.hpp"
 
 Commands::Commands(Server *server, User *user, s_message msg)
-	: _server(server), _user(user), _message(msg) {
-	routeCmd();
-};
+	: _server(server), _user(user), _message(msg) { routeCmd(); }
 
-Commands::~Commands() {};
+Commands::~Commands() {}
 
 void	Commands::routeCmd()
 {

@@ -19,6 +19,11 @@
 # include "User.hpp"
 # include "Channel.hpp"
 
+/*************************************************************
+* Contains the message sent by the user.
+* The 'params' variable contains the whole input, including
+* the command and the parameters
+*************************************************************/
 typedef struct s_message
 {
 	std::string					cmd;

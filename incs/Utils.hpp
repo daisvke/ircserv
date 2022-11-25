@@ -16,7 +16,11 @@
 
 # include <stdlib.h>
 # include <stddef.h>
+# include <string>
+# include <vector>
+# include <sstream>
 
 void	*IrcMemset(void *s, int c, size_t n);
+std::vector<std::string>	ircSplit(std::string str, char c);
 
 #endif

@@ -22,9 +22,9 @@ Commands::~Commands() {};
 *************************************************************/
 void	Commands::nick(void)
 {
-	if (_message.params.size() < 1) { /* ERR_NONICKNAMEGIVEN */ }
+	if (_message.params.size() < 2) { /* ERR_NONICKNAMEGIVEN */ }
 
-	std::string	newNick = _message.params[0];
+	std::string	newNick = _message.params[1];
 	if (_server->findUser(newNick) == false)
 		_user->setNickName(newNick);
 	else {
@@ -37,9 +37,9 @@ void	Commands::nick(void)
 *************************************************************/
 void	Commands::user(void)
 {
-	if (_message.params.size() < 1) { /*ERR_NEEDMOREPARAMS */}
+	if (_message.params.size() < 2) { /*ERR_NEEDMOREPARAMS */}
 
-	std::string	newUserName = _message.params[0];
+	std::string	newUserName = _message.params[1];
 	if (_server->findUser(newUserName) == false)
 		_user->setUserName(newUserName);
 	else { /* ERR_ALREADYREGISTRED */ }
@@ -50,9 +50,9 @@ void	Commands::user(void)
 *************************************************************/
 void	Commands::oper(void)
 {
-	if (_message.params.size() < 2) { /*ERR_NEEDMOREPARAMS */}
+	if (_message.params.size() < 3) { /*ERR_NEEDMOREPARAMS */}
 
-	User		*user = _server->findUser(_message.params[0]);
+	User		*user = _server->findUser(_message.params[1]);
 	if (!user) { return ;/* ERR not found */ }
 	if (_server->getPassword() != _message.params[1]) {
 		return; /* ERR_PASSWDMISMATCH */ 
@@ -66,7 +66,7 @@ void	Commands::oper(void)
 void	Commands::quit(void)
 {
 	_user->disconnect();
-	std::string	lastWords = _message.params[0];
+	std::string	lastWords = _message.params[1];
 	// remove from all channels
 	std::vector<Channel *>	channels = _server->getChannels();
 	for (size_t i(0); i < channels.size(); ++i)
@@ -83,16 +83,21 @@ void	Commands::quit(void)
 /*************************************************************
 * The user begins listening to a channel
 *************************************************************/
-void	Commands::join(void) {
-	if (_message.params.size() < 1) { /*ERR_NEEDMOREPARAMS;*/ }
+void	Commands::join(void)
+{
+	if (_message.params.size() < 2) { /*ERR_NEEDMOREPARAMS;*/ }
 	
-	std::string	channelName = _message.params[0];
-	Channel	*channel = _server->findChannel(channelName);
-	if (!channel) { return ; /* ERR_NOSUCHCHANNEL */ }
-	if (channel->isKeyProtected())
-		if (_message.params[1] != channel->getKey())
-			return ; /* ERR_BADCHANNELKEY */
-	channel->join(_user);
+	std::vector<std::string>	channelNames = ircSplit(_message.params[1], ',');
+	std::vector<std::string>	channelKeys = ircSplit(_message.params[2], ',');
+
+	for (size_t i(0); i < channelNames.size(); ++i) {
+		Channel	*channel = _server->findChannel(channelNames[i]);
+		if (!channel) { continue ; /* ERR_NOSUCHCHANNEL */ }
+		if (channel->isKeyProtected())
+			if (channelKeys[i] != channel->getKey())
+				return ; /* ERR_BADCHANNELKEY */
+		channel->join(_user);
+	}
 
 	// handle? => user shouldn't be banned  ERR_BANNEDFROMCHAN
 	// handle ? => user should be invited if channel is invite only

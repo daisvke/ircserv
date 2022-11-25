@@ -60,8 +60,18 @@ std::string		Channel::getName(void) const { return _name; }
 std::string		Channel::getTopic(void) const { return _topic; }
 userDirectory	Channel::getUserDirectory(void) const { return _users; }
 std::string		Channel::getKey(void) const { return _key; }
-size_t			Channel::getUserNbr(void) const { return _users.size(); };
-size_t			Channel::getUserLimit(void) const { return _userLimit; };
+size_t			Channel::getUserNbr(void) const { return _users.size(); }
+size_t			Channel::getUserLimit(void) const { return _userLimit; }
+
+std::string	*Channel::getUserMode(std::string name)
+{
+	userDirectory::iterator	it = _users.begin();
+
+	for (; it != _users.end(); ++it)
+		if ((*it).first->getNickName() == name)
+			return &(*it).second;
+	return 0;
+}
 
 bool			Channel::isKeyProtected() const { return checkMode('k'); }
 bool			Channel::isTopicProtected() const { return checkMode('t'); }
@@ -69,6 +79,10 @@ bool			Channel::isModerated() const { return checkMode('m'); }
 bool			Channel::isMembersOnly() const { return checkMode('n'); }
 bool			Channel::isSecret() const { return checkMode('s'); }
 bool			Channel::isPrivate() const { return checkMode('p'); }
+
+bool			Channel::isOper(std::string name) {
+	return getUserMode(name)->find('o') ? true : false;
+}
 
 
 /*************************************************************
@@ -96,7 +110,11 @@ void	Channel::join(User *user)
 *************************************************************/
 void	Channel::part(User *user)
 {
-	_users.erase(user);
+	userDirectory::iterator	it = _users.begin();
+
+	for (; it != _users.end(); ++it)
+		if (((*it).first->getNickName() == user->getNickName()))
+			_users.erase(user);
 	std::cout << user->getNickName() << " has parted channel '"
 		<< getName() << "'!" << std::endl;
 }
@@ -104,12 +122,11 @@ void	Channel::part(User *user)
 /*************************************************************
 * Prints all members of the channel
 *************************************************************/
-void	Channel::names(void) const
+void	Channel::names(void)
 {
-	userDirectory			users = getUserDirectory();
-	userDirectory::iterator	it = users.begin();
+	userDirectory::iterator	it = _users.begin();
 
-	for (; it != users.end(); ++it)
+	for (; it != _users.end(); ++it)
 		std::cout << (*it).first->getNickName() << std::endl; //replace print fct
 }
 

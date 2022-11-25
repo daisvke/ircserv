@@ -2,5 +2,6 @@
 !.gitignore
 !*/
 bircd
+.vscode
 !*.?pp
 !Makefile

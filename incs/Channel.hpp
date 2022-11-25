@@ -38,6 +38,8 @@ class Channel
 		std::string		getKey(void) const;
 		size_t			getUserNbr(void) const;
 		size_t			getUserLimit(void) const;
+		std::string		*getUserMode(std::string name);
+
 		// mode getters
 		bool			isKeyProtected() const;
 		bool			isTopicProtected() const;
@@ -45,11 +47,12 @@ class Channel
 		bool			isMembersOnly() const;
 		bool			isSecret() const;
 		bool			isPrivate() const;
+		bool			isOper(std::string name);
 
 		// commands
 		void	join(User *user);
 		void	part(User *user);
-		void	names(void) const;
+		void	names(void);
 		bool	checkMode(char c) const;
 
 

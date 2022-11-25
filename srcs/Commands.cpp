@@ -22,7 +22,7 @@ Commands::~Commands() {};
 *************************************************************/
 void	Commands::nick(void)
 {
-	if (_message.params.size() < 2) { /* ERR_NONICKNAMEGIVEN */ }
+	if (_message.params.size() < 2) { return ;/* ERR_NONICKNAMEGIVEN */ }
 
 	std::string	newNick = _message.params[1];
 	if (_server->findUser(newNick) == false)
@@ -37,7 +37,7 @@ void	Commands::nick(void)
 *************************************************************/
 void	Commands::user(void)
 {
-	if (_message.params.size() < 2) { /*ERR_NEEDMOREPARAMS */}
+	if (_message.params.size() < 2) { return ;/*ERR_NEEDMOREPARAMS */}
 
 	std::string	newUserName = _message.params[1];
 	if (_server->findUser(newUserName) == false)
@@ -50,7 +50,7 @@ void	Commands::user(void)
 *************************************************************/
 void	Commands::oper(void)
 {
-	if (_message.params.size() < 3) { /*ERR_NEEDMOREPARAMS */}
+	if (_message.params.size() < 3) { return ; /*ERR_NEEDMOREPARAMS */}
 
 	User		*user = _server->findUser(_message.params[1]);
 	if (!user) { return ;/* ERR not found */ }
@@ -87,7 +87,7 @@ void	Commands::quit(void)
 *************************************************************/
 void	Commands::join(void)
 {
-	if (_message.params.size() < 2) { /*ERR_NEEDMOREPARAMS;*/ }
+	if (_message.params.size() < 2) { return ;/*ERR_NEEDMOREPARAMS;*/ }
 	
 	std::vector<std::string>	channelNames = ircSplit(_message.params[1], ',');
 	std::vector<std::string>	channelKeys = ircSplit(_message.params[2], ',');
@@ -116,7 +116,7 @@ void	Commands::join(void)
 *************************************************************/
 void	Commands::part(void)
 {
-	if (_message.params.size() < 2) { /*ERR_NEEDMOREPARAMS;*/ }
+	if (_message.params.size() < 2) { return ;/*ERR_NEEDMOREPARAMS;*/ }
 
 	std::vector<std::string>	channelNames = ircSplit(_message.params[1], ',');
 
@@ -143,7 +143,7 @@ void	Commands::part(void)
 *************************************************************/
 void	Commands::topic(void)
 {
-	if (_message.params.size() < 2) { /*ERR_NEEDMOREPARAMS;*/ }
+	if (_message.params.size() < 2) { return ;/*ERR_NEEDMOREPARAMS;*/ }
 	if (_message.params.size() == 2) { return ; /* print topic name */ }
 
 	Channel	*channel = _server->findChannel(_message.params[1]);
@@ -209,4 +209,34 @@ void	Commands::list(void) const
 			std::cout << channels[i]->getTopic() << std::endl; // replace print fct
 		}
 	}
+}
+
+void	Commands::invite(void)
+{
+	if (_message.params.size() < 4) { return ;/*ERR_NEEDMOREPARAMS;*/ }
+
+	std::string	nick = _message.params[1];
+	if (!_server->findUser(nick)) { return ; /* _ERRNOSUCHNICK */ }
+	Channel		*channel = _server->findChannel(_message.params[2]);
+	
+	if (channel->isMembersOnly() && channel->isOper(nick) == false)
+		return ; /* ERR_CHANOPRIVSNEEDED */
+	channel->join(_server->findUser(nick));
+	// handle err_useronchannel ?
+}
+
+void	Commands::kick(void)
+{
+	if (_message.params.size() < 3) { return ;/*ERR_NEEDMOREPARAMS;*/ }
+
+	User		*target = _server->findUser(_message.params[2]);
+	std::string	user = _user->getNickName();
+	Channel		*channel = _server->findChannel(_message.params[1]);
+	
+	if (!channel) { return ; /* ERR_NOSUCHCHANNEL */ }
+	if (channel->isOper(user) == false)
+		return ; /* ERR_CHANOPRIVSNEEDED */
+	
+	channel->part(target);
+	// handle err_notonchannel ?
 }

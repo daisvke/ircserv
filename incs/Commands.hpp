@@ -47,6 +47,9 @@ class Commands
 	void	topic(void);
 	void	names(void) const;
 	void	list(void) const;
+	void	invite(void);
+	void	kick(void);
+
 
 	private:
 		Server		*_server;

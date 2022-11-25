@@ -53,8 +53,6 @@ class Commands
 	Commands(Server *server, User *user, t_message msg);
 	~Commands();
 
-	void	routeCmd();
-
 	void	nick(void);
 	void	user(void);
 	void	oper(void);
@@ -69,6 +67,8 @@ class Commands
 
 
 	private:
+		void		routeCmd();
+
 		Server		*_server;
 		User		*_user;
 		t_message	_message;

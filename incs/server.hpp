@@ -60,7 +60,9 @@ class Server{
 		std::string				getPassword(void) const;
 		std::vector<Channel *>	getChannels(void) const;
 		Channel					*findChannel(std::string name);
-		User					*findUser(std::string name);
+		User					*findUserByNick(std::string name);
+		User					*findUserByName(std::string name);
+
 
 	private :
 		struct sockaddr_in	_sockAddr;

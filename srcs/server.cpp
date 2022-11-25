@@ -337,9 +337,17 @@ Channel	*Server::findChannel(std::string name){
 	return 0;
 }
 
-User	*Server::findUser(std::string name){
+User	*Server::findUserByNick(std::string name){
 	for (size_t i(0); i < _users.size(); ++i) {
 		if (_users[i]->getNickName() == name)
+			return _users[i];
+	}
+	return 0;
+}
+
+User	*Server::findUserByName(std::string name){
+	for (size_t i(0); i < _users.size(); ++i) {
+		if (_users[i]->getUserName() == name)
 			return _users[i];
 	}
 	return 0;

@@ -25,7 +25,7 @@ void	Commands::nick(void)
 	if (_message.params.size() < 2) { return ;/* ERR_NONICKNAMEGIVEN */ }
 
 	std::string	newNick = _message.params[1];
-	if (_server->findUser(newNick) == false)
+	if (_server->findUserByNick(newNick) == false)
 		_user->setNickName(newNick);
 	else {
 		// return ERR_NICKNAMEINUSE
@@ -40,7 +40,7 @@ void	Commands::user(void)
 	if (_message.params.size() < 2) { return ;/*ERR_NEEDMOREPARAMS */}
 
 	std::string	newUserName = _message.params[1];
-	if (_server->findUser(newUserName) == false)
+	if (_server->findUserByName(newUserName) == false)
 		_user->setUserName(newUserName);
 	else { /* ERR_ALREADYREGISTRED */ }
 }
@@ -52,7 +52,7 @@ void	Commands::oper(void)
 {
 	if (_message.params.size() < 3) { return ; /*ERR_NEEDMOREPARAMS */}
 
-	User		*user = _server->findUser(_message.params[1]);
+	User		*user = _server->findUserByNick(_message.params[1]);
 	if (!user) { return ;/* ERR not found */ }
 	if (_server->getPassword() != _message.params[1]) {
 		return; /* ERR_PASSWDMISMATCH */ 
@@ -216,12 +216,12 @@ void	Commands::invite(void)
 	if (_message.params.size() < 4) { return ;/*ERR_NEEDMOREPARAMS;*/ }
 
 	std::string	nick = _message.params[1];
-	if (!_server->findUser(nick)) { return ; /* _ERRNOSUCHNICK */ }
+	if (!_server->findUserByNick(nick)) { return ; /* _ERRNOSUCHNICK */ }
 	Channel		*channel = _server->findChannel(_message.params[2]);
 	
 	if (channel->isMembersOnly() && channel->isOper(nick) == false)
 		return ; /* ERR_CHANOPRIVSNEEDED */
-	channel->join(_server->findUser(nick));
+	channel->join(_server->findUserByNick(nick));
 	// handle err_useronchannel ?
 }
 
@@ -229,7 +229,7 @@ void	Commands::kick(void)
 {
 	if (_message.params.size() < 3) { return ;/*ERR_NEEDMOREPARAMS;*/ }
 
-	User		*target = _server->findUser(_message.params[2]);
+	User		*target = _server->findUserByNick(_message.params[2]);
 	std::string	user = _user->getNickName();
 	Channel		*channel = _server->findChannel(_message.params[1]);
 	

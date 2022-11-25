@@ -12,7 +12,8 @@
 
 #include "Channel.hpp"
 
-Channel::Channel(std::string name, std::string key): _name(name), _modes(), _userLimit() {}
+Channel::Channel(std::string name, std::string key)
+	: _name(name), _modes(), _key(key), _userLimit() {}
 Channel::~Channel() {}
 
 

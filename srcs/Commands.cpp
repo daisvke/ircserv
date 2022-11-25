@@ -165,27 +165,48 @@ void	Commands::topic(void)
 *************************************************************/
 void	Commands::names(void) const
 {
-	std::vector<std::string>	channelNames = ircSplit(_message.params[1], ',');
+	std::vector<Channel *>	channels;
 
-	for (size_t i(0); i < channelNames.size(); ++i) {
-		Channel	*channel = _server->findChannel(channelNames[i]);
+	if (_message.params.size() > 1)
+	{
+		std::vector<std::string>	channelNames = ircSplit(_message.params[1], ',');
+		for (size_t i(0); i < channelNames.size(); ++i)
+			if (Channel	*chan = _server->findChannel(channelNames[i]))
+				channels.push_back(chan);
+	}
+	else
+		std::vector<Channel *>	channels = _server->getChannels();
 
-		if (channel && (!(channel->isTopicProtected() || channel->isPrivate())))
-			std::cout << channel->getName(); // replace print fct
-			channel->names();
+	for (size_t i(0); i < channels.size(); ++i) {
+
+		if (!(channels[i]->isTopicProtected() || channels[i]->isPrivate()))
+		{
+			std::cout << channels[i]->getName() << std::endl; // replace print fct
+			channels[i]->names();
+		}
 	}
 }
-/*
+
 void	Commands::list(void) const
 {
-	std::vector<Channel *>	channelVect;
-	std::vector<Channel *>::iterator	it = channelVect.begin();
+	std::vector<Channel *>	channels;
 
-	// need to go throught the real array of channels here
-	for (;it != channelVect.end(); ++it)
+	if (_message.params.size() > 1)
 	{
-		std::cout << (*it)->getName() << std::endl;
-		std::cout << (*it)->getTopic() << std::endl; //to send to clients instead
+		std::vector<std::string>	channelNames = ircSplit(_message.params[1], ',');
+		for (size_t i(0); i < channelNames.size(); ++i)
+			if (Channel	*chan = _server->findChannel(channelNames[i]))
+				channels.push_back(chan);
+	}
+	else
+		std::vector<Channel *>	channels = _server->getChannels();
+
+	for (size_t i(0); i < channels.size(); ++i) {
+
+		if (!(channels[i]->isTopicProtected() || channels[i]->isPrivate()))
+		{
+			std::cout << channels[i]->getName() << std::endl; // replace print fct
+			std::cout << channels[i]->getTopic() << std::endl; // replace print fct
+		}
 	}
 }
-*/

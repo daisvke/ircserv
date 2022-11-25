@@ -33,7 +33,7 @@ std::vector<std::string>	ircSplit(std::string str, char c)
 	std::string					segment;
 	std::vector<std::string>	segmentVect;
 
-	while (std::getline(input, segment, ' '))
+	while (std::getline(input, segment, c))
 		segmentVect.push_back(segment);
 	return segmentVect;
 }

@@ -36,6 +36,9 @@ class Channel
 		std::string		getTopic(void) const;
 		userDirectory	getUserDirectory(void) const;
 		std::string		getKey(void) const;
+		size_t			getUserNbr(void) const;
+		size_t			getUserLimit(void) const;
+		// mode getters
 		bool			isKeyProtected() const;
 		bool			isTopicProtected() const;
 		bool			isModerated() const;
@@ -46,7 +49,9 @@ class Channel
 		// commands
 		void	join(User *user);
 		void	part(User *user);
+		void	names(void) const;
 		bool	checkMode(char c) const;
+
 
 	private:
 
@@ -55,7 +60,7 @@ class Channel
 		std::string		_modes;
 		std::string		_key;
 		userDirectory	_users;
-		int				_userLimit;
+		size_t			_userLimit;
 };
 
 #endif

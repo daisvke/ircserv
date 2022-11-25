@@ -65,19 +65,21 @@ void	Commands::oper(void)
 *************************************************************/
 void	Commands::quit(void)
 {
-	_user->disconnect();
-	std::string	lastWords = _message.params[1];
-	// remove from all channels
+	std::string				lastWords = _message.params[1];
 	std::vector<Channel *>	channels = _server->getChannels();
+
+	_user->disconnect();
 	for (size_t i(0); i < channels.size(); ++i)
 	{
-		userDirectory	users = channels[i]->getUserDirectory();
+		userDirectory			users = channels[i]->getUserDirectory();
 		userDirectory::iterator	it = users.begin();
+
 		for (; it != users.end(); ++it)
-			if ((*it).first->getNickName() == _user->getNickName()) { users.erase(it); }
+			if ((*it).first->getNickName() == _user->getNickName())
+				channels[i]->part((*it).first);
 	}
 	if (lastWords.empty() == false)
-	std::cout << lastWords << std::endl; // replace by server printer function
+		std::cout << lastWords << std::endl; // replace by server printer function
 }
 
 /*************************************************************
@@ -96,7 +98,9 @@ void	Commands::join(void)
 		if (channel->isKeyProtected())
 			if (channelKeys[i] != channel->getKey())
 				return ; /* ERR_BADCHANNELKEY */
-		channel->join(_user);
+		if (channel->getUserNbr() < channel->getUserLimit())
+			channel->join(_user);
+		else { /* ERR_CHANNELISFULL */ }
 	}
 
 	// handle? => user shouldn't be banned  ERR_BANNEDFROMCHAN
@@ -108,28 +112,70 @@ void	Commands::join(void)
 }
 
 /*************************************************************
-*  
+*  The user quits all the channels given as parameters
+*************************************************************/
+void	Commands::part(void)
+{
+	if (_message.params.size() < 2) { /*ERR_NEEDMOREPARAMS;*/ }
+
+	std::vector<std::string>	channelNames = ircSplit(_message.params[1], ',');
+
+	for (size_t i(0); i < channelNames.size(); ++i) {
+		Channel	*channel = _server->findChannel(channelNames[i]);
+
+		if (!channel) { continue ; /* ERR_NOSUCHCHANNEL */ }
+		userDirectory			users = channel->getUserDirectory();
+		userDirectory::iterator	it = users.begin();
+		
+		for (; it != users.end(); ++it)
+			if ((*it).first->getNickName() == _user->getNickName())
+				channel->part((*it).first);
+		channel->part(_user);
+	}
+}
+
+// mode cmd
+
+/*************************************************************
+* If a topic name is given: changes the topic name of a channel,
+*	or adds one if no topic has been set
+* If no topic name is given, prints the current topic name
 *************************************************************/
 void	Commands::topic(void)
 {
-	Channel	*channel;
-	std::string	newTopic; // need to get new topic name from cmd params
+	if (_message.params.size() < 2) { /*ERR_NEEDMOREPARAMS;*/ }
+	if (_message.params.size() == 2) { return ; /* print topic name */ }
 
-	if (_message.params.size() < 1) { /*ERR_NONICKNAMEGIVEN;*/ }
+	Channel	*channel = _server->findChannel(_message.params[1]);
+
+	if (!channel) { return ; /* ERR_NOSUCHCHANNEL */ }
+	std::string	newTopic = _message.params[2];
 
 	if (channel->isTopicProtected() == false)
 		channel->setTopic(newTopic);
+	else { return; /* ERR_CHANOPRIVSNEEDED */ }
 }
 
+/*************************************************************
+* If no channel name is given as param:
+*	all the channels with all its members are printed.
+* If channel names are given: 
+* 	Prints all members of all the given non private, non secret, or currently listening channels.
+* There is no error message for wrong channel names etc.
+*************************************************************/
 void	Commands::names(void) const
 {
-	// need here a method to find a channel from all the channels
-	Channel	*channel;
+	std::vector<std::string>	channelNames = ircSplit(_message.params[1], ',');
 
-	if (channel->isTopicProtected() || channel->isPrivate())
-		return ;
+	for (size_t i(0); i < channelNames.size(); ++i) {
+		Channel	*channel = _server->findChannel(channelNames[i]);
+
+		if (channel && (!(channel->isTopicProtected() || channel->isPrivate())))
+			std::cout << channel->getName(); // replace print fct
+			channel->names();
+	}
 }
-
+/*
 void	Commands::list(void) const
 {
 	std::vector<Channel *>	channelVect;
@@ -142,3 +188,4 @@ void	Commands::list(void) const
 		std::cout << (*it)->getTopic() << std::endl; //to send to clients instead
 	}
 }
+*/

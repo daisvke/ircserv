@@ -59,6 +59,9 @@ std::string		Channel::getName(void) const { return _name; }
 std::string		Channel::getTopic(void) const { return _topic; }
 userDirectory	Channel::getUserDirectory(void) const { return _users; }
 std::string		Channel::getKey(void) const { return _key; }
+size_t			Channel::getUserNbr(void) const { return _users.size(); };
+size_t			Channel::getUserLimit(void) const { return _userLimit; };
+
 bool			Channel::isKeyProtected() const { return checkMode('k'); }
 bool			Channel::isTopicProtected() const { return checkMode('t'); }
 bool			Channel::isModerated() const { return checkMode('m'); }
@@ -95,6 +98,18 @@ void	Channel::part(User *user)
 	_users.erase(user);
 	std::cout << user->getNickName() << " has parted channel '"
 		<< getName() << "'!" << std::endl;
+}
+
+/*************************************************************
+* Prints all members of the channel
+*************************************************************/
+void	Channel::names(void) const
+{
+	userDirectory			users = getUserDirectory();
+	userDirectory::iterator	it = users.begin();
+
+	for (; it != users.end(); ++it)
+		std::cout << (*it).first->getNickName() << std::endl; //replace print fct
 }
 
 /*************************************************************

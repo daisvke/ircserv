@@ -19,14 +19,29 @@
 # include "User.hpp"
 # include "Channel.hpp"
 
+enum	e_commands
+{
+	_NICK,
+	_USER,
+	_OPER,
+	_QUIT,
+	_JOIN,
+	_PART,
+	_TOPIC,
+	_NAMES,
+	_LIST,
+	_INVITE,
+	_KICK
+};
+
 /*************************************************************
 * Contains the message sent by the user.
 * The 'params' variable contains the whole input, including
-* the command and the parameters
+* 	the command and the parameters
 *************************************************************/
 typedef struct s_message
 {
-	std::string					cmd;
+	int							cmd;
 	std::vector<std::string>	params;
 }	t_message;
 
@@ -37,6 +52,8 @@ class Commands
 
 	Commands(Server *server, User *user, t_message msg);
 	~Commands();
+
+	void	routeCmd();
 
 	void	nick(void);
 	void	user(void);

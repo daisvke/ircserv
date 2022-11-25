@@ -17,6 +17,24 @@ Commands::Commands(Server *server, User *user, s_message msg)
 
 Commands::~Commands() {};
 
+void	Commands::routeCmd()
+{
+	switch (_message.cmd)
+	{
+		case _NICK:		nick(); break;
+		case _USER:		user(); break;
+		case _OPER:		oper(); break;
+		case _QUIT:		quit(); break;
+		case _JOIN:		join(); break;
+		case _PART:		part(); break;
+		case _TOPIC:	topic(); break;
+		case _NAMES:	names(); break;
+		case _LIST:		list(); break;
+		case _INVITE:	invite(); break;
+		case _KICK:		kick(); break;
+	}
+}
+
 /*************************************************************
 * Changes the user's nickname online; for example /nick Carlos
 *************************************************************/

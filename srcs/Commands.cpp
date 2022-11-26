@@ -32,6 +32,8 @@ void	Commands::routeCmd()
 		case _LIST:		list(); break;
 		case _INVITE:	invite(); break;
 		case _KICK:		kick(); break;
+
+		default:		std::cerr << "erroooor cmd not found" << std::endl; //replace fct
 	}
 }
 
@@ -243,6 +245,9 @@ void	Commands::invite(void)
 	// handle err_useronchannel ?
 }
 
+/*************************************************************
+* Only a channel operator can kick out a user from the channel
+*************************************************************/
 void	Commands::kick(void)
 {
 	if (_message.params.size() < 3) { return ;/*ERR_NEEDMOREPARAMS;*/ }
@@ -256,5 +261,11 @@ void	Commands::kick(void)
 		return ; /* ERR_CHANOPRIVSNEEDED */
 	
 	channel->part(target);
+
+	if (_message.params.size() > 3)
+	{
+		std::string	comment = _message.params[3];
+		std::cout << comment << std::endl; // replace print fct
+	}
 	// handle err_notonchannel ?
 }

@@ -67,6 +67,7 @@ class Commands
 
 
 	private:
+	
 		void		routeCmd();
 
 		Server		*_server;

@@ -62,7 +62,7 @@ class Server{
 		Channel					*findChannel(std::string name);
 		User					*findUserByNick(std::string name);
 		User					*findUserByName(std::string name);
-
+		
 
 	private :
 		struct sockaddr_in	_sockAddr;

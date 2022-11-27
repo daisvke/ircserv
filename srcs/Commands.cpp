@@ -154,7 +154,31 @@ void	Commands::part(void)
 	}
 }
 
-// mode cmd
+/*************************************************************
+* Used by a channel oper to change the mode of the channel.
+* The mode can be add ('+'), or removed ('-'). By default it is added.
+*************************************************************/
+void	Commands::mode(void)
+{
+	if (_message.params.size() < 1) { return ;/*ERR_NEEDMOREPARAMS;*/ }
+
+	Channel	*channel = _server->findChannel(_message.params[1]);
+	if (!channel) { return ; /* ERR_NOSUCHCHANNEL */ }
+
+ 	bool	isChanOper = channel->isOper(_user->getNickName());
+	if (isChanOper == false)
+		return ; /* ERR_CHANOPRIVSNEEDED */
+
+	
+
+	bool	remove = _message.params[2].find('-') ? true : false;
+	char	sign = remove == true ? '-' : '+';
+	std::string	modes = _message.params[2];
+	modes.erase(std::remove(modes.begin(), modes.end(), sign), modes.end());
+
+	for (size_t i(0); i < modes.size(); ++i)
+		channel->modifyModes(modes[i], channel->getName(), remove);
+}
 
 /*************************************************************
 * If a topic name is given: changes the topic name of a channel,
@@ -268,4 +292,21 @@ void	Commands::kick(void)
 		std::cout << comment << std::endl; // replace print fct
 	}
 	// handle err_notonchannel ?
+}
+
+//void	Commands::privmsg(void) {}
+
+//void	Commands::notice(void) {}
+
+void	Commands::kill(void)
+{
+	if (_message.params.size() < 3) { return ;/*ERR_NEEDMOREPARAMS;*/ }
+	if (_user->isOperator() == false) { return ; /*ERR_NOPRIVILEGES*/}
+
+	User		*target = _server->findUserByNick(_message.params[1]);
+	if (!target) { return ; /* ERR_NOSUCHNICK */ }
+
+	std::vector<std::string>	comment; comment.push_back(_message.params[1]);
+	t_message	msg = { _QUIT, comment};
+	Commands	cmd(_server, target, msg);
 }

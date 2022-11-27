@@ -14,10 +14,13 @@
 # define COMMANDS_HPP
 
 # include <vector>
+# include <algorithm>
 
 # include "server.hpp"
 # include "User.hpp"
 # include "Channel.hpp"
+
+# define _MODES	
 
 enum	e_commands
 {
@@ -53,22 +56,23 @@ class Commands
 	Commands(Server *server, User *user, t_message msg);
 	~Commands();
 
-	void	nick(void);
-	void	user(void);
-	void	oper(void);
-	void	quit(void);
-	void	join(void);
-	void	part(void);
-	void	topic(void);
-	void	names(void) const;
-	void	list(void) const;
-	void	invite(void);
-	void	kick(void);
-
 
 	private:
-	
-		void		routeCmd();
+
+		void	nick(void);
+		void	user(void);
+		void	oper(void);
+		void	quit(void);
+		void	join(void);
+		void	part(void);
+		void	mode(void);
+		void	topic(void);
+		void	names(void) const;
+		void	list(void) const;
+		void	invite(void);
+		void	kick(void);
+		void	kill(void);
+		void	routeCmd();
 
 		Server		*_server;
 		User		*_user;

@@ -26,8 +26,8 @@ class Channel
 
 		// setters
 		void	setTopic(std::string name);
-		int		handleModes(char mode, std::string params);
-		void	setTargetMode(char c, std::string target);
+		void	modifyModes(char mode, std::string params, bool remove);
+		void	modifyTargetMode(char c, std::string target, bool remove);
 		void	setUserLimit(std::string limit);
 		void	setChannelMode(char c, std::string params);
 

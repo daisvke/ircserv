@@ -169,8 +169,6 @@ void	Commands::mode(void)
 	if (isChanOper == false)
 		return ; /* ERR_CHANOPRIVSNEEDED */
 
-	
-
 	bool	remove = _message.params[2].find('-') ? true : false;
 	char	sign = remove == true ? '-' : '+';
 	std::string	modes = _message.params[2];

@@ -20,8 +20,6 @@
 # include "User.hpp"
 # include "Channel.hpp"
 
-# define _MODES	
-
 enum	e_commands
 {
 	_NICK,

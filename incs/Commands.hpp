@@ -30,11 +30,13 @@ enum	e_commands
 	_QUIT,
 	_JOIN,
 	_PART,
+	_MODE,
 	_TOPIC,
 	_NAMES,
 	_LIST,
 	_INVITE,
-	_KICK
+	_KICK,
+	_KILL
 };
 
 /*************************************************************

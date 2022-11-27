@@ -27,11 +27,13 @@ void	Commands::routeCmd()
 		case _QUIT:		quit(); break;
 		case _JOIN:		join(); break;
 		case _PART:		part(); break;
+		case _MODE:		mode(); break;
 		case _TOPIC:	topic(); break;
 		case _NAMES:	names(); break;
 		case _LIST:		list(); break;
 		case _INVITE:	invite(); break;
 		case _KICK:		kick(); break;
+		case _KILL:		kill(); break;
 
 		default:		std::cerr << "erroooor cmd not found" << std::endl; //replace fct
 	}

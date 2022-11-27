@@ -176,8 +176,9 @@ void	Commands::mode(void)
 	std::string	modes = _message.params[2];
 	modes.erase(std::remove(modes.begin(), modes.end(), sign), modes.end());
 
+	std::string	params = _message.params[3];
 	for (size_t i(0); i < modes.size(); ++i)
-		channel->modifyModes(modes[i], channel->getName(), remove);
+		channel->modifyModes(modes[i], params, remove);
 }
 
 /*************************************************************
@@ -195,7 +196,8 @@ void	Commands::topic(void)
 	if (!channel) { return ; /* ERR_NOSUCHCHANNEL */ }
 	std::string	newTopic = _message.params[2];
 
-	if (channel->isTopicProtected() == false)
+	if (channel->isTopicProtected() == false
+		|| _user->isOperator() == true)
 		channel->setTopic(newTopic);
 	else { return; /* ERR_CHANOPRIVSNEEDED */ }
 }

@@ -37,7 +37,7 @@ void	Channel::modifyTargetMode(char c, std::string target, bool remove)
 		}
 		++it;
 	}
-	std::cout << "Client name " << target << " not found!" << std::endl; 
+	std::cout << "Client name " << target << " not found!" << std::endl; //replace
 }
 
 void	Channel::setChannelMode(char c, std::string params)
@@ -150,7 +150,7 @@ void	Channel::modifyModes(char c, std::string params, bool remove)
 	if (_modes.find(c) != std::string::npos) { setChannelMode(c, params); }
 	else if (remove == true) { _modes.erase(c); }
 
-	// handle b
+	// handle b ? n-v 
 }
 
 bool	Channel::checkMode(char c) const

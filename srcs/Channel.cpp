@@ -132,7 +132,7 @@ void	Channel::names(void)
 }
 
 /*************************************************************
-* Modifies channel modes.
+* Modifies user/channel modes.
 * If the mode is not already set, and remove is false,
 * 	then the new mode is added.
 * If the mode is already set, and remove is true,

@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/22 12:03:08 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/29 17:07:57 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 # define SERVER_PORT 8084
 # define BUFFER_SIZE 1024
 # define MAX_CLIENT 100
-# define TIMEOUT 11000
+# define TIMEOUT 1100000
 # define TIMEOUT_MESS "time out - server automatic shutdown has been requested"
 # define ACCEPTED "the server has accepted your connection"
 # define SERVER_START_MESS "Server lauched"
@@ -62,7 +62,7 @@ class Server{
 		Channel					*findChannel(std::string name);
 		User					*findUserByNick(std::string name);
 		User					*findUserByName(std::string name);
-		
+
 
 	private :
 		struct sockaddr_in	_sockAddr;
@@ -74,33 +74,39 @@ class Server{
 		int					_nfds;
 		int					_newSd;
 		struct pollfd		_fds[MAX_CLIENT];
+		//std::list<struct pollfd>	_listFds;
 
+		
 		std::string				_password;
 		std::vector<User *>		_users;
 		std::vector<Channel *>	_channels;
-		//int					_pollRet;
 
-		void				initServer();
-		int					setSocket();
-		int					setSocketopt();
-		int					setNonBlocking();
-		int					bindSocket();
-		int					setListenSocket();
-		void				waitForConn(); //Attendre un événement concernant un descripteur de fichier
-		int					checkPollRet( int ret );
-		//void				serverPrint(const char * str);
-		void				reactToEvent(int fd);
-		int					findReadableFd();
-		int					acceptNewSd();
-		void				readExistingFds(int fd);
+		/*init the server */
+		void	initServer();
+		int		setSocket();
+		int		setSocketopt();
+		int		setNonBlocking();
+		int		bindSocket();
+		int		setListenSocket();
+
+		/*react to poll event */
+
+		int		checkPollRet( int ret );
+		int		findReadableFd();
+
+		int		acceptNewSd();
+		void	readExistingFds(int fd);
+		void	reactToEvent(int index);
+		void	waitForConn();
+
+		/*react management Utils */
+		template <typename T> void	serverPrint(T & str){	std::cout << "[+] " << str << std::endl;}
+		void						closeConn(int index);
+		void						closeAllConn();
+		int							turnOffServer(std::string str);
 
 
-		void				closeConn(int index);
-		int					turnOffServer(std::string str);
 
-
-		template <typename T>
-		void				serverPrint(T & str){	std::cout << "[+] " << str << std::endl;}
 };
 
 #endif

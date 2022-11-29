@@ -3,13 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   User.hpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dtanigaw <dtanigaw@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 18:47:16 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/11/17 08:44:51 by dtanigaw         ###   ########.fr       */
+/*   Updated: 2022/11/29 15:51:59 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#ifndef USER_HPP
+
+# ifndef USER_HPP
 # define USER_HPP
 
 # include <string>
@@ -42,6 +43,7 @@ class User
 		bool		_isConnected;
 		std::string	_nickName;
 		std::string	_userName;
+		std::string	_buffer;
 };
 
 #endif

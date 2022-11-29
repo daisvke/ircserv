@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/22 12:18:53 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/29 17:12:15 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,11 @@
 *********************************************/
 
 Server::Server() : _addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS),
-	_opt(1), _nfds(0), _newSd(0), _password()/*, _pollRet(0)*/{
+	_opt(1), _nfds(0), _newSd(0), _password(){
 
-	IrcMemset((void *)_buffer, 0, sizeof(_buffer));
-	IrcMemset((void *)_fds, 0, sizeof(_fds));
-	std::cout << "Server constructor called" << std::endl;
+	ircMemset((void *)_buffer, 0, sizeof(_buffer));
+	ircMemset((void *)_fds, 0, sizeof(_fds));
+	std::cout << ircTime() <<"Server constructor called" << std::endl;
 }
 
 Server::Server(Server &cpy) {
@@ -150,6 +150,8 @@ void	Server::initServer()
 	serverPrint(SERVER_START_MESS);
 }
 
+
+
 /*************************************************************
 * Poll / wait for newconn
 *************************************************************/
@@ -193,19 +195,21 @@ int	Server::findReadableFd()
 	*****************************************************************************/
 int	Server::acceptNewSd()
 {
-	do{
-		_newSd = accept(_listenSd, NULL, NULL);	//ckeck on man to see if other argument are necessary or not
-		if (_newSd < 0){
-			if (errno != EWOULDBLOCK)
-				return (turnOffServer("accept() failed"));
-			break ;
-		}
-		printf("[DEBUG_MESS] acceptNewSd : a new connection has been made ! fd = %d \n", _newSd);
+	//do{
+	_newSd = accept(_listenSd, NULL, NULL);	//ckeck on man to see if other argument are necessary or not
+	if (_newSd < 0){
+		if (errno != EWOULDBLOCK)
+			return (turnOffServer("accept() failed"));
+		//break ;
+	}
+	else {
+		//printf("[DEBUG_MESS] acceptNewSd : a new connection has been made ! fd = %d \n", _newSd);
 		_fds[_nfds].fd = _newSd;				//	check if it is necessary to find a way to use the new reusable fd. Maybe accept can do it automatically ?
 		_fds[_nfds].events = POLLIN;
 		_nfds++;
 	}
-	while (_newSd != -1);
+	//}
+	//while (_newSd != -1);
 	return (POLL_OK);
 }
 
@@ -216,58 +220,25 @@ int	Server::acceptNewSd()
 	recv returns the number of bytes received, -1 if an error occured and 0 for EOF
 	*****************************************************************************/
 void	Server::readExistingFds(int index){
-	serverPrint("readExistingFds : fd is readable, a new message has been received");
-	//int	sendRet;
+	printf("readExistingFds : fd is readable, a new message has been received: index = %d , fd = %d \n", index, _fds[index].fd);
+
 	int recvRet;
 
-	// do{
-	// 	//close()
-	// 	return ;
-	// 	//recv function
-	// 	//need to link on channel ??
-	// }
-	//while(1)
-	//{
-		recvRet = recv(_fds[index].fd, _buffer, sizeof(_buffer), 0);
-		(recvRet < BUFFER_SIZE - 1) ? _buffer[recvRet] = '\0' : _buffer[BUFFER_SIZE - 1] = '\0';
-		//_buffer[recvRet] = '\0';
-		if (recvRet < 0){
-			if (errno != EWOULDBLOCK){
-				serverPrint("recv() failed");
-				closeConn(index);
-			}
-			//break ;
-		}
-		else if (recvRet == 0){										// not sure about this one.
+	recvRet = recv(_fds[index].fd, _buffer, sizeof(_buffer), 0);
+	if (recvRet < 0){
+		if (errno != EWOULDBLOCK){
+			serverPrint("recv() failed");
 			closeConn(index);
-			//break ;
 		}
-		else
-			serverPrint(_buffer);
-
-		// sendRet = send(_fds[index].fd, _buffer, sizeof(_buffer), 0);	// is it really usefull to send back a message to the client ?
-		// if (sendRet < 0){
-		// 	if (errno != EWOULDBLOCK){
-		// 		serverPrint("send() failed");
-		// 		closeConn(index);
-		// 	}
-		// 	break ;
-		// }
-	//}
-}
-
-void	Server::closeConn(int index){
-	std::cout << "[DEBUG_MESS] : closeConn has been called" << std::endl;
-	close(_fds[index].fd);
-	_fds[index].fd = -1;
-
-	for (int i = 0; i < _nfds; i++){
-		if(_fds[i].fd == -1){
-			for (int j = i; j < _nfds; j++)
-				_fds[j].fd = _fds[j+1].fd;
-			i--;
-			_nfds--;
-		}
+	}
+	else if (recvRet == 0)									// not sure about this one.
+		closeConn(index);
+	else{
+		printf("_buffer = %s, recvRet = %d\n",_buffer, recvRet);
+		printf("_buffer[ret] = %d \n",_buffer[recvRet]);
+		printf("_buffer[ret - 1] = %d\n", _buffer[recvRet - 1]);
+		printf("_buffer[ret - 2] = %d \n", _buffer[recvRet - 2]);
+		printf("_buffer[ret - 3] = %d \n\n", _buffer[recvRet - 3]);
 	}
 }
 
@@ -286,6 +257,16 @@ void	Server::reactToEvent(int index){
 		readExistingFds(index);
 }
 
+
+
+
+
+
+
+
+
+
+
 /*******************************************
 * poll is blocking until
 	-> it catchs an event(new fds or listening socket is readable)
@@ -302,7 +283,22 @@ void	Server::waitForConn(){
 			reactToEvent(findReadableFd());
 	}
 	while (_status == ON_STATUS);
+	closeAllConn();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void	Server::startServer(){
 	try {
@@ -315,13 +311,24 @@ void	Server::startServer(){
 }
 
 /******************************************
-	Server Utils
+	Server management Utils
 *******************************************/
-/*
-void	Server::serverPrint(std::string str){
+void	Server::closeConn(int index){ std::cout << "[DEBUG_MESS] : closeConn has been called" << std::endl;
 
-	std::cout << "[+] " << str << std::endl;
-}*/
+	if (_fds[index].fd  > -1){
+		close(_fds[index].fd);
+		_fds[index].fd = -1;
+	}
+	if (index < _nfds)
+		for (int i = 0; i < _nfds; i++){
+			if(_fds[i].fd == -1){
+				for (int j = i; j < _nfds; j++)
+					_fds[j].fd = _fds[j+1].fd;
+				i--;
+				_nfds--;
+			}
+	}
+}
 
 int		Server::turnOffServer(std::string str){
 	serverPrint(str);
@@ -329,6 +336,16 @@ int		Server::turnOffServer(std::string str){
 	return (POLL_FAILURE);
 }
 
+void	Server::closeAllConn(){
+	for (int i = 0; i < _nfds; i++)
+		if (_fds[i].fd > 0)
+			close(_fds[i].fd);
+}
+
+
+/******************************************
+	Server Utils
+*******************************************/
 Channel	*Server::findChannel(std::string name){
 	for (size_t i(0); i < _channels.size(); ++i) {
 		if (_channels[i]->getName() == name)
@@ -356,11 +373,6 @@ User	*Server::findUserByName(std::string name){
 std::string	Server::getPassword(void) const { return _password; }
 
 std::vector<Channel *>	Server::getChannels(void) const { return _channels; }
-
-
-
-
-
 
 
 /**************************************

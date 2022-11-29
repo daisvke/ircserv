@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/29 17:12:15 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/29 19:23:26 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,13 +233,9 @@ void	Server::readExistingFds(int index){
 	}
 	else if (recvRet == 0)									// not sure about this one.
 		closeConn(index);
-	else{
-		printf("_buffer = %s, recvRet = %d\n",_buffer, recvRet);
-		printf("_buffer[ret] = %d \n",_buffer[recvRet]);
-		printf("_buffer[ret - 1] = %d\n", _buffer[recvRet - 1]);
-		printf("_buffer[ret - 2] = %d \n", _buffer[recvRet - 2]);
-		printf("_buffer[ret - 3] = %d \n\n", _buffer[recvRet - 3]);
-	}
+	else
+		handleCmd(_fds[index].fd);
+	ircMemset((void *)_buffer, 0, sizeof(_buffer));
 }
 
 /****************************************************************************

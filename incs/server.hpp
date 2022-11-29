@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/29 20:41:17 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/29 23:08:25 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ class Server{
 
 
 		std::string				_password;
-		std::vector<User *>		_users;
+		//std::vector<User *>		_users;
 		std::vector<Channel *>	_channels;
 
 		/*init the server */
@@ -99,17 +99,18 @@ class Server{
 		int		bindSocket();
 		int		setListenSocket();
 
-		/*react to poll event */
-
+		/*poll management */
 		int		checkPollRet( int ret );
 		int		findReadableFd();
-
 		int		acceptNewSd();
 		void	readExistingFds(int fd);
 		void	reactToEvent(int index);
 		void	waitForConn();
 
-		void	handleCmd(int index);
+		/*react to cmd */
+		void	updateServerMaps(int fd);
+		void	execCmd(int fd);
+		void	handleCmd(int fd);
 
 		/*react management Utils */
 		template <typename T> void	serverPrint(T & str){	std::cout << "[+] " << str << std::endl;}
@@ -122,3 +123,5 @@ class Server{
 };
 
 #endif
+
+//irssi -n Warlink -p 8084 -c localhost

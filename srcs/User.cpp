@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   User.cpp                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dtanigaw <dtanigaw@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 18:47:19 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/11/17 15:08:37 by dtanigaw         ###   ########.fr       */
+/*   Updated: 2022/11/29 22:56:31 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,8 +28,19 @@ void	User::disconnect(void) { _isConnected = false; }
 /*************************************************************
 * Getters
 *************************************************************/
+int			User::getFd(void) const {return _fd;}
 std::string	User::getNickName(void) const { return _nickName; }
 std::string	User::getUserName(void) const { return _userName; }
 bool		User::isOperator(void) const { return _isOper; }
 bool		User::isConnected(void) const { return _isConnected; }
 
+/* debug overload to delete*/
+std::ostream & operator<<(std::ostream & o, User * const &rhs){
+
+	o	<< "_fd :" << rhs->getFd() << "\n"
+		<< "_isOper: " << rhs->isOperator() << "\n"
+		<< "_isConnected: " << rhs->isConnected() << "\n"
+		<< "_nickName " << rhs->getNickName()
+		<< "_userName " << rhs->getUserName();
+	return (o);
+}

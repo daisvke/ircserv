@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   Commands.cpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dtanigaw <dtanigaw@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/11/21 07:44:59 by dtanigaw         ###   ########.fr       */
+/*   Updated: 2022/11/30 00:10:46 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Commands.hpp"
 
-Commands::Commands(Server *server, User *user, s_message msg)
+Commands::Commands(Server *server, User *user, t_message msg)
 	: _server(server), _user(user), _message(msg) { routeCmd(); }
 
 Commands::~Commands() {}
@@ -47,7 +47,7 @@ void	Commands::nick(void)
 	if (_message.params.size() < 2) { return ;/* ERR_NONICKNAMEGIVEN */ }
 
 	std::string	newNick = _message.params[1];
-	if (_server->findUserByNick(newNick) == false)
+	if (_server->findUserByNick(nmsgewNick) == false)
 		_user->setNickName(newNick);
 	else {
 		// return ERR_NICKNAMEINUSE
@@ -55,7 +55,7 @@ void	Commands::nick(void)
 }
 
 /*************************************************************
-* Used at the begining of a connection 
+* Used at the begining of a connection
 *************************************************************/
 void	Commands::user(void)
 {
@@ -77,7 +77,7 @@ void	Commands::oper(void)
 	User		*user = _server->findUserByNick(_message.params[1]);
 	if (!user) { return ;/* ERR not found */ }
 	if (_server->getPassword() != _message.params[1]) {
-		return; /* ERR_PASSWDMISMATCH */ 
+		return; /* ERR_PASSWDMISMATCH */
 	}
 	_user->setAsOperator();
 }
@@ -110,7 +110,7 @@ void	Commands::quit(void)
 void	Commands::join(void)
 {
 	if (_message.params.size() < 2) { return ;/*ERR_NEEDMOREPARAMS;*/ }
-	
+
 	std::vector<std::string>	channelNames = ircSplit(_message.params[1], ',');
 	std::vector<std::string>	channelKeys = ircSplit(_message.params[2], ',');
 
@@ -148,7 +148,7 @@ void	Commands::part(void)
 		if (!channel) { continue ; /* ERR_NOSUCHCHANNEL */ }
 		userDirectory			users = channel->getUserDirectory();
 		userDirectory::iterator	it = users.begin();
-		
+
 		for (; it != users.end(); ++it)
 			if ((*it).first->getNickName() == _user->getNickName())
 				channel->part((*it).first);
@@ -205,7 +205,7 @@ void	Commands::topic(void)
 /*************************************************************
 * If no channel name is given as param:
 *	all the channels with all its members are printed.
-* If channel names are given: 
+* If channel names are given:
 * 	Prints all members of all the given non private, non secret, or currently listening channels.
 * There is no error message for wrong channel names etc.
 *************************************************************/
@@ -264,7 +264,7 @@ void	Commands::invite(void)
 	std::string	nick = _message.params[1];
 	if (!_server->findUserByNick(nick)) { return ; /* _ERRNOSUCHNICK */ }
 	Channel		*channel = _server->findChannel(_message.params[2]);
-	
+
 	if (channel->isMembersOnly() && channel->isOper(nick) == false)
 		return ; /* ERR_CHANOPRIVSNEEDED */
 	channel->join(_server->findUserByNick(nick));
@@ -281,11 +281,11 @@ void	Commands::kick(void)
 	User		*target = _server->findUserByNick(_message.params[2]);
 	std::string	user = _user->getNickName();
 	Channel		*channel = _server->findChannel(_message.params[1]);
-	
+
 	if (!channel) { return ; /* ERR_NOSUCHCHANNEL */ }
 	if (channel->isOper(user) == false)
 		return ; /* ERR_CHANOPRIVSNEEDED */
-	
+
 	channel->part(target);
 
 	if (_message.params.size() > 3)

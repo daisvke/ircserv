@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 18:47:16 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/11/29 20:03:52 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/29 22:56:41 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define USER_HPP
 
 # include <string>
+# include <iostream>
 
 class User
 {
@@ -31,6 +32,7 @@ class User
 		void	disconnect(void);
 
 		// getters
+		int			getFd(void) const;
 		std::string	getNickName(void) const;
 		std::string	getUserName(void) const;
 		bool		isOperator(void) const;
@@ -44,5 +46,8 @@ class User
 		std::string	_nickName;
 		std::string	_userName;
 };
+
+/* debug overload to delete*/
+std::ostream& operator<<(std::ostream& o,  User *const & rhs);
 
 #endif

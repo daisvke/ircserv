@@ -6,17 +6,22 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/11/30 17:20:26 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/30 20:50:08 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Commands.hpp"
+#include "iterator"
 
 Commands::Commands(Server *server, User *user, t_message msg)
 	: _server(server), _user(user), _message(msg) { routeCmd(); }
 
 Commands::Commands(Server *server, User *user, std::string &str)
-	: _server(server), _user(user) { setupMap(); _message.params = ircSplit(str, ' ');}
+	: _server(server), _user(user), _params(ircSplit(str, ' '))
+	{
+		_message.params = ircSplit(str, ' ');
+		setupMap();
+	}
 
 Commands::~Commands() {}
 
@@ -42,6 +47,13 @@ void	Commands::routeCmd()
 	}
 }
 
+template <typename T>
+void	printMap(std::map<std::string, T> & mymap){
+	for (typename std::map<std::string, T>::iterator it = mymap.begin(); it!=mymap.end(); ++it){
+		std::cout << "key : " <<it->first << " - "<< "val : "<<it->second << std::endl;
+	}
+}
+
 void	Commands::setupMap()
 {
 	_cmdMap[NICK]	=		&Commands::nick;
@@ -57,7 +69,19 @@ void	Commands::setupMap()
 	_cmdMap[INVITE]	=		&Commands::invite;
 	_cmdMap[KICK]	=		&Commands::kick;
 	_cmdMap[KILL]	=		&Commands::kill;
-	std::cout << "inside setupMaps" << std::endl;
+
+	cmdMap::iterator it;
+	it = _cmdMap.find(_params[0]);
+	if (it != _cmdMap.end())
+		(this->*_cmdMap[_params[0]])();
+	// else
+	// 	std::cout << "ERROR IS HERE \n" << std::endl;
+
+	// std::cout << "inside setupMaps" << std::endl;
+	// std::cout << "_cmdMap[_params[0]] = " << _cmdMap[_params[0]] << std::endl;
+	// std::cout << "_cmdMap[_params[1]] = " << _cmdMap[_params[1]] << std::endl;
+	// for (size_t i(0); i < _params.size(); ++i)
+	// 		std::cout << i << ":" <<_params[i] << std::endl;
 }
 
 /*************************************************************
@@ -65,14 +89,17 @@ void	Commands::setupMap()
 *************************************************************/
 void	Commands::nick(void)
 {
-	if (_message.params.size() < 2) { return ;/* ERR_NONICKNAMEGIVEN */ }
+	std::cout << " >>>>>>>>>> inside nick function" << std::endl;
+	if (_params.size() < 2) { printf("size problem !!!!!! \n"); return ;/* ERR_NONICKNAMEGIVEN */ }
 
-	std::string	newNick = _message.params[1];
+	std::string	newNick = _params[1];
 	if (_server->findUserByNick(newNick) == false)
 		_user->setNickName(newNick);
 	else {
 		// return ERR_NICKNAMEINUSE
 	}
+	std::cout << " >>>>>>>>>> outside nick function" << std::endl;
+
 }
 
 /*************************************************************
@@ -80,12 +107,16 @@ void	Commands::nick(void)
 *************************************************************/
 void	Commands::user(void)
 {
+	std::cout << " >>>>>>>>>> inside user function" << std::endl;
+
 	if (_message.params.size() < 2) { return ;/*ERR_NEEDMOREPARAMS */}
 
 	std::string	newUserName = _message.params[1];
 	if (_server->findUserByName(newUserName) == false)
 		_user->setUserName(newUserName);
 	else { /* ERR_ALREADYREGISTRED */ }
+	std::cout << "outside user function <<<<<<<<<<<<<<" << std::endl;
+
 }
 
 /*************************************************************

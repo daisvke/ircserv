@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:10 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/11/30 17:09:52 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/30 21:17:16 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,25 +15,25 @@
 
 # include <vector>
 # include <algorithm>
-
+# include <map>
 
 # include "User.hpp"
 # include "Channel.hpp"
 # include "server.hpp"
 
-# define NICK "NICK"
-# define USER "USER"
-# define OPER "OPER"
-# define QUIT "QUIT"
-# define JOIN "JOIN"
-# define PART "PART"
-# define MODE "MODE"
-# define TOPIC "TOPIC"
-# define NAMES "NAMES"
-# define LIST "LIST"
-# define INVITE "INVITE"
-# define KICK "KICK"
-# define KILL "KILL"
+# define NICK	"NICK"
+# define USER	"USER"
+# define OPER	"OPER"
+# define QUIT	"QUIT"
+# define JOIN	"JOIN"
+# define PART	"PART"
+# define MODE	"MODE"
+# define TOPIC	"TOPIC"
+# define NAMES	"NAMES"
+# define LIST	"LIST"
+# define INVITE	"INVITE"
+# define KICK	"KICK"
+# define KILL	"KILL"
 
 class Server ;
 
@@ -95,8 +95,10 @@ class Commands
 		void	routeCmd();
 		void	routeCmdMap();
 
-		Server		*_server;
-		User		*_user;
+		Server						*_server;
+		User						*_user;
+		std::vector<std::string>	_params;
+
 		t_message	_message;
 		//std::map<std::string, f>	_cmdMap;
 		//std::map<std::string, f> _cmdMap;

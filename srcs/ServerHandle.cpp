@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 18:58:55 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/30 13:53:58 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/30 15:22:23 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,14 @@ void	printMap(std::map<int, T> & mymap){
 
 void	Server::updateServerMaps(int key){
 
-	std::pair<userMap::iterator,bool> userMapRet;
-	std::pair<cmdMap::iterator,bool> cmdMapret;
+	std::pair<userMap::iterator,bool>	userMapRet;
+	std::pair<cmdMap::iterator,bool>	cmdMapret;
 
 	userMapRet = _userMap.insert(std::pair<int, User *>(key, new User));
-	if (userMapRet.second == true )
+	if (userMapRet.second == true)
 		_userMap[key]->setFd(key);
 	cmdMapret = _cmdMap.insert(std::pair<int, std::string>(key, _buffer));
-	if (cmdMapret.second == false )
+	if (cmdMapret.second == false)
 		_cmdMap[key] += _buffer;
 }
 
@@ -49,7 +49,7 @@ std::string	extractCmd(std::string &s){
 
 void	Server::execCmd(int key, std::string &str){
 
-	Commands cmd = Commands(this, _userMap[key], _cmdMap[key]);
+	Commands cmd = Commands(this, _userMap[key], str);
 }
 
 void	Server::cmdMaker(int key){
@@ -58,9 +58,9 @@ void	Server::cmdMaker(int key){
 
 	while (1){
 		cmd = extractCmd(_cmdMap[key]);
-		if (cmd ==)
+		if (cmd.empty())
 			break;
-		execCmd(int key, cmd);
+		execCmd(key, cmd);
 	}
 }
 

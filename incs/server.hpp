@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/30 13:51:02 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/30 15:17:55 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,8 +51,8 @@ enum e_return {
 * the map will be used by the server to updated its _cmdBuffer
 *************************************************************/
 
-typedef std::map<int, User *>	userMap;
-typedef std::map<int, std::string> cmdMap;
+typedef std::map<int, User *>		userMap;
+typedef std::map<int, std::string>	cmdMap;
 
 class Server{
 	public :

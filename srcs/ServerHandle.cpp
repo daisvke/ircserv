@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 18:58:55 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/30 15:22:23 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/30 17:12:06 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ void	Server::updateServerMaps(int key){
 
 std::string	extractCmd(std::string &s){
 
-	std::string sub = 0;
+	std::string sub = "";
 	std::size_t pos = s.find("\r\n");
 
 	if (pos != std::string::npos)

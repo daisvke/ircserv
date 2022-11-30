@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/30 13:49:12 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/30 17:10:46 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,8 @@
 * 				Coplien Form
 *********************************************/
 
-Server::Server() : _addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS),
-	_opt(1), _nfds(0), _newSd(0), _password(){
+Server::Server() : _password(), _addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS),
+	_opt(1), _nfds(0), _newSd(0){
 
 	ircMemset((void *)_buffer, 0, sizeof(_buffer));
 	ircMemset((void *)_fds, 0, sizeof(_fds));

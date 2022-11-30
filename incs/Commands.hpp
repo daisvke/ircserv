@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:10 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/11/30 13:47:00 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/30 17:09:52 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,14 +65,14 @@ typedef struct s_message
 	std::vector<std::string>	params;
 }	t_message;
 
-
-typedef std::map<std::string, void (*)()> commandsMap;
 class Commands
 {
+	typedef std::map<std::string, void(Commands::*)(void)> cmdMap;
+
 	public:
 
 	Commands(Server *server, User *user, t_message msg);
-	Commands(Server *server, User *user, std::string strMsg);
+	Commands(Server *server, User *user, std::string &str);
 	~Commands();
 
 	private:
@@ -85,18 +85,23 @@ class Commands
 		void	part(void);
 		void	mode(void);
 		void	topic(void);
-		void	names(void) const;
-		void	list(void) const;
+		void	names(void);
+		void	list(void);
 		void	invite(void);
 		void	kick(void);
 		void	kill(void);
+
+		void	setupMap();
 		void	routeCmd();
 		void	routeCmdMap();
 
 		Server		*_server;
 		User		*_user;
 		t_message	_message;
-		commandsMap	_cmdMap;
+		//std::map<std::string, f>	_cmdMap;
+		//std::map<std::string, f> _cmdMap;
+		//std::map<std::string, void(Commands::*)(void)>   _cmdMap;
+		cmdMap		_cmdMap;
 
 };
 

@@ -6,11 +6,12 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/29 19:23:26 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/30 13:49:12 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
+
 
 /*********************************************
 * 				Coplien Form
@@ -343,6 +344,7 @@ void	Server::closeAllConn(){
 	Server Utils
 *******************************************/
 Channel	*Server::findChannel(std::string name){
+
 	for (size_t i(0); i < _channels.size(); ++i) {
 		if (_channels[i]->getName() == name)
 			return _channels[i];

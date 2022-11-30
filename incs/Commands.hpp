@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Commands.hpp                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dtanigaw <dtanigaw@student.42.fr>          +#+  +:+       +#+        */
+/*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:10 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/11/21 07:39:52 by dtanigaw         ###   ########.fr       */
+/*   Updated: 2022/11/30 13:47:00 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,26 @@
 # include <vector>
 # include <algorithm>
 
-# include "server.hpp"
+
 # include "User.hpp"
 # include "Channel.hpp"
+# include "server.hpp"
+
+# define NICK "NICK"
+# define USER "USER"
+# define OPER "OPER"
+# define QUIT "QUIT"
+# define JOIN "JOIN"
+# define PART "PART"
+# define MODE "MODE"
+# define TOPIC "TOPIC"
+# define NAMES "NAMES"
+# define LIST "LIST"
+# define INVITE "INVITE"
+# define KICK "KICK"
+# define KILL "KILL"
+
+class Server ;
 
 enum	e_commands
 {
@@ -49,13 +66,14 @@ typedef struct s_message
 }	t_message;
 
 
+typedef std::map<std::string, void (*)()> commandsMap;
 class Commands
 {
 	public:
 
 	Commands(Server *server, User *user, t_message msg);
+	Commands(Server *server, User *user, std::string strMsg);
 	~Commands();
-
 
 	private:
 
@@ -73,10 +91,13 @@ class Commands
 		void	kick(void);
 		void	kill(void);
 		void	routeCmd();
+		void	routeCmdMap();
 
 		Server		*_server;
 		User		*_user;
 		t_message	_message;
+		commandsMap	_cmdMap;
+
 };
 
 #endif

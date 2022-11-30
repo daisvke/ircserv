@@ -6,12 +6,12 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 18:58:55 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/30 00:02:39 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/30 13:53:58 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
-#include "Commands.hpp"
+
 
 /* debug function */
 template <typename T>
@@ -34,39 +34,41 @@ void	Server::updateServerMaps(int key){
 		_cmdMap[key] += _buffer;
 }
 
-std::string	extractCmd(std::string &cmdBuffer){
+std::string	extractCmd(std::string &s){
 
 	std::string sub = 0;
-	std::size_t pos = _cmdMap[key].find("\r\n");
+	std::size_t pos = s.find("\r\n");
 
 	if (pos != std::string::npos)
 	{
 		sub = s.substr(0 , pos);
-		line.erase (0, pos + 2 );
+		s.erase (0, pos + 2 );
 	}
-	return sub;
+	return (sub);
 }
 
-void	Server::cmdMaker(int key, std::string &str){
-	Commands	myCmd(this, _userMap[key], )
+void	Server::execCmd(int key, std::string &str){
+
+	Commands cmd = Commands(this, _userMap[key], _cmdMap[key]);
 }
 
-void	Server::execCmd(int key){
+void	Server::cmdMaker(int key){
 
 	std::string	cmd;
 
 	while (1){
-		cmd = extractCmd(_cmdBuffer[key]);
-		if (!cmd)
+		cmd = extractCmd(_cmdMap[key]);
+		if (cmd ==)
 			break;
-		cmdMaker(int key, cmd);
+		execCmd(int key, cmd);
 	}
 }
+
 
 void	Server::handleCmd(int key){
 
 	updateServerMaps(key);
-	execCmd(key);
+	cmdMaker(key);
 }
 
 

@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/29 23:08:25 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/30 13:51:02 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define SERVER_HPP
 
 # include "headers.hpp"
+# include "Commands.hpp"
 
 # define LOCAL_HOST "127.0.0.1"
 # define SERVER_PORT 8084
@@ -73,6 +74,11 @@ class Server{
 
 
 	private :
+
+		std::string			_password;
+		int					_port;
+
+		/*poll*/
 		struct sockaddr_in	_sockAddr;
 		int					_addrlen;
 		int					_listenSd;
@@ -82,13 +88,11 @@ class Server{
 		int					_nfds;
 		int					_newSd;
 		struct pollfd		_fds[MAX_CLIENT];
-		userMap				_userMap;
-		cmdMap				_cmdMap;
-		//std::list<struct pollfd>	_listFds;
 
-
-		std::string				_password;
-		//std::vector<User *>		_users;
+		/*cmd*/
+		userMap					_userMap;
+		cmdMap					_cmdMap;
+		std::vector<User *>		_users;
 		std::vector<Channel *>	_channels;
 
 		/*init the server */
@@ -109,7 +113,8 @@ class Server{
 
 		/*react to cmd */
 		void	updateServerMaps(int fd);
-		void	execCmd(int fd);
+		void	cmdMaker(int fd);
+		void	execCmd(int key, std::string &str);
 		void	handleCmd(int fd);
 
 		/*react management Utils */

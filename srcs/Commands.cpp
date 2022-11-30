@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/11/30 00:10:46 by lchan            ###   ########.fr       */
+/*   Updated: 2022/11/30 13:24:49 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 
 Commands::Commands(Server *server, User *user, t_message msg)
 	: _server(server), _user(user), _message(msg) { routeCmd(); }
+
+Commands::Commands(Server *server, User *user, std::string strMsg)
+	: _server(server), _user(user), _message.params(ircSplit(stdMsg, ' ')){ buildMap();}
 
 Commands::~Commands() {}
 
@@ -37,6 +40,23 @@ void	Commands::routeCmd()
 
 		default:		std::cerr << "erroooor cmd not found" << std::endl; //replace fct
 	}
+}
+
+void	Commands::buildMap()
+{
+	_cmdRoute[NICK]		=	&nick();
+	_cmdRoute[USER]		=	&user();
+	_cmdRoute[OPER]		=	&oper();
+	_cmdRoute[QUIT]		=	&quit();
+	_cmdRoute[JOIN]		=	&join();
+	_cmdRoute[PART]		=	&part();
+	_cmdRoute[MODE]		=	&mode();
+	_cmdRoute[TOPIC]	=	&topic();
+	_cmdRoute[NAMES]	=	&names();
+	_cmdRoute[LIST]		=	&list();
+	_cmdRoute[INVITE]	=	&invite();
+	_cmdRoute[KICK]		=	&kick();
+	_cmdRoute[KILL]		=	&kill();
 }
 
 /*************************************************************

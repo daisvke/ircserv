@@ -6,20 +6,20 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 18:58:55 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/30 17:12:06 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/01 18:21:34 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "server.hpp"
 
-
 /* debug function */
 template <typename T>
 void	printMap(std::map<int, T> & mymap){
 	for (typename std::map<int, T>::iterator it = mymap.begin(); it!=mymap.end(); ++it){
-		std::cout << "key : " <<it->first << "\n" << "val : "<<it->second << std::endl;
+		std::cout << "key : " << "[" << it->first << "]" << " - " << "val : "<< "[" << it->second << "]" << std::endl;
 	}
 }
+
 
 void	Server::updateServerMaps(int key){
 
@@ -64,20 +64,18 @@ void	Server::cmdMaker(int key){
 	}
 }
 
-
 void	Server::handleCmd(int key){
+
 
 	updateServerMaps(key);
 	cmdMaker(key);
+	printMap(_userMap);
 }
 
+void	Server::PrintInfo(void) {
 
-	// userMap::iterator it = _userMap.find('b');
-	// if ( it == _userMap.end())
-	// 	_userMap.insert(std::pair<int, User *>(fd, new User));
-
-			// printf("_buffer = %s, recvRet = %d\n",_buffer, recvRet);
-		// printf("_buffer[ret] = %d \n",_buffer[recvRet]);
-		// printf("_buffer[ret - 1] = %d\n", _buffer[recvRet - 1]);
-		// printf("_buffer[ret - 2] = %d \n", _buffer[recvRet - 2]);
-		// printf("_buffer[ret - 3] = %d \n\n", _buffer[recvRet - 3]);
+	std::cout << "printing _userMap" << std::endl;
+	printMap(_userMap);
+	std::cout << "printing _cmdMap" << std::endl;
+	printMap(_cmdMap);
+}

@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 18:47:19 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/11/29 22:56:31 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/01 17:47:00 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,10 @@ bool		User::isConnected(void) const { return _isConnected; }
 /* debug overload to delete*/
 std::ostream & operator<<(std::ostream & o, User * const &rhs){
 
-	o	<< "_fd :" << rhs->getFd() << "\n"
-		<< "_isOper: " << rhs->isOperator() << "\n"
-		<< "_isConnected: " << rhs->isConnected() << "\n"
-		<< "_nickName " << rhs->getNickName()
-		<< "_userName " << rhs->getUserName();
+	o	<< "_fd :" << rhs->getFd() << " "
+		<< "_isOper: " << rhs->isOperator() << " "
+		<< "_isConnected: " << rhs->isConnected() << " "
+		<< "_nickName: " << rhs->getNickName() << " "
+		<< "_userName: " << rhs->getUserName();
 	return (o);
 }

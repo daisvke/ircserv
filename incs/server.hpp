@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/30 15:17:55 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/01 18:19:44 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 # define SERVER_PORT 8084
 # define BUFFER_SIZE 1024
 # define MAX_CLIENT 100
-# define TIMEOUT 1100000
+# define TIMEOUT 1100
 # define TIMEOUT_MESS "time out - server automatic shutdown has been requested"
 # define ACCEPTED "the server has accepted your connection"
 # define SERVER_START_MESS "Server lauched"
@@ -57,10 +57,10 @@ typedef std::map<int, std::string>	cmdMap;
 class Server{
 	public :
 		Server();
-		Server(Server &cpy);
+		// Server(Server &cpy);
 		~Server();
 
-		Server &operator=(Server &rhs);
+		// Server &operator=(Server &rhs);
 
 		void				startServer();
 
@@ -83,6 +83,7 @@ class Server{
 		int					_addrlen;
 		int					_listenSd;
 		bool				_status;
+		bool				_CondenceArrayFlag;
 		char				_buffer[BUFFER_SIZE];
 		int					_opt;
 		int					_nfds;
@@ -118,13 +119,15 @@ class Server{
 		void	handleCmd(int fd);
 
 		/*react management Utils */
-		template <typename T> void	serverPrint(T & str){	std::cout << "[+] " << str << std::endl;}
+		template <typename T> void	serverPrint(T & str){std::cout << "[+] " << str << std::endl;}
 		void						closeConn(int index);
 		void						closeAllConn();
+		void						NarrowArray(void);
+		void						deleteUser(int index);
 		int							turnOffServer(std::string str);
 
-
-
+		/*visual utils*/
+		void	PrintInfo(void);
 };
 
 #endif

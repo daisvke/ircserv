@@ -15,7 +15,7 @@
 * A map including a pointer to the users and indicating
 * whether the user is an operator or a regular user on this channel
 *************************************************************/
-typedef typename std::map<User *, std::string>	userDirectory;
+typedef /*typename*/ std::map<User *, std::string>	userDirectory;
 
 class Channel
 {

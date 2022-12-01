@@ -20,6 +20,10 @@ Commands::Commands(Server *server, User *user, std::string &str)
 	: _server(server), _user(user), _params(ircSplit(str, ' '))
 	{
 		_message.params = ircSplit(str, ' ');
+		// If corresponds to unused line thrown before the first command,
+		//	skip it.
+		if (_params[0] == "CAP")
+			return ;
 		setupMap();
 	}
 

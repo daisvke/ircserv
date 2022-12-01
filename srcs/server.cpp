@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/01 19:36:37 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/01 22:41:39 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 *********************************************/
 
 Server::Server() :	_password(), _addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS),
-					_CondenceArrayFlag(ON_STATUS), _opt(1), _nfds(0), _newSd(0)
+					_condenceArrayFlag(ON_STATUS), _opt(1), _nfds(0), _newSd(0)
 {
 	ircMemset((void *)_buffer, 0, sizeof(_buffer));
 	ircMemset((void *)_fds, 0, sizeof(_fds));
@@ -34,7 +34,7 @@ Server::~Server(){ closeAllConn(); std::cout << "Server destructor called" << st
 	/*************************************************************
 	* Create stream socket to receive incoming connections
 	*************************************************************/
-int		Server::setSocket()
+int	Server::setSocket()
 {
 	_listenSd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (_listenSd == ERROR)
@@ -47,7 +47,7 @@ int		Server::setSocket()
 	/*************************************************************
 	* Allow socket descriptor to be reuseable
 	*************************************************************/
-int		Server::setSocketopt()
+int	Server::setSocketopt()
 {
 	if (setsockopt(_listenSd, SOL_SOCKET, SO_REUSEADDR
 		| SO_REUSEPORT, &_opt, sizeof(_opt)) == ERROR)
@@ -61,7 +61,7 @@ int		Server::setSocketopt()
 	* 	--> (similar to O_NONBLOCK flag with the fcntl subroutine)
 	* All incoming connections will inherit that state from listening socket
 	*************************************************************/
-int		Server::setNonBlocking()
+int	Server::setNonBlocking()
 {
 	int on = 1;
 	int ret = ioctl(_listenSd, FIONBIO, (char *)&on);
@@ -74,7 +74,7 @@ int		Server::setNonBlocking()
 	/*************************************************************
 	* Bind the socket
 	*************************************************************/
-int		Server::bindSocket()
+int	Server::bindSocket()
 {
 	_sockAddr.sin_family = AF_INET;
 	_sockAddr.sin_addr.s_addr = inet_addr(LOCAL_HOST);
@@ -88,7 +88,7 @@ int		Server::bindSocket()
 	/*************************************************************
 	* Set the listen back log and initial listening socket
 	*************************************************************/
-int		Server::setListenSocket()
+int	Server::setListenSocket()
 {
 	if (listen(_listenSd, MAX_CLIENT) == ERROR )
 		return (E_LISTEN_ERR);
@@ -214,6 +214,20 @@ void	Server::readExistingFds(int index){
 	ircMemset((void *)_buffer, 0, sizeof(_buffer));
 }
 
+void	Server::sendMsg(int fd, std::string &msg){
+
+	int	sendRet;
+
+	sendRet = send(fd, msg.c_str(), msg.length(), 0);
+	if (sendRet < 0)
+	{
+		serverPrint("send() failed");
+		for (int i = 0; i < _nfds; i++)
+			if (_fds[i].fd == fd)
+				closeConn(i);
+	}
+}
+
 /****************************************************************************
  * if poll does not fail, it's either :
 	-> _listenSd (listen socket descriptor) is readable (a new connection is incomming)
@@ -273,20 +287,19 @@ void	Server::startServer(){
 *******************************************/
 void	Server::closeConn(int index)
 {
-	int	i = _fds[index].fd;
+	int	fd = _fds[index].fd;
 
-	if (i > -1){
-		deleteUser(i);
-		close(i);
-		i = -1;
+	if (fd > -1){
+		deleteUser(fd);
+		close(fd);
+		fd = -1;
 	}
-	if (_CondenceArrayFlag && index < _nfds)
+	if (_condenceArrayFlag && index < _nfds)
 		NarrowArray();
 }
 
 void	Server::NarrowArray(void)
 {
-	_CondenceArrayFlag = 0;
 	for (int i = 0; i < _nfds; i++){
 		if(_fds[i].fd == -1){
 			for (int j = i; j < _nfds; j++)
@@ -321,6 +334,7 @@ int		Server::turnOffServer(std::string str)
 
 void	Server::closeAllConn()
 {
+	_condenceArrayFlag = 0;
 	for (int i = 0; i < _nfds; i++)
 		if (_fds[i].fd > 0)
 			closeConn(i);

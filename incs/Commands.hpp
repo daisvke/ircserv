@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:10 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/01 15:53:51 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/01 22:42:52 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@
 # define KICK	"KICK"
 # define KILL	"KILL"
 
+# define RPL_WELCOME(nick) (":Welcome to the Internet Relay Network " + nick + "\r\n")
+
 class Server ;
 
 class Commands
@@ -45,6 +47,11 @@ class Commands
 
 		Commands(Server *server, User *user, std::string &str);
 		~Commands();
+
+	public:
+
+		// getter
+		std::string	&getRpl();
 
 	private:
 
@@ -70,7 +77,7 @@ class Commands
 		std::vector<std::string>	_params;
 		cmdMap						_cmdMap;
 
-
+		std::string					_rpl;
 };
 
 #endif

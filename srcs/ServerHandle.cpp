@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 18:58:55 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/01 18:21:34 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/01 22:40:49 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ void	printMap(std::map<int, T> & mymap){
 		std::cout << "key : " << "[" << it->first << "]" << " - " << "val : "<< "[" << it->second << "]" << std::endl;
 	}
 }
-
 
 void	Server::updateServerMaps(int key){
 
@@ -50,6 +49,7 @@ std::string	extractCmd(std::string &s){
 void	Server::execCmd(int key, std::string &str){
 
 	Commands cmd = Commands(this, _userMap[key], str);
+	sendMsg(key, cmd.getRpl());
 }
 
 void	Server::cmdMaker(int key){
@@ -64,12 +64,12 @@ void	Server::cmdMaker(int key){
 	}
 }
 
+/* key = _fds[index].fd */
 void	Server::handleCmd(int key){
-
 
 	updateServerMaps(key);
 	cmdMaker(key);
-	printMap(_userMap);
+	//printMap(_userMap);
 }
 
 void	Server::PrintInfo(void) {

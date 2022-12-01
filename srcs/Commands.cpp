@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/01 18:07:00 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/01 22:53:19 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ Commands::Commands(Server *server, User *user, std::string &str)
 	}
 
 Commands::~Commands() {}
+
+std::string&	Commands::getRpl(){ return (_rpl);}
 
 void	Commands::setupMap()
 {
@@ -41,6 +43,11 @@ void	Commands::setupMap()
 	_cmdMap[KILL]	=		&Commands::kill;
 }
 
+// void	Commands::setupRplMap() // set up a map for answers
+// {
+
+// }
+
 void	Commands::routeCmd()
 {
 	cmdMap::iterator it;
@@ -48,6 +55,8 @@ void	Commands::routeCmd()
 	it = _cmdMap.find(_params[0]);
 	if (it != _cmdMap.end())
 		(this->*_cmdMap[_params[0]])();
+	if (_rpl.empty())
+		_rpl = "test\r\n";
 }
 
 /*************************************************************
@@ -55,8 +64,7 @@ void	Commands::routeCmd()
 *************************************************************/
 void	Commands::nick(void)
 {
-	std::cout << " >>>>>>>>>> inside nick function" << std::endl;
-	if (_params.size() < 2) { printf("size problem !!!!!! \n"); return ;/* ERR_NONICKNAMEGIVEN */ }
+	if (_params.size() < 2) { return ;/* ERR_NONICKNAMEGIVEN */ }
 
 	std::string	newNick = _params[1];
 	if (_server->findUserByNick(newNick) == false)
@@ -64,8 +72,6 @@ void	Commands::nick(void)
 	else {
 		// return ERR_NICKNAMEINUSE
 	}
-	std::cout << " >>>>>>>>>> outside nick function" << std::endl;
-
 }
 
 /*************************************************************
@@ -73,16 +79,12 @@ void	Commands::nick(void)
 *************************************************************/
 void	Commands::user(void)
 {
-	std::cout << " >>>>>>>>>> inside user function" << std::endl;
-
 	if (_params.size() < 2) { return ;/*ERR_NEEDMOREPARAMS */}
 
 	std::string	newUserName = _params[1];
 	if (_server->findUserByName(newUserName) == false)
 		_user->setUserName(newUserName);
 	else { /* ERR_ALREADYREGISTRED */ }
-	std::cout << "outside user function <<<<<<<<<<<<<<" << std::endl;
-
 }
 
 /*************************************************************

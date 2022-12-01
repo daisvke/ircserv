@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/01 18:29:13 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/01 19:36:37 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,47 +18,14 @@
 *********************************************/
 
 Server::Server() :	_password(), _addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS),
-					_CondenceArrayFlag(OFF_STATUS), _opt(1), _nfds(0), _newSd(0)
+					_CondenceArrayFlag(ON_STATUS), _opt(1), _nfds(0), _newSd(0)
 {
 	ircMemset((void *)_buffer, 0, sizeof(_buffer));
 	ircMemset((void *)_fds, 0, sizeof(_fds));
 	std::cout << ircTime() <<"Server constructor called" << std::endl;
 }
 
-// Server::Server(Server &cpy)
-// {
-// 	*this = cpy;
-// }
-
-Server::~Server(){
-
-	closeAllConn();
-	// // Clean up all of the users that have be created
-	// userMap::iterator it;
-	// for (userMap::iterator it = _userMap.begin(); it != _userMap.end(); ++it)
-	// 	delete (it->second);
-	// // Clean up all of the sockets that are open
-	// if (_nfds){
-	// 	for (int i = 0; i < _nfds; i++)
-	// 		if(_fds[i].fd >= 0)
-	// 			close(_fds[i].fd);
-	// }
-	// else if (_listenSd >= 0)
-	// 		close (_listenSd);
-
-	std::cout << "Server destructor called" << std::endl;
-}
-
-// Server	&Server::operator=(Server &rhs){
-
-// 	_sockAddr = rhs._sockAddr;
-// 	_listenSd = rhs._listenSd;
-// 	_addrlen = rhs._addrlen;
-// 	for (int i = 0; i < BUFFER_SIZE; i++)
-// 		rhs._buffer[i] = _buffer[i];
-// 	_opt = rhs._opt;
-// 	return (*this);
-// }
+Server::~Server(){ closeAllConn(); std::cout << "Server destructor called" << std::endl;}
 
 /*********************************************
  * 				initServer
@@ -229,7 +196,7 @@ int	Server::acceptNewSd()
 	recv returns the number of bytes received, -1 if an error occured and 0 for EOF
 	*****************************************************************************/
 void	Server::readExistingFds(int index){
-	printf("readExistingFds : fd is readable, a new message has been received: index = %d , fd = %d \n", index, _fds[index].fd);
+	//printf("readExistingFds : fd is readable, a new message has been received: index = %d , fd = %d \n", index, _fds[index].fd);
 
 	int recvRet;
 
@@ -336,15 +303,13 @@ void	Server::deleteUser(int index)
 	cmdMap::iterator	cmdIterator;
 
 	userIterator = _userMap.find(index);
-	if (userIterator != _userMap.end())
-	{
+	if (userIterator != _userMap.end()){
 		delete (_userMap[index]);
 		_userMap.erase(index);
 	}
 	cmdIterator  = _cmdMap.find(index);
 	if (cmdIterator != _cmdMap.end())
 		_cmdMap.erase(index);
-
 }
 
 int		Server::turnOffServer(std::string str)
@@ -358,9 +323,8 @@ void	Server::closeAllConn()
 {
 	for (int i = 0; i < _nfds; i++)
 		if (_fds[i].fd > 0)
-			closeConn(_fds[i].fd);
+			closeConn(i);
 }
-
 
 /******************************************
 	Server Utils

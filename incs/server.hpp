@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/01 18:19:44 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/01 19:51:24 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 # define SERVER_PORT 8084
 # define BUFFER_SIZE 1024
 # define MAX_CLIENT 100
-# define TIMEOUT 1100
+# define TIMEOUT 2100
 # define TIMEOUT_MESS "time out - server automatic shutdown has been requested"
 # define ACCEPTED "the server has accepted your connection"
 # define SERVER_START_MESS "Server lauched"
@@ -57,13 +57,9 @@ typedef std::map<int, std::string>	cmdMap;
 class Server{
 	public :
 		Server();
-		// Server(Server &cpy);
 		~Server();
 
-		// Server &operator=(Server &rhs);
-
 		void				startServer();
-
 		/* Note to delete: putting these functions here in public
 		to be able to use them with Command class */
 		std::string				getPassword(void) const;
@@ -71,7 +67,6 @@ class Server{
 		Channel					*findChannel(std::string name);
 		User					*findUserByNick(std::string name);
 		User					*findUserByName(std::string name);
-
 
 	private :
 
@@ -93,7 +88,6 @@ class Server{
 		/*cmd*/
 		userMap					_userMap;
 		cmdMap					_cmdMap;
-		std::vector<User *>		_users;
 		std::vector<Channel *>	_channels;
 
 		/*init the server */
@@ -119,12 +113,13 @@ class Server{
 		void	handleCmd(int fd);
 
 		/*react management Utils */
-		template <typename T> void	serverPrint(T & str){std::cout << "[+] " << str << std::endl;}
-		void						closeConn(int index);
-		void						closeAllConn();
-		void						NarrowArray(void);
-		void						deleteUser(int index);
-		int							turnOffServer(std::string str);
+		template <typename T>
+		void	serverPrint(T & str){std::cout << "[+] " << str << std::endl;}
+		void	closeConn(int index);
+		void	closeAllConn();
+		void	NarrowArray(void);
+		void	deleteUser(int index);
+		int		turnOffServer(std::string str);
 
 		/*visual utils*/
 		void	PrintInfo(void);
@@ -132,4 +127,5 @@ class Server{
 
 #endif
 
+//std::vector<User *>		_users;
 //irssi -n Warlink -p 8084 -c localhost

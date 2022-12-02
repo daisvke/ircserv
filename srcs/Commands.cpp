@@ -76,16 +76,13 @@ void	Commands::routeCmd()
 * Sends channel message to one or more members of the channel
 *************************************************************/
 
-void	Commands::sendMsg(Channel *channel, int fd, std::string &msg, bool broadcast)
+void	Commands::sendMsgToChan(Channel *channel, int fd, std::string &msg)
 {
-	if (broadcast == false) { _server->sendMsg(fd, msg); }
-	else {
-			userDirectory	users = channel->getUserDirectory();
-			userDirectory::iterator	it = users.begin();
+	userDirectory	users = channel->getUserDirectory();
+	userDirectory::iterator	it = users.begin();
 
-			for (; it != users.end(); ++it)
-				_server->sendMsg((*it).first->getFd(), msg);
-	}
+	for (; it != users.end(); ++it)
+		_server->sendMsg((*it).first->getFd(), msg);
 }
 
 

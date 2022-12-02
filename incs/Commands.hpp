@@ -80,7 +80,7 @@ class Commands
 
 		void	setupMap();
 		void	routeCmd();
-		void	sendMsg(Channel *channel, int fd, std::string &msg, bool broadcast);
+		void	sendMsgToChan(Channel *channel, int fd, std::string &msg);
 
 
 		Server						*_server;

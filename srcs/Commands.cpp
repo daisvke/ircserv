@@ -28,19 +28,20 @@ std::string&	Commands::getRpl(){ return (_rpl);}
 
 void	Commands::setupMap()
 {
-	_cmdMap[NICK]	=		&Commands::nick;
-	_cmdMap[USER]	=		&Commands::user;
-	_cmdMap[OPER]	=		&Commands::oper;
-	_cmdMap[QUIT]	=		&Commands::quit;
-	_cmdMap[JOIN]	=		&Commands::join;
-	_cmdMap[PART]	=		&Commands::part;
-	_cmdMap[MODE]	=		&Commands::mode;
-	_cmdMap[TOPIC]	=		&Commands::topic;
-	_cmdMap[NAMES]	=		&Commands::names;
-	_cmdMap[LIST]	=		&Commands::list;
-	_cmdMap[INVITE]	=		&Commands::invite;
-	_cmdMap[KICK]	=		&Commands::kick;
-	_cmdMap[KILL]	=		&Commands::kill;
+	_cmdMap[NICK]		=		&Commands::nick;
+	_cmdMap[USER]		=		&Commands::user;
+	_cmdMap[OPER]		=		&Commands::oper;
+	_cmdMap[QUIT]		=		&Commands::quit;
+	_cmdMap[JOIN]		=		&Commands::join;
+	_cmdMap[PART]		=		&Commands::part;
+	_cmdMap[MODE]		=		&Commands::mode;
+	_cmdMap[TOPIC]		=		&Commands::topic;
+	_cmdMap[NAMES]		=		&Commands::names;
+	_cmdMap[LIST]		=		&Commands::list;
+	_cmdMap[INVITE]		=		&Commands::invite;
+	_cmdMap[KICK]		=		&Commands::kick;
+	_cmdMap[PRIVMSG]	=		&Commands::privmsg;
+	_cmdMap[KILL]		=		&Commands::kill;
 }
 
 // void	Commands::setupRplMap() // set up a map for answers
@@ -58,6 +59,24 @@ void	Commands::routeCmd()
 	if (_rpl.empty())
 		_rpl = "test\r\n";
 }
+
+
+/*************************************************************
+* Sends channel message to one or more members of the channel
+*************************************************************/
+
+void	Commands::sendMsg(Channel *channel, int fd, std::string &msg, bool broadcast)
+{
+	if (broadcast == false) { _server->sendMsg(fd, msg); }
+	else {
+			userDirectory	users = channel->getUserDirectory();
+			userDirectory::iterator	it = users.begin();
+
+			for (; it != users.end(); ++it)
+				_server->sendMsg((*it).first->getFd(), msg);
+	}
+}
+
 
 /*************************************************************
 * Changes the user's nickname online; for example /nick Carlos
@@ -316,9 +335,30 @@ void	Commands::kick(void)
 	// handle err_notonchannel ?
 }
 
-//void	Commands::privmsg(void) {}
+void	Commands::privmsg(void)
+{
+	std::vector<std::string>	userNames = ircSplit(_params[1], ',');
+	std::string					message = _params[2];
 
-//void	Commands::notice(void) {}
+	if (_params.size() < 2) { return ;/*ERR_NORECIPIENT;*/ }
+
+	for (size_t i(0); i < userNames.size(); ++i)
+	{
+		User	*target = _server->findUserByNick(userNames[i]);
+		if (!target) { /* ERR_NOSUCHNICK */ return ;}
+		_server->sendMsg(target->getFd(), message);
+	}
+}
+
+/*************************************************************
+* Unlike privmsg, does not send errorback error messages
+*************************************************************/
+void	Commands::notice(void) {
+	std::string					message = _params[2];
+
+	User	*target = _server->findUserByNick(_params[1]);
+	_server->sendMsg(target->getFd(), message);
+}
 
 void	Commands::kill(void)
 {

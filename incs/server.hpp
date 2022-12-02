@@ -67,6 +67,8 @@ class Server{
 		Channel					*findChannel(std::string name);
 		User					*findUserByNick(std::string name);
 		User					*findUserByName(std::string name);
+		void					sendMsg(int fd, std::string &msg);
+
 
 	private :
 
@@ -121,7 +123,6 @@ class Server{
 		void	NarrowArray(void);
 		void	deleteUser(int index);
 		int		turnOffServer(std::string str);
-		void	sendMsg(int fd, std::string &msg);
 
 		/*visual utils*/
 		void	PrintInfo(void);

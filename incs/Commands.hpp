@@ -21,19 +21,21 @@
 # include "Channel.hpp"
 # include "server.hpp"
 
-# define NICK	"NICK"
-# define USER	"USER"
-# define OPER	"OPER"
-# define QUIT	"QUIT"
-# define JOIN	"JOIN"
-# define PART	"PART"
-# define MODE	"MODE"
-# define TOPIC	"TOPIC"
-# define NAMES	"NAMES"
-# define LIST	"LIST"
-# define INVITE	"INVITE"
-# define KICK	"KICK"
-# define KILL	"KILL"
+# define NICK		"NICK"
+# define USER		"USER"
+# define OPER		"OPER"
+# define QUIT		"QUIT"
+# define JOIN		"JOIN"
+# define PART		"PART"
+# define MODE		"MODE"
+# define TOPIC		"TOPIC"
+# define NAMES		"NAMES"
+# define LIST		"LIST"
+# define INVITE		"INVITE"
+# define KICK		"KICK"
+# define PRIVMSG	"PRIVMSG"
+# define KILL		"KILL"
+
 
 # define RPL_WELCOME(nick) (":Welcome to the Internet Relay Network " + nick + "\r\n")
 
@@ -55,6 +57,8 @@ class Commands
 
 	private:
 
+		enum e_broadcastMode{ _TO_ONE, _TO_ALL };
+
 		void	nick(void);
 		void	user(void);
 		void	oper(void);
@@ -67,10 +71,14 @@ class Commands
 		void	list(void);
 		void	invite(void);
 		void	kick(void);
+		void	privmsg(void);
+		void	notice(void);
 		void	kill(void);
 
 		void	setupMap();
 		void	routeCmd();
+		void	sendMsg(Channel *channel, int fd, std::string &msg, bool broadcast);
+
 
 		Server						*_server;
 		User						*_user;

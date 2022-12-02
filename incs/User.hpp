@@ -42,7 +42,7 @@ class User
 
 		int			_fd;
 		bool		_isOper;
-		bool		_isConnected;
+		bool		_isConnected; // usefull ?
 		std::string	_nickName;
 		std::string	_userName;
 };

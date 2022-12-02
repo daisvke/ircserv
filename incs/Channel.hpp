@@ -55,12 +55,12 @@ public:
 	bool checkMode(char c) const;
 
 private:
-	std::string _name;
-	std::string _topic;
-	std::string _modes;
-	std::string _key;
-	userDirectory _users;
-	size_t _userLimit;
+	std::string		_name;
+	std::string		_topic;
+	std::string		_modes;
+	std::string		_key;
+	userDirectory	_users;
+	size_t			_userLimit;
 };
 
 #endif

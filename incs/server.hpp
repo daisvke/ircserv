@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/01 22:44:23 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/02 17:00:24 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,10 @@
 # define BUFFER_SIZE 1024
 # define MAX_CLIENT 1000
 # define TIMEOUT 21000
+# define SERVER_VERSION "Ubuntu 22.04.1 LTS"
+# define SERVER_NAME "<ircserv	>"
+
+
 # define TIMEOUT_MESS "time out - server automatic shutdown has been requested"
 # define ACCEPTED "the server has accepted your connection"
 # define SERVER_START_MESS "Server lauched"
@@ -75,6 +79,7 @@ class Server{
 
 		std::string			_password;
 		int					_port;
+		std::string			_creationTime;
 
 		/*poll*/
 		struct sockaddr_in	_sockAddr;

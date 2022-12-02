@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 18:58:55 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/01 22:40:49 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/02 15:30:24 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ std::string	extractCmd(std::string &s){
 void	Server::execCmd(int key, std::string &str){
 
 	Commands cmd = Commands(this, _userMap[key], str);
-	sendMsg(key, cmd.getRpl());
+	//sendMsg(key, cmd.getRpl());
 }
 
 void	Server::cmdMaker(int key){

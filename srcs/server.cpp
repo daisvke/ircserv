@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/01 22:41:39 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/02 15:50:48 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,12 @@
 * 				Coplien Form
 *********************************************/
 
-Server::Server() :	_password(), _addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS),
+Server::Server() :	_password(), _creationTime(getTimeStr()), _addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS),
 					_condenceArrayFlag(ON_STATUS), _opt(1), _nfds(0), _newSd(0)
 {
 	ircMemset((void *)_buffer, 0, sizeof(_buffer));
 	ircMemset((void *)_fds, 0, sizeof(_fds));
-	std::cout << ircTime() <<"Server constructor called" << std::endl;
+	std::cout << _creationTime <<"Server constructor called" << std::endl;
 }
 
 Server::~Server()
@@ -320,7 +320,7 @@ void	Server::deleteUser(int index)
 	cmdMap::iterator	cmdIterator;
 
 	userIterator = _userMap.find(index);
-	if (userIterator != _userMap.end()){
+	if (userIterator != _userMap.end()){ //Do we have to delete user from all channel ?
 		delete (_userMap[index]);
 		_userMap.erase(index);
 	}

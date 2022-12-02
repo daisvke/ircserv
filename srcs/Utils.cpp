@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 12:51:53 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/29 14:19:58 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/02 15:58:17 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,4 +63,14 @@ std::string	ircTime(){
 		<< ((ltm->tm_min < 10) ? "0" : "")
 		<< ltm->tm_min << " ";
 	return (ss.str());
+}
+
+std::string	getTimeStr(){
+
+	time_t				now = time(0);
+	std::string			dt = ctime(&now);
+
+	dt.erase(dt.end() - 1); // erase the \n of the end
+
+	return(dt);
 }

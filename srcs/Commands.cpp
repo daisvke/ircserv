@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/01 22:53:19 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/02 17:32:00 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,10 +44,15 @@ void Commands::setupMap()
 	_cmdMap[KILL] = &Commands::kill;
 }
 
-// void	Commands::setupRplMap() // set up a map for answers
-// {
+void	Commands::setupRplMap() // set up a map for answers
+{
+	std::string	nick = _user->getNickName();
+	std::string cmd = _params[0];
 
-// }
+
+	_rplMap["RPL_WELCOME"] = RPL_WELCOME(_user->getNickName());
+	
+}
 
 /*************************************************************
  * Looks for the command on the cmdMap.
@@ -69,7 +74,7 @@ void Commands::routeCmd()
 	}
 
 	if (_rpl.empty())
-		_rpl = "test\r\n";
+		_rpl = _rplMap[NICK];
 }
 
 /*************************************************************
@@ -505,28 +510,3 @@ void printMap(std::map<std::string, T> &mymap)
 				  << "val : " << it->second << std::endl;
 	}
 }
-
-// Commands::Commands(Server *server, User *user, t_message msg)
-// 	: _server(server), _user(user), _message(msg) { routeCmd(); }
-
-// void	Commands::routeCmd()
-// {
-// 	switch (_message.cmd)
-// 	{
-// 		case _NICK:		nick(); break;
-// 		case _USER:		user(); break;
-// 		case _OPER:		oper(); break;
-// 		case _QUIT:		quit(); break;
-// 		case _JOIN:		join(); break;
-// 		case _PART:		part(); break;
-// 		case _MODE:		mode(); break;
-// 		case _TOPIC:	topic(); break;
-// 		case _NAMES:	names(); break;
-// 		case _LIST:		list(); break;
-// 		case _INVITE:	invite(); break;
-// 		case _KICK:		kick(); break;
-// 		case _KILL:		kill(); break;
-
-// 		default:		std::cerr << "erroooor cmd not found" << std::endl; //replace fct
-// 	}
-// }

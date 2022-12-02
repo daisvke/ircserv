@@ -124,7 +124,11 @@ void	Commands::nick(void)
 *************************************************************/
 void	Commands::user(void)
 {
-	if (_params.size() < 2) { return ;/*ERR_NEEDMOREPARAMS */}
+	if (_params.size() < 2) {
+		std::string	message = _ERR_NEEDMOREPARAMS;
+		_server->sendMsg(_user->getFd(), message);
+		return ;
+	}
 
 	std::string	newUserName = _params[1];
 	if (_server->findUserByName(newUserName) == false)

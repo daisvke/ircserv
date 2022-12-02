@@ -124,11 +124,12 @@ void	Commands::nick(void)
 *************************************************************/
 void	Commands::user(void)
 {
+	/*
 	if (_params.size() < 2) {
 		std::string	message = _ERR_NEEDMOREPARAMS;
-		_server->sendMsg(_user->getFd(), message);
-		return ;
+		_server->sendMsg(_user->getFd(), message); return ;
 	}
+	*/
 
 	std::string	newUserName = _params[1];
 	if (_server->findUserByName(newUserName) == false)
@@ -141,14 +142,21 @@ void	Commands::user(void)
 *************************************************************/
 void	Commands::oper(void)
 {
-	if (_params.size() < 3) { return ; /*ERR_NEEDMOREPARAMS */}
+	if (_params.size() < 3) {
+		std::string	message = _ERR_NEEDMOREPARAMS;
+		_server->sendMsg(_user->getFd(), message); return ;
+	}
 
 	User		*user = _server->findUserByNick(_params[1]);
 	if (!user) { return ;/* ERR not found */ }
 	if (_server->getPassword() != _params[1]) {
+			std::string	message = _RPL_YOUREOPER;
+		_server->sendMsg(_user->getFd(), message); return ;
 		return; /* ERR_PASSWDMISMATCH */
 	}
 	_user->setAsOperator();
+	std::string	message = _RPL_YOUREOPER;
+	_server->sendMsg(_user->getFd(), message);
 }
 
 /*************************************************************

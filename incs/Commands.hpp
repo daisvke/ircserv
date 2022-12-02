@@ -40,6 +40,7 @@
 # define RPL_WELCOME(nick) (":Welcome to the Internet Relay Network " + nick + "\r\n")
 
 # define _ERR_NEEDMOREPARAMS	"Not enough parameters given"
+# define _RPL_YOUREOPER			"You are oper"
 
 class Server ;
 

@@ -221,6 +221,7 @@ void	Server::sendMsg(int fd, std::string &msg){
 
 	int	sendRet;
 
+	msg += _CRLF;
 	sendRet = send(fd, msg.c_str(), msg.length(), 0);
 	if (sendRet < 0)
 	{

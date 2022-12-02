@@ -25,6 +25,7 @@
 # define ACCEPTED "the server has accepted your connection"
 # define SERVER_START_MESS "Server lauched"
 # define POLL_ERR_MESS "Poll() failed"
+# define _CRLF "\r\n"
 
 enum e_socket{
 	E_SOCK_SUCCESS,

@@ -49,13 +49,24 @@ void	Commands::setupMap()
 
 // }
 
+
+/*************************************************************
+* Looks for the command on the cmdMap.
+* If nothing is found, sends an error message to the user.
+*************************************************************/
 void	Commands::routeCmd()
 {
 	cmdMap::iterator it;
+	std::string			cmd = _params[0];
 
-	it = _cmdMap.find(_params[0]);
+	it = _cmdMap.find(cmd);
 	if (it != _cmdMap.end())
-		(this->*_cmdMap[_params[0]])();
+		(this->*_cmdMap[cmd])();
+	else {
+		std::string	message = "Unknown command: " + cmd;
+		_server->sendMsg(_user->getFd(), message); return ;
+	}
+
 	if (_rpl.empty())
 		_rpl = "test\r\n";
 }
@@ -79,17 +90,32 @@ void	Commands::sendMsg(Channel *channel, int fd, std::string &msg, bool broadcas
 
 
 /*************************************************************
-* Changes the user's nickname online; for example /nick Carlos
+* Changes the user's nickname online; for example /nick Carlos.
+* If no new nick is given, prints the current nick.
 *************************************************************/
 void	Commands::nick(void)
 {
-	if (_params.size() < 2) { return ;/* ERR_NONICKNAMEGIVEN */ }
-
+	std::string	message;
 	std::string	newNick = _params[1];
-	if (_server->findUserByNick(newNick) == false)
+	std::remove_if(newNick.begin(), newNick.end(), isspace);
+	if (newNick.empty())
+	{
+		message = "No nickname given"; // ERR_NONICKNAMEGIVEN
+		_server->sendMsg(_user->getFd(), message); return ;
+	}
+	if (_params.size() == 1) {
+		message = "Your nickname is " + newNick;
+		_server->sendMsg(_user->getFd(), message); return ;
+	}
+
+	if (_server->findUserByNick(newNick) == false) {
 		_user->setNickName(newNick);
+		message = "You're now known as " + newNick;
+		_server->sendMsg(_user->getFd(), message);
+	}
 	else {
-		// return ERR_NICKNAMEINUSE
+		message = "Nick " + newNick + " is already in use"; // ERR_NICKNAMEINUSE
+		_server->sendMsg(_user->getFd(), message);
 	}
 }
 

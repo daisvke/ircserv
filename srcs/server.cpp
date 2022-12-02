@@ -25,7 +25,11 @@ Server::Server() :	_password(), _addrlen(sizeof(_sockAddr)), _listenSd(-1), _sta
 	std::cout << ircTime() <<"Server constructor called" << std::endl;
 }
 
-Server::~Server(){ closeAllConn(); std::cout << "Server destructor called" << std::endl;}
+Server::~Server()
+{
+	closeAllConn(); std::cout << "Server destructor called" << std::endl;
+	deleteAllUsers();
+}
 
 /*********************************************
  * 				initServer
@@ -323,6 +327,16 @@ void	Server::deleteUser(int index)
 	cmdIterator  = _cmdMap.find(index);
 	if (cmdIterator != _cmdMap.end())
 		_cmdMap.erase(index);
+}
+
+void	Server::deleteAllUsers(void)
+{
+	userMap::iterator	it = _userMap.begin();
+
+	for (; it != _userMap.end(); ++it) {
+		int	userFd = (*it).second->getFd();
+		deleteUser(userFd);
+	}
 }
 
 int		Server::turnOffServer(std::string str)

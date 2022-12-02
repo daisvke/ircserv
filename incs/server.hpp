@@ -122,6 +122,7 @@ class Server{
 		void	closeAllConn();
 		void	NarrowArray(void);
 		void	deleteUser(int index);
+		void	deleteAllUsers(void);
 		int		turnOffServer(std::string str);
 
 		/*visual utils*/

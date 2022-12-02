@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:10 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/02 17:19:15 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/01 22:42:52 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,11 +36,8 @@
 # define PRIVMSG	"PRIVMSG"
 # define KILL		"KILL"
 
-// welcome
-# define RPL_WELCOME(nick)					(":Welcome to the Internet Relay Network " + nick + "\r\n")
-# define RPL_YOURHOST(servername, version)	(":Your host is " + servername + ", running version " + version + "\r\n")
-# define RPL_MYINFO(servername, version, usr_modes, chann_modes) (":" + servername + " " + version + " " + usr_modes + " " + chann_modes + "\r\n")
-# define RPL_CREATED(date)					(":This server was created " + date + "\r\n");
+
+# define RPL_WELCOME(nick) (":Welcome to the Internet Relay Network " + nick + "\r\n")
 
 # define _ERR_NOSUCHCMD(cmd)		"Unknown command: " + cmd
 # define _ERR_NEEDMOREPARAMS		"Not enough parameters given"
@@ -57,16 +54,15 @@
 # define _ERR_BADCHANNELKEY(chan)	"Wrong key for " + chan
 # define _ERR_CHANNELISFULL(chan)	"Channel " + chan + " is full"
 # define _ERR_INVITEONLYCHAN(chan)	"Channel " + chan + " is invite only"
+// part
+# define _ERR_NOSUCHCHANNEL(chan)	chan + ": No such channel: "
 
-//user
-# define ERR_ALREADYREGISTRED() (":Unauthorized command (already registered)\r\n")
 
 class Server ;
 
 class Commands
 {
-	typedef std::map<std::string, void(Commands::*)(void)>	cmdMap;
-	typedef std::map<std::string, std::string>				rplMap;
+	typedef std::map<std::string, void(Commands::*)(void)> cmdMap;
 
 	public:
 
@@ -99,7 +95,6 @@ class Commands
 		void	kill(void);
 
 		void	setupMap();
-		void	setupRplMap();
 		void	routeCmd();
 		void	sendMsgToChan(Channel *channel, std::string &msg);
 
@@ -108,7 +103,6 @@ class Commands
 		User						*_user;
 		std::vector<std::string>	_params;
 		cmdMap						_cmdMap;
-		rplMap						_rplMap;
 
 		std::string					_rpl;
 };

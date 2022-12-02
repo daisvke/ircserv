@@ -145,11 +145,10 @@ void	Commands::oper(void)
 	}
 
 	User		*user = _server->findUserByNick(_params[1]);
-	if (!user) { return ;/* ERR not found */ }
+	if (!user) { return ; }
 	if (_server->getPassword() != _params[1]) {
-			std::string	message = _RPL_YOUREOPER;
+		std::string	message = _ERR_PASSWDMISMATCH;
 		_server->sendMsg(_user->getFd(), message); return ;
-		return; /* ERR_PASSWDMISMATCH */
 	}
 	_user->setAsOperator();
 	std::string	message = _RPL_YOUREOPER;
@@ -175,7 +174,7 @@ void	Commands::quit(void)
 				channels[i]->part((*it).first);
 	}
 	if (lastWords.empty() == false)
-		std::cout << lastWords << std::endl; // replace by server printer function
+		std::cout << lastWords << std::endl; // replace by server broadcast function
 }
 
 /*************************************************************

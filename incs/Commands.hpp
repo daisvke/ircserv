@@ -39,8 +39,6 @@
 
 # define RPL_WELCOME(nick) (":Welcome to the Internet Relay Network " + nick + "\r\n")
 
-# define _RPL_YOUREOPER				"You are oper"
-
 # define _ERR_NOSUCHCMD(cmd)		"Unknown command: " + cmd
 # define _ERR_NEEDMOREPARAMS		"Not enough parameters given"
 
@@ -49,6 +47,11 @@
 # define _RPL_NICKSUCCESS(nick)		"You're now known as " + nick
 # define _ERR_NONICKNAMEGIVEN		"No nickname given"
 # define _ERR_NICKNAMEINUSE(nick)	"Nick " + nick + " is already in use"
+# define _ERR_PASSWDMISMATCH		"Wrong password"
+
+// oper
+# define _RPL_YOUREOPER				"You are oper"
+
 
 class Server ;
 

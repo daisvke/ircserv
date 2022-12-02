@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/02 17:32:00 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/01 22:53:19 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,15 +44,10 @@ void Commands::setupMap()
 	_cmdMap[KILL] = &Commands::kill;
 }
 
-void	Commands::setupRplMap() // set up a map for answers
-{
-	std::string	nick = _user->getNickName();
-	std::string cmd = _params[0];
+// void	Commands::setupRplMap() // set up a map for answers
+// {
 
-
-	_rplMap["RPL_WELCOME"] = RPL_WELCOME(_user->getNickName());
-	
-}
+// }
 
 /*************************************************************
  * Looks for the command on the cmdMap.
@@ -74,7 +69,7 @@ void Commands::routeCmd()
 	}
 
 	if (_rpl.empty())
-		_rpl = _rplMap[NICK];
+		_rpl = "test\r\n";
 }
 
 /*************************************************************
@@ -251,7 +246,9 @@ void Commands::part(void)
 {
 	if (_params.size() < 2)
 	{
-		return; /*ERR_NEEDMOREPARAMS;*/
+		std::string message = _ERR_NEEDMOREPARAMS;
+		_server->sendMsg(_user->getFd(), message);
+		return;
 	}
 
 	std::vector<std::string> channelNames = ircSplit(_params[1], ',');
@@ -262,7 +259,9 @@ void Commands::part(void)
 
 		if (!channel)
 		{
-			continue; /* ERR_NOSUCHCHANNEL */
+			std::string message = _ERR_NOSUCHCHANNEL(channelNames[i]);
+			_server->sendMsg(_user->getFd(), message);
+			continue;
 		}
 		userDirectory users = channel->getUserDirectory();
 		userDirectory::iterator it = users.begin();
@@ -272,6 +271,7 @@ void Commands::part(void)
 				channel->part((*it).first);
 		channel->part(_user);
 	}
+	// ERR8NOTONCHANNEL
 }
 
 /*************************************************************
@@ -282,7 +282,9 @@ void Commands::mode(void)
 {
 	if (_params.size() < 1)
 	{
-		return; /*ERR_NEEDMOREPARAMS;*/
+		std::string message = _ERR_NEEDMOREPARAMS;
+		_server->sendMsg(_user->getFd(), message);
+		return;
 	}
 
 	Channel *channel = _server->findChannel(_params[1]);
@@ -314,7 +316,9 @@ void Commands::topic(void)
 {
 	if (_params.size() < 2)
 	{
-		return; /*ERR_NEEDMOREPARAMS;*/
+		std::string message = _ERR_NEEDMOREPARAMS;
+		_server->sendMsg(_user->getFd(), message);
+		return;
 	}
 	if (_params.size() == 2)
 	{
@@ -398,7 +402,9 @@ void Commands::invite(void)
 {
 	if (_params.size() < 4)
 	{
-		return; /*ERR_NEEDMOREPARAMS;*/
+		std::string message = _ERR_NEEDMOREPARAMS;
+		_server->sendMsg(_user->getFd(), message);
+		return;
 	}
 
 	std::string nick = _params[1];
@@ -421,7 +427,9 @@ void Commands::kick(void)
 {
 	if (_params.size() < 3)
 	{
-		return; /*ERR_NEEDMOREPARAMS;*/
+		std::string message = _ERR_NEEDMOREPARAMS;
+		_server->sendMsg(_user->getFd(), message);
+		return;
 	}
 
 	User *target = _server->findUserByNick(_params[2]);
@@ -452,7 +460,9 @@ void Commands::privmsg(void)
 
 	if (_params.size() < 2)
 	{
-		return; /*ERR_NORECIPIENT;*/
+		std::string message = _ERR_NEEDMOREPARAMS;
+		_server->sendMsg(_user->getFd(), message);
+		return;
 	}
 
 	for (size_t i(0); i < userNames.size(); ++i)
@@ -481,7 +491,9 @@ void Commands::kill(void)
 {
 	if (_params.size() < 3)
 	{
-		return; /*ERR_NEEDMOREPARAMS;*/
+		std::string message = _ERR_NEEDMOREPARAMS;
+		_server->sendMsg(_user->getFd(), message);
+		return;
 	}
 	if (_user->isOperator() == false)
 	{
@@ -510,3 +522,28 @@ void printMap(std::map<std::string, T> &mymap)
 				  << "val : " << it->second << std::endl;
 	}
 }
+
+// Commands::Commands(Server *server, User *user, t_message msg)
+// 	: _server(server), _user(user), _message(msg) { routeCmd(); }
+
+// void	Commands::routeCmd()
+// {
+// 	switch (_message.cmd)
+// 	{
+// 		case _NICK:		nick(); break;
+// 		case _USER:		user(); break;
+// 		case _OPER:		oper(); break;
+// 		case _QUIT:		quit(); break;
+// 		case _JOIN:		join(); break;
+// 		case _PART:		part(); break;
+// 		case _MODE:		mode(); break;
+// 		case _TOPIC:	topic(); break;
+// 		case _NAMES:	names(); break;
+// 		case _LIST:		list(); break;
+// 		case _INVITE:	invite(); break;
+// 		case _KICK:		kick(); break;
+// 		case _KILL:		kill(); break;
+
+// 		default:		std::cerr << "erroooor cmd not found" << std::endl; //replace fct
+// 	}
+// }

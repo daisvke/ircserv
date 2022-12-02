@@ -63,7 +63,7 @@ void	Commands::routeCmd()
 	if (it != _cmdMap.end())
 		(this->*_cmdMap[cmd])();
 	else {
-		std::string	message = "Unknown command: " + cmd;
+		std::string	message = _ERR_NOSUCHCMD(cmd);
 		_server->sendMsg(_user->getFd(), message); return ;
 	}
 
@@ -76,7 +76,7 @@ void	Commands::routeCmd()
 * Sends channel message to one or more members of the channel
 *************************************************************/
 
-void	Commands::sendMsgToChan(Channel *channel, int fd, std::string &msg)
+void	Commands::sendMsgToChan(Channel *channel, std::string &msg)
 {
 	userDirectory	users = channel->getUserDirectory();
 	userDirectory::iterator	it = users.begin();
@@ -97,21 +97,21 @@ void	Commands::nick(void)
 	std::remove_if(newNick.begin(), newNick.end(), isspace);
 	if (newNick.empty())
 	{
-		message = "No nickname given"; // ERR_NONICKNAMEGIVEN
+		message = _ERR_NONICKNAMEGIVEN; 
 		_server->sendMsg(_user->getFd(), message); return ;
 	}
 	if (_params.size() == 1) {
-		message = "Your nickname is " + newNick;
+		message = _RPL_CURRENTNICK(_user->getNickName());
 		_server->sendMsg(_user->getFd(), message); return ;
 	}
 
 	if (_server->findUserByNick(newNick) == false) {
 		_user->setNickName(newNick);
-		message = "You're now known as " + newNick;
+		message = _RPL_NICKSUCCESS(newNick);
 		_server->sendMsg(_user->getFd(), message);
 	}
 	else {
-		message = "Nick " + newNick + " is already in use"; // ERR_NICKNAMEINUSE
+		message = _ERR_NICKNAMEINUSE(newNick); //
 		_server->sendMsg(_user->getFd(), message);
 	}
 }

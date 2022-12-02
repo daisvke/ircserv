@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/01 22:53:19 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/02 21:53:06 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,25 @@
 Commands::Commands(Server *server, User *user, std::string &str)
 	: _server(server), _user(user), _params(ircSplit(str, ' '))
 {
-	if (_params[0] == "CAP")
-		return;
+	if (_params[0] == "CAP"){
+
+	std::string message;
+	std::string servername = ":irc.lchan.com";
+
+	message = servername + " 001 " + "Tamere " + RPL_WELCOME;
+	_server->sendMsg(_user->getFd(), message);
+	message = servername + " 002 " + "Tamere " + RPL_YOURHOST;
+	_server->sendMsg(_user->getFd(), message);
+	message = servername + " 003 " + "Tamere " + RPL_MYINFO;
+	_server->sendMsg(_user->getFd(), message);
+	message = servername + " 004 " + "Tamere " + RPL_CREATED + getTimeStr();
+	_server->sendMsg(_user->getFd(), message);
+	message = servername + " 005 " + "Tamere " + " parameter  =  1*20 letter value      =  * letpun letter     =  ALPHA / DIGIT";
+	_server->sendMsg(_user->getFd(), message);
+
+
+	}
+		// return;
 	setupMap();
 	routeCmd();
 }

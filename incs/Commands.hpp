@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:10 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/01 22:42:52 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/02 21:51:38 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,11 @@
 # define KILL		"KILL"
 
 
-# define RPL_WELCOME(nick) (":Welcome to the Internet Relay Network " + nick + "\r\n")
+# define RPL_WELCOME ":Welcome to the lchan_Network, <Tamere>[!<user>@<host>]"
+# define RPL_YOURHOST ":Your host is servername, running version version"
+# define RPL_MYINFO ": servername version o i"
+# define RPL_CREATED ":This server was created date"
+
 
 # define _ERR_NOSUCHCMD(cmd)		"Unknown command: " + cmd
 # define _ERR_NEEDMOREPARAMS		"Not enough parameters given"

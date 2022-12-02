@@ -47,11 +47,13 @@
 # define _RPL_NICKSUCCESS(nick)		"You're now known as " + nick
 # define _ERR_NONICKNAMEGIVEN		"No nickname given"
 # define _ERR_NICKNAMEINUSE(nick)	"Nick " + nick + " is already in use"
-# define _ERR_PASSWDMISMATCH		"Wrong password"
-
 // oper
 # define _RPL_YOUREOPER				"You are oper"
-
+# define _ERR_PASSWDMISMATCH		"Wrong password"
+// join
+# define _ERR_BADCHANNELKEY(chan)	"Wrong key for " + chan
+# define _ERR_CHANNELISFULL(chan)	"Channel " + chan + " is full"
+# define _ERR_INVITEONLYCHAN(chan)	"Channel " + chan + " is invite only"
 
 class Server ;
 

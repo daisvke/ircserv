@@ -16,7 +16,13 @@
 Commands::Commands(Server *server, User *user, std::string &str)
 	: _server(server), _user(user), _params(ircSplit(str, ' '))
 {
-	if (_params[0] == "CAP"){ return ; }
+	static int i;
+
+	if (_params[0] == "CAP"){ std::cout << i << " HEREEEEE" << std::endl;return ; }
+	else { std::cout << i << " NOOOO" << std::endl;}
+	std::cout << "/=================================" << std::endl;
+	for (size_t i(0); i < _params.size();++i) {std::cout << _params[i] << std::endl;}
+	std::cout << "=================================/" << std::endl;
 
 	setupMap();
 	routeCmd();
@@ -26,7 +32,7 @@ Commands::~Commands() {}
 
 std::string &Commands::getRpl() { return (_rpl); }
 
-void Commands::setupMap()
+void Commands::setupMap() // define it and call once in Server ?
 {
 	_cmdMap[NICK] = &Commands::nick;
 	_cmdMap[USER] = &Commands::user;
@@ -42,6 +48,8 @@ void Commands::setupMap()
 	_cmdMap[KICK] = &Commands::kick;
 	_cmdMap[PRIVMSG] = &Commands::privmsg;
 	_cmdMap[KILL] = &Commands::kill;
+	_cmdMap[PING] = &Commands::ping;
+	_cmdMap[PONG] = &Commands::pong;
 }
 
 // void	Commands::setupRplMap() // set up a map for answers
@@ -125,6 +133,7 @@ void Commands::nick(void)
  * The string sent by the client contains: 
  * 	<username> <hostname> <servername> <realname>
  * This cmd will assign all this data to the User object.
+ * It removes the ':' character if it set before realname.
  *************************************************************/
 void Commands::user(void)
 {
@@ -137,15 +146,18 @@ void Commands::user(void)
 	if (_server->findUserByName(userName) == false)
 		_user->setUserName(userName);
 	else
-	{ /* ERR_ALREADYREGISTRED */
+	{
+		std::string	message = _ERR_ALREADYREGISTRED(userName);
+		_server->sendMsg(_user->getFd(), message); return ;
 	}
 
 	_user->setUserName(_params[1]);
 	_user->setHostName(_params[2]);
 	_server->setName(_params[3]);
-	std::string	realName = _params[4];
+	std::string	realName;
+	if (_params[4][0] == ':') { _params[4].erase(0, 1); }
 	for (size_t i(4); i < _params.size(); ++i)
-		realName += _params[i];
+		realName += ' ' + _params[i];
 	_user->setRealName(realName);
 
 	registerClient();
@@ -164,9 +176,6 @@ void	Commands::registerClient(void)
 	_server->sendMsg(_user->getFd(), message);
 	message = _RPL_MYINFO(nickName, serverName);
 	_server->sendMsg(_user->getFd(), message);
-//	message = " 005 " + "Tamere " + " parameter  =  1*20 letter value      =  * letpun letter     =  ALPHA / DIGIT";
-//	_server->sendMsg(_user->getFd(), message);
-
 }
 
 /*************************************************************
@@ -538,6 +547,29 @@ void Commands::kill(void)
 	std::string msg = QUIT + _params[1];
 	Commands cmd(_server, target, msg);
 }
+
+void	Commands::ping(void)
+{
+	std::string message;
+	std::string	servername = _params[1];
+
+	if (servername != _server->getName())
+	{
+		message = _ERR_NOSUCHSERVER(_server->getName());
+		_server->sendMsg(_user->getFd(), message); return ;
+	}
+	message = "PING";
+	_server->sendMsg(_user->getFd(), message);
+}
+
+void	Commands::pong(void)
+{
+	std::string message;
+
+	message = "PONG";
+	_server->sendMsg(_user->getFd(), message);
+}
+
 
 /*************/
 /* to delete */

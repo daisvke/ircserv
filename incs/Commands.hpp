@@ -35,6 +35,8 @@
 # define KICK		"KICK"
 # define PRIVMSG	"PRIVMSG"
 # define KILL		"KILL"
+# define PING		"PING"
+# define PONG		"PONG"
 
 # define _NETWORKNAME		"IRC-LCHAN-DTANIGAWcom"
 # define _SERVERVERSION		"0.0.1"
@@ -48,23 +50,27 @@
 # define _RPL_MYINFO(nick, server)		"004 " + nick + server + _SERVERVERSION + _USERMODES + _CHANMODES + _CHAN_PARAM_MODES
 
 
-# define _ERR_NOSUCHCMD(cmd)		"Unknown command: " + cmd
-# define _ERR_NEEDMOREPARAMS		"Not enough parameters given"
+# define _ERR_NOSUCHCMD(cmd)			"Unknown command: " + cmd
+# define _ERR_NEEDMOREPARAMS			"Not enough parameters given"
 
 // nick
-# define _RPL_CURRENTNICK(nick)		"Your nickname is " + nick
-# define _RPL_NICKSUCCESS(nick)		"You're now known as " + nick
-# define _ERR_NONICKNAMEGIVEN		"No nickname given"
-# define _ERR_NICKNAMEINUSE(nick)	"Nick " + nick + " is already in use"
+# define _RPL_CURRENTNICK(nick)			"Your nickname is " + nick
+# define _RPL_NICKSUCCESS(nick)			"You're now known as " + nick
+# define _ERR_NONICKNAMEGIVEN			"No nickname given"
+# define _ERR_NICKNAMEINUSE(nick)		"Nick " + nick + " is already in use"
+// user
+# define _ERR_ALREADYREGISTRED(user)	user + " already registered"
 // oper
-# define _RPL_YOUREOPER				"You are oper"
-# define _ERR_PASSWDMISMATCH		"Wrong password"
-// join
-# define _ERR_BADCHANNELKEY(chan)	"Wrong key for " + chan
-# define _ERR_CHANNELISFULL(chan)	"Channel " + chan + " is full"
-# define _ERR_INVITEONLYCHAN(chan)	"Channel " + chan + " is invite only"
+# define _RPL_YOUREOPER					"You are oper"
+# define _ERR_PASSWDMISMATCH			"Wrong password"
+// join	
+# define _ERR_BADCHANNELKEY(chan)		"Wrong key for " + chan
+# define _ERR_CHANNELISFULL(chan)		"Channel " + chan + " is full"
+# define _ERR_INVITEONLYCHAN(chan)		"Channel " + chan + " is invite only"
 // part
-# define _ERR_NOSUCHCHANNEL(chan)	chan + ": No such channel: "
+# define _ERR_NOSUCHCHANNEL(chan)		chan + ": No such channel"
+//ping
+# define _ERR_NOSUCHSERVER(server)		server + ": No such server"
 
 
 class Server ;
@@ -102,6 +108,8 @@ class Commands
 		void	privmsg(void);
 		void	notice(void);
 		void	kill(void);
+		void	ping(void);
+		void	pong(void);
 
 		void	setupMap();
 		void	routeCmd();

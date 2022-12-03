@@ -36,11 +36,16 @@
 # define PRIVMSG	"PRIVMSG"
 # define KILL		"KILL"
 
+# define _NETWORKNAME		"IRC-LCHAN-DTANIGAWcom"
+# define _SERVERVERSION		"0.0.1"
+# define _USERMODES			"ovinsk"
+# define _CHANMODES			"ovtimnsplk"//b ?
+# define _CHAN_PARAM_MODES	"ovlk"
 
-# define RPL_WELCOME ":Welcome to the lchan_Network, <Tamere>[!<user>@<host>]"
-# define RPL_YOURHOST ":Your host is servername, running version version"
-# define RPL_MYINFO ": servername version o i"
-# define RPL_CREATED ":This server was created date"
+# define _RPL_WELCOME(nick, user)		"001 " + nick + " :Welcome to the " + _NETWORKNAME + " Network, " + user
+# define _RPL_YOURHOST(nick, server)	"002 " + nick + " :Your host is " + server + ", running version " + _SERVERVERSION
+# define _RPL_CREATED(nick, datetime)	"003 " + nick + " :This server was created " + datetime
+# define _RPL_MYINFO(nick, server)		"004 " + nick + server + _SERVERVERSION + _USERMODES + _CHANMODES + _CHAN_PARAM_MODES
 
 
 # define _ERR_NOSUCHCMD(cmd)		"Unknown command: " + cmd
@@ -100,6 +105,7 @@ class Commands
 
 		void	setupMap();
 		void	routeCmd();
+		void	registerClient(void);
 		void	sendMsgToChan(Channel *channel, std::string &msg);
 
 

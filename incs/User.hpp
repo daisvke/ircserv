@@ -27,6 +27,8 @@ class User
 		void	setFd(int fd);
 		void	setNickName(std::string nick);
 		void	setUserName(std::string user);
+		void	setHostName(std::string host);
+		void	setRealName(std::string real);
 		void	setAsOperator(void);
 		void	connect(void);
 		void	disconnect(void);
@@ -35,6 +37,9 @@ class User
 		int			getFd(void) const;
 		std::string	getNickName(void) const;
 		std::string	getUserName(void) const;
+		std::string	getHostName(void) const;
+		std::string	getRealName(void) const;
+
 		bool		isOperator(void) const;
 		bool		isConnected(void) const;
 
@@ -45,6 +50,8 @@ class User
 		bool		_isConnected; // usefull ?
 		std::string	_nickName;
 		std::string	_userName;
+		std::string	_hostName;
+		std::string	_realName;
 };
 
 /* debug overload to delete*/

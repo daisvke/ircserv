@@ -67,6 +67,8 @@ class Server{
 		void				startServer();
 		/* Note to delete: putting these functions here in public
 		to be able to use them with Command class */
+		void					setName(std::string name);
+		std::string				getName(void) const;
 		std::string				getPassword(void) const;
 		std::vector<Channel *>	getChannels(void) const;
 		Channel					*findChannel(std::string name);
@@ -77,6 +79,7 @@ class Server{
 
 	private :
 
+		std::string			_name;
 		std::string			_password;
 		int					_port;
 		std::string			_creationTime;

@@ -17,7 +17,7 @@
 * 				Coplien Form
 *********************************************/
 
-Server::Server() :	_password(), _creationTime(getTimeStr()), _addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS),
+Server::Server() :	_name("unknown"), _password(), _creationTime(getTimeStr()), _addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS),
 					_condenceArrayFlag(ON_STATUS), _opt(1), _nfds(0), _newSd(0)
 {
 	ircMemset((void *)_buffer, 0, sizeof(_buffer));
@@ -221,7 +221,7 @@ void	Server::sendMsg(int fd, std::string &msg){
 
 	int	sendRet;
 
-	msg += _CRLF;
+	msg = ":" + _name + " " + msg + _CRLF;
 	sendRet = send(fd, msg.c_str(), msg.length(), 0);
 	if (sendRet < 0)
 	{
@@ -382,6 +382,8 @@ User	*Server::findUserByName(std::string name){
 	// return 0;
 }
 
+void		Server::setName(std::string name) { _name = name; }
+std::string	Server::getName(void) const { return _name; }
 std::string	Server::getPassword(void) const { return _password; }
 
 std::vector<Channel *>	Server::getChannels(void) const { return _channels; }

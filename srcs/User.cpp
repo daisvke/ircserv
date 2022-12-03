@@ -21,6 +21,8 @@ User::~User() {}
 void	User::setFd(int fd) { _fd = fd; }
 void	User::setNickName(std::string nick) { _nickName = nick; }
 void	User::setUserName(std::string user) { _userName = user; }
+void	User::setHostName(std::string host) { _hostName = host; }
+void	User::setRealName(std::string real) { _realName = real; }
 void	User::setAsOperator(void) { _isOper = true; }
 void	User::connect(void) { _isConnected = true; }
 void	User::disconnect(void) { _isConnected = false; }
@@ -31,6 +33,9 @@ void	User::disconnect(void) { _isConnected = false; }
 int			User::getFd(void) const {return _fd;}
 std::string	User::getNickName(void) const { return _nickName; }
 std::string	User::getUserName(void) const { return _userName; }
+std::string	User::getHostName(void) const { return _hostName; }
+std::string	User::getRealName(void) const { return _realName; }
+
 bool		User::isOperator(void) const { return _isOper; }
 bool		User::isConnected(void) const { return _isConnected; }
 

@@ -16,25 +16,8 @@
 Commands::Commands(Server *server, User *user, std::string &str)
 	: _server(server), _user(user), _params(ircSplit(str, ' '))
 {
-	if (_params[0] == "CAP"){
+	if (_params[0] == "CAP"){ return ; }
 
-	std::string message;
-	std::string servername = ":irc.lchan.com";
-
-	message = servername + " 001 " + "Tamere " + RPL_WELCOME;
-	_server->sendMsg(_user->getFd(), message);
-	message = servername + " 002 " + "Tamere " + RPL_YOURHOST;
-	_server->sendMsg(_user->getFd(), message);
-	message = servername + " 003 " + "Tamere " + RPL_MYINFO;
-	_server->sendMsg(_user->getFd(), message);
-	message = servername + " 004 " + "Tamere " + RPL_CREATED + getTimeStr();
-	_server->sendMsg(_user->getFd(), message);
-	message = servername + " 005 " + "Tamere " + " parameter  =  1*20 letter value      =  * letpun letter     =  ALPHA / DIGIT";
-	_server->sendMsg(_user->getFd(), message);
-
-
-	}
-		// return;
 	setupMap();
 	routeCmd();
 }
@@ -138,23 +121,52 @@ void Commands::nick(void)
 }
 
 /*************************************************************
- * Used at the begining of a connection
+ * Used at the begining of a connection between client and server.
+ * The string sent by the client contains: 
+ * 	<username> <hostname> <servername> <realname>
+ * This cmd will assign all this data to the User object.
  *************************************************************/
 void Commands::user(void)
 {
-	/*
-	if (_params.size() < 2) {
+	if (_params.size() < 5) {
 		std::string	message = _ERR_NEEDMOREPARAMS;
 		_server->sendMsg(_user->getFd(), message); return ;
 	}
-	*/
 
-	std::string newUserName = _params[1];
-	if (_server->findUserByName(newUserName) == false)
-		_user->setUserName(newUserName);
+	std::string userName = _params[1];
+	if (_server->findUserByName(userName) == false)
+		_user->setUserName(userName);
 	else
 	{ /* ERR_ALREADYREGISTRED */
 	}
+
+	_user->setUserName(_params[1]);
+	_user->setHostName(_params[2]);
+	_server->setName(_params[3]);
+	std::string	realName = _params[4];
+	for (size_t i(4); i < _params.size(); ++i)
+		realName += _params[i];
+	_user->setRealName(realName);
+
+	registerClient();
+}
+
+void	Commands::registerClient(void)
+{
+	std::string	nickName = _user->getNickName();
+	std::string	serverName = _server->getName();
+	std::string	message = _RPL_WELCOME(nickName, _user->getUserName());
+
+	_server->sendMsg(_user->getFd(), message);
+	message = _RPL_YOURHOST(nickName, serverName);
+	_server->sendMsg(_user->getFd(), message);
+	message = _RPL_CREATED(nickName, getTimeStr());
+	_server->sendMsg(_user->getFd(), message);
+	message = _RPL_MYINFO(nickName, serverName);
+	_server->sendMsg(_user->getFd(), message);
+//	message = " 005 " + "Tamere " + " parameter  =  1*20 letter value      =  * letpun letter     =  ALPHA / DIGIT";
+//	_server->sendMsg(_user->getFd(), message);
+
 }
 
 /*************************************************************

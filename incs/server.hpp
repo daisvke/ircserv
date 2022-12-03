@@ -64,7 +64,7 @@ class Server{
 		Server();
 		~Server();
 
-		void				startServer();
+		void					startServer();
 		/* Note to delete: putting these functions here in public
 		to be able to use them with Command class */
 		void					setName(std::string name);
@@ -74,6 +74,7 @@ class Server{
 		Channel					*findChannel(std::string name);
 		User					*findUserByNick(std::string name);
 		User					*findUserByName(std::string name);
+		void					addChannel(std::string name, std::string key);
 		void					sendMsg(int fd, std::string &msg);
 
 

@@ -249,7 +249,7 @@ void Commands::join(void)
 
 		if (!channel && channel->getUserNbr() < channel->getUserLimit())
 		{
-			// create chan
+			_server->addChannel(channelNames[i], channelKeys[i]);
 			continue;
 		}
 		else if (!channel)

@@ -382,6 +382,12 @@ User	*Server::findUserByName(std::string name){
 	// return 0;
 }
 
+void	Server::addChannel(std::string name, std::string key)
+{
+	Channel	*channel = new Channel(name, key);
+	_channels.push_back(channel);
+}
+
 void		Server::setName(std::string name) { _name = name; }
 std::string	Server::getName(void) const { return _name; }
 std::string	Server::getPassword(void) const { return _password; }

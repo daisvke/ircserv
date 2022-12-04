@@ -489,7 +489,8 @@ void Commands::invite(void)
 	std::string nick = _params[1];
 	if (!_server->findUserByNick(nick))
 	{
-		return; /* _ERRNOSUCHNICK */
+		message = _ERR_NOSUCHNICK(nick);
+		return _server->sendMsg(_user->getFd(), message);
 	}
 	Channel *channel = _server->findChannel(_params[2]);
 
@@ -498,9 +499,20 @@ void Commands::invite(void)
 		 message = _ERR_CHANOPRIVSNEEDED(_user->getNickName());
 		return _server->sendMsg(_user->getFd(), message);
 	}
-	channel->join(_server->findUserByNick(nick), _ISNOTOPER);
-	// handle err_useronchannel ?
+
+	User	*user = _server->findUserByNick(nick);
+	userDirectory	*users = channel->getUserDirectory();
+	userDirectory::iterator	it = users->begin();
+
+	for (; it != users->end(); ++it)
+		if ((*it).first->getNickName() == nick)
+		{
+			std::string	message = _ERR_USERONCHANNEL(nick, _params[2]);
+			return _server->sendMsg(_user->getFd(), message);
+		}
+	return channel->join(user, _ISNOTOPER);
 }
+
 
 /*************************************************************
  * Only a channel operator can kick out a user from the channel

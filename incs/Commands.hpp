@@ -81,6 +81,8 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define _ERR_NOSUCHNICK(nick)				"401 " + nick + " No such nick"
 # define _ERR_CANNOTSENDTOCHAN(nick, chan)	"404 " + nick + " Cannot send to channel '" + chan + "'"
 # define _ERR_CHANOPRIVSNEEDED(nick)		"482 " + nick + " Need to be operator"
+// invite
+# define _ERR_USERONCHANNEL(nick, chan)			"443 " + nick + " Already on channel " + chan
 
 
 class Server ;

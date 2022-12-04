@@ -500,8 +500,8 @@ void Commands::invite(void)
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
-	User	*user = _server->findUserByNick(nick);
-	userDirectory	*users = channel->getUserDirectory();
+	User					*user = _server->findUserByNick(nick);
+	userDirectory			*users = channel->getUserDirectory();
 	userDirectory::iterator	it = users->begin();
 
 	for (; it != users->end(); ++it)

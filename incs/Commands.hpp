@@ -46,34 +46,41 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define _CHANMODES			"ovtimnsplk"//b ?
 # define _CHAN_PARAM_MODES	"ovlk"
 
+// authentification
 # define _RPL_WELCOME(nick, user)		"001 " + nick + " :Welcome to the " + _NETWORKNAME + " Network, " + user
 # define _RPL_YOURHOST(nick, server)	"002 " + nick + " :Your host is " + server + ", running version " + _SERVERVERSION
 # define _RPL_CREATED(nick, datetime)	"003 " + nick + " :This server was created " + datetime
-# define _RPL_MYINFO(nick, server)		"004 " + nick + server + _SERVERVERSION + _USERMODES + _CHANMODES + _CHAN_PARAM_MODES
+# define _RPL_MYINFO(nick, server)		"004 " + nick + " " + server + " " + _SERVERVERSION + " " + _USERMODES \
+	+ " " + _CHANMODES + " " + _CHAN_PARAM_MODES
 
-
-# define _ERR_NOSUCHCMD(cmd)			"Unknown command: " + cmd
-# define _ERR_NEEDMOREPARAMS			"Not enough parameters given"
+// commands
+# define _ERR_NOSUCHCMD(cmd)				"Unknown command: " + cmd
+# define _ERR_NEEDMOREPARAMS				"Not enough parameters given"
 
 // nick
-# define _RPL_CURRENTNICK(nick)			"Your nickname is " + nick
-# define _RPL_NICKSUCCESS(nick)			"You're now known as " + nick
-# define _ERR_NONICKNAMEGIVEN			"No nickname given"
-# define _ERR_NICKNAMEINUSE(nick)		"Nick " + nick + " is already in use"
+# define _RPL_CURRENTNICK(nick)				"Your nickname is " + nick
+# define _RPL_NICKSUCCESS(nick)				"You're now known as " + nick
+# define _ERR_NONICKNAMEGIVEN				"No nickname given"
+# define _ERR_NICKNAMEINUSE(nick)			"Nick " + nick + " is already in use"
 // user
-# define _ERR_ALREADYREGISTRED(user)	user + " already registered"
+# define _ERR_ALREADYREGISTRED(user)		user + " already registered"
 // oper
-# define _RPL_YOUREOPER					"You are oper"
-# define _ERR_PASSWDMISMATCH			"Wrong password"
+# define _RPL_YOUREOPER						"You are oper"
+# define _ERR_PASSWDMISMATCH				"Wrong password"
 // join	
-# define _ERR_BADCHANNELKEY(chan)		"Wrong key for " + chan
-# define _ERR_CHANNELISFULL(chan)		"Channel " + chan + " is full"
-# define _ERR_INVITEONLYCHAN(chan)		"Channel " + chan + " is invite only"
-# define _RPL_TOPIC(nick, name)			"332 " + nick + name
+# define _ERR_BADCHANNELKEY(chan)			"Wrong key for " + chan
+# define _ERR_CHANNELISFULL(chan)			"Channel " + chan + " is full"
+# define _ERR_INVITEONLYCHAN(chan)			"Channel " + chan + " is invite only"
+# define _RPL_TOPIC(nick, name)				"332 " + nick + " " + name
 // part
-# define _ERR_NOSUCHCHANNEL(chan)		chan + ": No such channel"
-//ping
-# define _ERR_NOSUCHSERVER(server)		server + ": No such server"
+# define _ERR_NOSUCHCHANNEL(nick, chan)		"403 " + nick + " " + chan + " No such channel"
+# define _ERR_NOTONCHANNEL(nick, chan)		"442 " + nick + " " + nick + " is not on channel " + chan
+// ping
+# define _ERR_NOSUCHSERVER(server)			server + " :No such server"
+// privmsg
+# define _ERR_NOSUCHNICK(nick)				"401 " + nick + " No such nick"
+# define _ERR_CANNOTSENDTOCHAN(nick, chan)	"404 " + nick + " Cannot send to channel '" + chan + "'"
+# define _ERR_CHANOPRIVSNEEDED(nick)		"482 " + nick + " Need to be operator"
 
 
 class Server ;
@@ -94,8 +101,6 @@ class Commands
 
 	private:
 
-		enum e_broadcastMode{ _TO_ONE, _TO_ALL };
-
 		void	nick(void);
 		void	user(void);
 		void	oper(void);
@@ -108,8 +113,7 @@ class Commands
 		void	list(void);
 		void	invite(void);
 		void	kick(void);
-		void	privmsg(void);
-		void	notice(void);
+		void	privmsg(bool isNoticeCmd);
 		void	kill(void);
 		void	ping(void);
 		void	pong(void);

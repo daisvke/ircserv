@@ -69,12 +69,12 @@ void Channel::setChannelMode(char c, std::string params)
  * Getters
  *************************************************************/
 
-std::string Channel::getName(void) const { return _name; }
-std::string Channel::getTopic(void) const { return _topic; }
-userDirectory *Channel::getUserDirectory(void) { return &_users; }
-std::string Channel::getKey(void) const { return _key; }
-size_t Channel::getUserNbr(void) const { return _users.size(); }
-size_t Channel::getUserLimit(void) const { return _userLimit; }
+std::string		Channel::getName(void) const { return _name; }
+std::string 	Channel::getTopic(void) const { return _topic; }
+userDirectory	*Channel::getUserDirectory(void) { return &_users; }
+std::string		Channel::getKey(void) const { return _key; }
+size_t			Channel::getUserNbr(void) const { return _users.size(); }
+size_t			Channel::getUserLimit(void) const { return _userLimit; }
 
 std::string *Channel::getUserMode(std::string name)
 {
@@ -86,18 +86,17 @@ std::string *Channel::getUserMode(std::string name)
 	return 0;
 }
 
-bool Channel::isKeyProtected(void) const { return checkMode('k'); }
-bool Channel::isTopicProtected(void) const { return checkMode('t'); }
-bool Channel::isModerated(void) const { return checkMode('m'); }
-bool Channel::isInviteOnly(void) const { return checkMode('n'); }
-bool Channel::isSecret(void) const { return checkMode('s'); }
-bool Channel::isPrivate(void) const { return checkMode('p'); }
-bool Channel::isLimited(void) const { return checkMode('l'); }
+bool	Channel::isKeyProtected(void) const { return checkMode('k'); }
+bool	Channel::isTopicProtected(void) const { return checkMode('t'); }
+bool	Channel::isModerated(void) const { return checkMode('m'); }
+bool	Channel::isInviteOnly(void) const { return checkMode('n'); }
+bool	Channel::isSecret(void) const { return checkMode('s'); }
+bool	Channel::isPrivate(void) const { return checkMode('p'); }
+bool	Channel::isLimited(void) const { return checkMode('l'); }	
 
-bool Channel::isOper(std::string name)
-{
-	return getUserMode(name)->find('o') ? true : false;
-}
+bool	Channel::isOper(std::string name) { return getUserMode(name)->find('o') ? true : false; }
+bool	Channel::hasVoice(std::string name) { return getUserMode(name)->find('v') ? true : false; }
+
 
 /*************************************************************
  * Commands
@@ -134,13 +133,13 @@ void Channel::part(User *user)
 /*************************************************************
  * Prints all members of the channel
  *************************************************************/
-void Channel::names(void)
+/*void Channel::names(void)
 {
 	userDirectory::iterator it = _users.begin();
 
 	for (; it != _users.end(); ++it)
 		std::cout << (*it).first->getNickName() << std::endl; // replace print fct
-}
+}*/
 
 /*************************************************************
  * Modifies user/channel modes.

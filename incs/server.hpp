@@ -74,7 +74,7 @@ class Server{
 		Channel					*findChannel(std::string name);
 		User					*findUserByNick(std::string name);
 		User					*findUserByName(std::string name);
-		void					addChannel(std::string name, std::string key);
+		Channel					*addChannel(std::string name, std::string key);
 		void					sendMsg(int fd, std::string &msg);
 
 

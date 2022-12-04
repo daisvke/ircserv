@@ -19,6 +19,7 @@
 # include <string>
 # include <vector>
 # include <sstream>
+# include <iostream>
 
 void						*ircMemset(void *s, int c, size_t n);
 std::vector<std::string>	ircSplit(std::string str, char c);

@@ -15,7 +15,7 @@
  * A map including a pointer to the users and indicating
  * whether the user is an operator or a regular user on this channel
  *************************************************************/
-typedef /*typename*/ std::map<User *, std::string> userDirectory;
+typedef std::map<User *, std::string> userDirectory;
 
 class Channel
 {
@@ -33,23 +33,24 @@ public:
 	// getters
 	std::string getName(void) const;
 	std::string getTopic(void) const;
-	userDirectory getUserDirectory(void) const;
+	userDirectory *getUserDirectory(void);
 	std::string getKey(void) const;
 	size_t getUserNbr(void) const;
 	size_t getUserLimit(void) const;
 	std::string *getUserMode(std::string name);
 
 	// mode getters
-	bool isKeyProtected() const;
-	bool isTopicProtected() const;
-	bool isModerated() const;
-	bool isInviteOnly() const;
-	bool isSecret() const;
-	bool isPrivate() const;
+	bool isKeyProtected(void) const;
+	bool isTopicProtected(void) const;
+	bool isModerated(void) const;
+	bool isInviteOnly(void) const;
+	bool isSecret(void) const;
+	bool isPrivate(void) const;
+	bool isLimited(void) const;
 	bool isOper(std::string name);
 
 	// commands
-	void join(User *user);
+	void join(User *user, bool isOper);
 	void part(User *user);
 	void names(void);
 	bool checkMode(char c) const;

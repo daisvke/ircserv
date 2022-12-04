@@ -13,7 +13,12 @@
 #include "Channel.hpp"
 
 Channel::Channel(std::string name, std::string key)
-	: _name(name), _modes(), _key(key), _userLimit() {}
+	: _name(name), _topic(), _key(key), _userLimit()
+{
+		if (key.empty() == false) { _modes += "k"; }
+
+}
+
 Channel::~Channel() {}
 
 /*************************************************************
@@ -32,13 +37,9 @@ void Channel::modifyTargetMode(char c, std::string target, bool remove)
 		{
 			std::string *mode = &((*it).second);
 			if (remove == true)
-			{
 				*mode += c;
-			}
 			else
-			{
 				mode->erase(c);
-			}
 		}
 		++it;
 	}
@@ -70,7 +71,7 @@ void Channel::setChannelMode(char c, std::string params)
 
 std::string Channel::getName(void) const { return _name; }
 std::string Channel::getTopic(void) const { return _topic; }
-userDirectory Channel::getUserDirectory(void) const { return _users; }
+userDirectory *Channel::getUserDirectory(void) { return &_users; }
 std::string Channel::getKey(void) const { return _key; }
 size_t Channel::getUserNbr(void) const { return _users.size(); }
 size_t Channel::getUserLimit(void) const { return _userLimit; }
@@ -85,12 +86,13 @@ std::string *Channel::getUserMode(std::string name)
 	return 0;
 }
 
-bool Channel::isKeyProtected() const { return checkMode('k'); }
-bool Channel::isTopicProtected() const { return checkMode('t'); }
-bool Channel::isModerated() const { return checkMode('m'); }
-bool Channel::isInviteOnly() const { return checkMode('n'); }
-bool Channel::isSecret() const { return checkMode('s'); }
-bool Channel::isPrivate() const { return checkMode('p'); }
+bool Channel::isKeyProtected(void) const { return checkMode('k'); }
+bool Channel::isTopicProtected(void) const { return checkMode('t'); }
+bool Channel::isModerated(void) const { return checkMode('m'); }
+bool Channel::isInviteOnly(void) const { return checkMode('n'); }
+bool Channel::isSecret(void) const { return checkMode('s'); }
+bool Channel::isPrivate(void) const { return checkMode('p'); }
+bool Channel::isLimited(void) const { return checkMode('l'); }
 
 bool Channel::isOper(std::string name)
 {
@@ -106,16 +108,13 @@ bool Channel::isOper(std::string name)
  * User is oper on the channel if:
  * 1. user is a global oper	2. user has created the channel
  *************************************************************/
-void Channel::join(User *user)
+void Channel::join(User *user, bool isOper)
 {
-	if (user->isOperator() || _users.empty())
+	if (isOper == true || (isOper == false && user->isOperator()))
 	{
-		_users[user] += "o";
+		std::string	mode = "o";
+		_users[user] += mode;
 	}
-	else
-		_users[user].clear();
-	std::cout << user->getNickName() << " has joined channel '"
-			  << getName() << "'!" << std::endl;
 }
 
 /*************************************************************

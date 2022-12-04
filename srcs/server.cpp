@@ -348,7 +348,6 @@ void	Server::closeAllConn()
 	Server Utils
 *******************************************/
 Channel	*Server::findChannel(std::string name){
-
 	for (size_t i(0); i < _channels.size(); ++i) {
 		if (_channels[i]->getName() == name)
 			return _channels[i];
@@ -382,10 +381,12 @@ User	*Server::findUserByName(std::string name){
 	// return 0;
 }
 
-void	Server::addChannel(std::string name, std::string key)
+Channel	*Server::addChannel(std::string name, std::string key)
 {
+	if (name[0] == '#') { name.erase(0, 1); }
 	Channel	*channel = new Channel(name, key);
 	_channels.push_back(channel);
+	return channel;
 }
 
 void		Server::setName(std::string name) { _name = name; }

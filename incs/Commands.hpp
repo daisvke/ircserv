@@ -21,6 +21,8 @@
 # include "Channel.hpp"
 # include "server.hpp"
 
+enum	e_isOper { _ISNOTOPER, _ISOPER };
+
 # define NICK		"NICK"
 # define USER		"USER"
 # define OPER		"OPER"
@@ -67,6 +69,7 @@
 # define _ERR_BADCHANNELKEY(chan)		"Wrong key for " + chan
 # define _ERR_CHANNELISFULL(chan)		"Channel " + chan + " is full"
 # define _ERR_INVITEONLYCHAN(chan)		"Channel " + chan + " is invite only"
+# define _RPL_TOPIC(nick, name)			"332 " + nick + name
 // part
 # define _ERR_NOSUCHCHANNEL(chan)		chan + ": No such channel"
 //ping

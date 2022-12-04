@@ -16,10 +16,7 @@
 Commands::Commands(Server *server, User *user, std::string &str)
 	: _server(server), _user(user), _params(ircSplit(str, ' '))
 {
-	static int i;
-
-	if (_params[0] == "CAP"){ std::cout << i << " HEREEEEE" << std::endl;return ; }
-	else { std::cout << i << " NOOOO" << std::endl;}
+	if (_params[0] == "CAP"){ return ; }
 	std::cout << "/=================================" << std::endl;
 	for (size_t i(0); i < _params.size();++i) {std::cout << _params[i] << std::endl;}
 	std::cout << "=================================/" << std::endl;
@@ -86,10 +83,10 @@ void Commands::routeCmd()
 
 void Commands::sendMsgToChan(Channel *channel, std::string &msg)
 {
-	userDirectory users = channel->getUserDirectory();
-	userDirectory::iterator it = users.begin();
+	userDirectory *users = channel->getUserDirectory();
+	userDirectory::iterator it = users->begin();
 
-	for (; it != users.end(); ++it)
+	for (; it != users->end(); ++it)
 		_server->sendMsg((*it).first->getFd(), msg);
 }
 
@@ -217,10 +214,10 @@ void Commands::quit(void)
 	_user->disconnect();
 	for (size_t i(0); i < channels.size(); ++i)
 	{
-		userDirectory users = channels[i]->getUserDirectory();
-		userDirectory::iterator it = users.begin();
+		userDirectory *users = channels[i]->getUserDirectory();
+		userDirectory::iterator it = users->begin();
 
-		for (; it != users.end(); ++it)
+		for (; it != users->end(); ++it)
 			if ((*it).first->getNickName() == _user->getNickName())
 				channels[i]->part((*it).first);
 	}
@@ -236,44 +233,62 @@ void Commands::join(void)
 	if (_params.size() < 2)
 	{
 		std::string message = _ERR_NEEDMOREPARAMS;
-		_server->sendMsg(_user->getFd(), message);
-		return;
+		_server->sendMsg(_user->getFd(), message); return;
 	}
 
-	std::vector<std::string> channelNames = ircSplit(_params[1], ',');
-	std::vector<std::string> channelKeys = ircSplit(_params[2], ',');
+	std::vector<std::string>	channelKeys;
+	std::vector<std::string>	channelNames = ircSplit(_params[1], ',');
+	bool						isOper;
+	std::string					message;
+
+	if (_params.size() > 2)
+		channelKeys = ircSplit(_params[2], ',');
+	while (channelKeys.size() != channelNames.size())
+		channelKeys.push_back("");
 
 	for (size_t i(0); i < channelNames.size(); ++i)
 	{
 		Channel *channel = _server->findChannel(channelNames[i]);
 
-		if (!channel && channel->getUserNbr() < channel->getUserLimit())
-		{
-			_server->addChannel(channelNames[i], channelKeys[i]);
-			continue;
+		if (!channel) {
+			channel = _server->addChannel(channelNames[i], channelKeys[i]);
+			isOper = true;
 		}
-		else if (!channel)
-			_ERR_CHANNELISFULL(channelNames[i]);
-		if (channel->isKeyProtected())
-		{
-			if (channelKeys[i] != channel->getKey())
+		else { isOper = false; }
+
+		if (channel && channel->getUserDirectory()->count(_user)) { return; }
+		if (channel && (channel->isLimited() == false
+			|| (channel->isLimited() == true && channel->getUserNbr() < channel->getUserLimit())))
+		{			
+			if (channel->isKeyProtected())
 			{
-				std::string message = _ERR_BADCHANNELKEY(channelNames[i]);
-				_server->sendMsg(_user->getFd(), message); return;
+				if (channelKeys[i] != channel->getKey())
+				{
+					message = _ERR_BADCHANNELKEY(channelNames[i]);
+					_server->sendMsg(_user->getFd(), message); return;
+				}
+			}
+			if (channel->isInviteOnly())
+			{
+				message = _ERR_INVITEONLYCHAN(channelNames[i]);
+				_server->sendMsg(_user->getFd(), message); return ;
 			}
 		}
-		if (channel->isInviteOnly())
-		{
-			std::string message = _ERR_INVITEONLYCHAN(channelNames[i]);
-			_server->sendMsg(_user->getFd(), message); return ;
-		}
-		channel->join(_user);
-		// RPL_TOPIC
+		else if (channel
+			&& channel->isLimited() == true && channel->getUserNbr() >= channel->getUserLimit())
+		{ _ERR_CHANNELISFULL(channelNames[i]); return; }
+
+		channel->join(_user, isOper);
+
+		message = _user->getNickName() + " has joined channel '" + channelNames[i] + "'";
+		sendMsgToChan(channel, message);
+
+		message = _RPL_TOPIC(_user->getNickName(), channel->getTopic());
+		_server->sendMsg(_user->getFd(), message);
 	}
 
 	// handle? => user shouldn't be banned  ERR_BANNEDFROMCHAN
-	// when join succeeds, screen is cleared and
-	// 	chan sends to user the topic name + list of
+	// when join succeeds, chan sends to user the topic name + list of
 	// 	all users on the chan, with himself on the list as well
 }
 
@@ -301,10 +316,10 @@ void Commands::part(void)
 			_server->sendMsg(_user->getFd(), message);
 			continue;
 		}
-		userDirectory users = channel->getUserDirectory();
-		userDirectory::iterator it = users.begin();
+		userDirectory *users = channel->getUserDirectory();
+		userDirectory::iterator it = users->begin();
 
-		for (; it != users.end(); ++it)
+		for (; it != users->end(); ++it)
 			if ((*it).first->getNickName() == _user->getNickName())
 				channel->part((*it).first);
 		channel->part(_user);
@@ -454,7 +469,7 @@ void Commands::invite(void)
 
 	if (channel->isInviteOnly() && channel->isOper(nick) == false)
 		return; /* ERR_CHANOPRIVSNEEDED */
-	channel->join(_server->findUserByNick(nick));
+	channel->join(_server->findUserByNick(nick), _ISNOTOPER);
 	// handle err_useronchannel ?
 }
 

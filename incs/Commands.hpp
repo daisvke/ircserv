@@ -66,15 +66,17 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define _ERR_ALREADYREGISTRED(user)		user + " already registered"
 // oper
 # define _RPL_YOUREOPER						"You are oper"
-# define _ERR_PASSWDMISMATCH				"Wrong password"
+# define _ERR_PASSWDMISMATCH(nick)			"464 " + nick + " :password incorrect"
 // join	
 # define _ERR_BADCHANNELKEY(chan)			"Wrong key for " + chan
 # define _ERR_CHANNELISFULL(chan)			"Channel " + chan + " is full"
 # define _ERR_INVITEONLYCHAN(chan)			"Channel " + chan + " is invite only"
-# define _RPL_TOPIC(nick, name)				"332 " + nick + " " + name
+# define _RPL_TOPIC(nick, chan, topic)		"332 " + nick + " #" + chan + " :" + topic
+# define _RPL_NAMREPLY(nick, name, sym, chan) "353 " + nick + " " + sym + " " + chan + " :" + name
+# define _RPL_ENDOFNAMES(nick, chan)		"366 " + nick + " " + chan + " :End of /NAMES list"
 // part
 # define _ERR_NOSUCHCHANNEL(nick, chan)		"403 " + nick + " " + chan + " No such channel"
-# define _ERR_NOTONCHANNEL(nick, chan)		"442 " + nick + " " + nick + " is not on channel " + chan
+# define _ERR_NOTONCHANNEL(nick, chan)		"442 " + nick + " " + nick + " is not on channel #" + chan
 // ping
 # define _ERR_NOSUCHSERVER(server)			server + " :No such server"
 // privmsg
@@ -103,6 +105,7 @@ class Commands
 
 	private:
 
+		void	pass(void);
 		void	nick(void);
 		void	user(void);
 		void	oper(void);

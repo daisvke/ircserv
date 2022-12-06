@@ -16,10 +16,11 @@
 Commands::Commands(Server *server, User *user, std::string &str)
 	: _server(server), _user(user), _params(ircSplit(str, ' '))
 {
-	if (_params[0] == "CAP"){ return ; }
-	std::cout << "/=================================" << std::endl;
+	if (_params[0] == "CAP") return ;
+	
+	std::cout << std::endl << "/=================================" << std::endl;
 	for (size_t i(0); i < _params.size();++i) {std::cout << _params[i] << std::endl;}
-	std::cout << "=================================/" << std::endl;
+	std::cout << "=================================/" << std::endl << std::endl;
 
 	setupMap();
 	routeCmd();
@@ -31,6 +32,7 @@ std::string &Commands::getRpl() { return (_rpl); }
 
 void Commands::setupMap() // define it and call once in Server ?
 {
+	_cmdMap["PASS"] = &Commands::pass;
 	_cmdMap[NICK] = &Commands::nick;
 	_cmdMap[USER] = &Commands::user;
 	_cmdMap[OPER] = &Commands::oper;
@@ -89,17 +91,39 @@ void Commands::sendMsgToChan(Channel *channel, std::string &msg)
 	userDirectory *users = channel->getUserDirectory();
 	userDirectory::iterator it = users->begin();
 
+	msg = "PRIVMSG #" + channel->getName() + " :" + msg;
+
 	for (; it != users->end(); ++it)
 		_server->sendMsg((*it).first->getFd(), msg);
 }
 
 /*************************************************************
- * Changes the user's nickname online; for example /nick Carlos.
+ * When launched with 'irssi -w <pwd>', a PASS message is sent to ircserv.
+ * This function will check if the given pwd is correct.
+ *************************************************************/
+void	Commands::pass(void)
+{
+	if (_params.size() < 2) {
+		std::string	message = _ERR_NEEDMOREPARAMS;
+		return _server->sendMsg(_user->getFd(), message);
+	}
+
+	if (_params[1] != _server->getPassword())
+	{
+		std::string	message = _ERR_PASSWDMISMATCH(_user->getNickName());
+		_server->sendMsg(_user->getFd(), message);
+		_server->closeAllConn();
+	}
+}
+
+/*************************************************************
+ * Changes the user's nickname online
  * If no new nick is given, prints the current nick.
  *************************************************************/
 void Commands::nick(void)
 {
 	std::string message;
+
 	std::string newNick = _params[1];
 	std::remove_if(newNick.begin(), newNick.end(), isspace);
 	if (newNick.empty())
@@ -194,7 +218,7 @@ void Commands::oper(void)
 	}
 	if (_server->getPassword() != _params[1])
 	{
-		std::string message = _ERR_PASSWDMISMATCH;
+		std::string message = _ERR_PASSWDMISMATCH(_user->getNickName());
 		return _server->sendMsg(_user->getFd(), message);
 	}
 	_user->setAsOperator();
@@ -251,10 +275,11 @@ void Commands::join(void)
 
 	for (size_t i(0); i < channelNames.size(); ++i)
 	{
-		Channel *channel = _server->findChannel(channelNames[i]);
+		std::string	channelName = channelNames[i][0] == '#' ? channelNames[i].erase(0, 1) : channelNames[i];
+		Channel		*channel = _server->findChannel(channelName);
 
 		if (!channel) {
-			channel = _server->addChannel(channelNames[i], channelKeys[i]);
+			channel = _server->addChannel(channelName, channelKeys[i]);
 			isOper = true;
 		}
 		else { isOper = false; }
@@ -267,27 +292,42 @@ void Commands::join(void)
 			{
 				if (channelKeys[i] != channel->getKey())
 				{
-					message = _ERR_BADCHANNELKEY(channelNames[i]);
+					message = _ERR_BADCHANNELKEY(channelName);
 					return _server->sendMsg(_user->getFd(), message);
 				}
 			}
 			if (channel->isInviteOnly())
 			{
-				message = _ERR_INVITEONLYCHAN(channelNames[i]);
+				message = _ERR_INVITEONLYCHAN(channelName);
 				return _server->sendMsg(_user->getFd(), message);
 			}
 		}
 		else if (channel
 			&& channel->isLimited() == true && channel->getUserNbr() >= channel->getUserLimit())
-		{ _ERR_CHANNELISFULL(channelNames[i]); return; }
+		{ _ERR_CHANNELISFULL(channelName); return; }
 
 		channel->join(_user, isOper);
 
-		message = _user->getNickName() + " has joined channel '" + channelNames[i] + "'";
+		message = _user->getNickName() + " has joined channel #" + channelName;
 		sendMsgToChan(channel, message);
 
-		message = _RPL_TOPIC(_user->getNickName(), channel->getTopic());
+		std::string	message = _user->getNickName() + " JOIN #" + channelName;
+
+		if (channel->getTopic().empty() == false)
+		{
+			message = _RPL_TOPIC(_user->getNickName(), channel->getName(), channel->getTopic());
+			_server->sendMsg(_user->getFd(), message);
+		}
+
+		userDirectory	*users = channel->getUserDirectory();
+		for (userDirectory::iterator it(users->begin()); it != users->end(); ++it)
+		{
+			message = _RPL_NAMREPLY(_user->getNickName(), (*it).first->getNickName(), '=', channel->getName());
+			_server->sendMsg(_user->getFd(), message);
+		}
+		message = _RPL_ENDOFNAMES(_user->getNickName(), channel->getName());
 		_server->sendMsg(_user->getFd(), message);
+
 	}
 
 	// handle? => user shouldn't be banned  ERR_BANNEDFROMCHAN
@@ -296,7 +336,8 @@ void Commands::join(void)
 }
 
 /*************************************************************
- *  The user quits all the channels given as parameters
+ * The user leaves all the channels given as parameters.
+ * If no parameter is given, the current channel is left.
  *************************************************************/
 void Commands::part(void)
 {
@@ -306,31 +347,46 @@ void Commands::part(void)
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
-	std::vector<std::string> channelNames = ircSplit(_params[1], ',');
+	std::vector<std::string>	channelNames = ircSplit(_params[1], ',');
+	std::string					reason;
+	if (_params.size() > 2)
+		reason = _params[2].erase(0,1);
 
 	for (size_t i(0); i < channelNames.size(); ++i)
 	{
-		Channel *channel = _server->findChannel(channelNames[i]);
+		std::string	channelName = channelNames[i][0] == '#' ? channelNames[i].erase(0, 1) : channelNames[i];
+		Channel *channel = _server->findChannel(channelName);
 
 		if (!channel)
 		{
-			std::string message = _ERR_NOSUCHCHANNEL(_user->getNickName(), channelNames[i]);
+			std::string message = _ERR_NOSUCHCHANNEL(_user->getNickName(), channelName);
 			_server->sendMsg(_user->getFd(), message);
 			continue;
 		}
+
 		userDirectory *users = channel->getUserDirectory();
 		userDirectory::iterator it = users->begin();
-
-		for (; it != users->end(); ++it)
+		while (it != users->end())
+		{
 			if ((*it).first->getNickName() == _user->getNickName())
-				channel->part((*it).first);
+			{
+				users->erase((*it++).first);
+				std::cout << _user->getNickName() << " left channel #" << channel->getName() << std::endl;
+				std::string	message = _user->getNickName() + " PART #" + channelName + " " + reason;
+			//	std::string	message = "PART #" + channel->getName();
+				_server->sendMsg(_user->getFd(), message);
+			//	message = _ERR_NOSUCHCHANNEL(_user->getNickName(), channelName);
+			//	_server->sendMsg(_user->getFd(), message);
+				break ;
+			}
+			else
+				++it;
+		}
 		if (it == users->end())
 		{
 			std::string message = _ERR_NOTONCHANNEL(_user->getNickName(), channel->getName());
 			return _server->sendMsg(_user->getFd(), message);
 		}
-
-		channel->part(_user);
 	}
 }
 
@@ -350,14 +406,20 @@ void Commands::mode(void)
 
 	if (_params[1][0] == '#')
 	{
-		Channel *channel = _server->findChannel(_params[1]);
+		Channel *channel = _server->findChannel(_params[1].erase(0, 1));
 		if (!channel)
 		{
 			message = _ERR_NOSUCHCHANNEL(_user->getNickName(), _params[1]);
-			_server->sendMsg(_user->getFd(), message);
+			return _server->sendMsg(_user->getFd(), message);
+		}
+		if (_params.size() < 3)
+		{
+			message = *channel->getUserMode(_user->getNickName());
+			return _server->sendMsg(_user->getFd(), message);
 		}
 
 		bool isChanOper = channel->isOper(_user->getNickName());
+
 		if (isChanOper == false)
 		{
 			message = _ERR_CHANOPRIVSNEEDED(_user->getNickName());
@@ -391,8 +453,7 @@ void Commands::topic(void)
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
-	Channel *channel = _server->findChannel(_params[1]);
-
+	Channel *channel = _server->findChannel(_params[1].erase(0, 1));
 	if (!channel)
 	{
 		message = _ERR_NOSUCHCHANNEL(nickName, _params[1]);
@@ -405,7 +466,6 @@ void Commands::topic(void)
 	}
 
 	std::string newTopic = _params[2];
-
 	if (channel->isTopicProtected() == false || _user->isOperator() == true)
 		channel->setTopic(newTopic);
 	else

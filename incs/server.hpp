@@ -77,9 +77,10 @@ class Server{
 		User					*findUserByName(std::string name);
 		Channel					*addChannel(std::string name, std::string key);
 
-
 		void					sendMsg(int fd, std::string &msg);
 		void					sendToAllUser(std::string &msg);
+
+		void					closeAllConn();
 
 
 	private :
@@ -133,7 +134,6 @@ class Server{
 		template <typename T>
 		void	serverPrint(T & str){std::cout << "[+] " << str << std::endl;}
 		void	closeConn(int index);
-		void	closeAllConn();
 		void	NarrowArray(void);
 		void	deleteUser(int index);
 		int		turnOffServer(std::string str);

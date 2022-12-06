@@ -121,13 +121,16 @@ void Channel::join(User *user, bool isOper)
  *************************************************************/
 void Channel::part(User *user)
 {
-	userDirectory::iterator it = _users.begin();
-
-	for (; it != _users.end(); ++it)
+	for (userDirectory::iterator it = _users.begin(); it != _users.end();)
+	{
 		if (((*it).first->getNickName() == user->getNickName()))
-			_users.erase(user);
-	std::cout << user->getNickName() << " has parted channel '"
-			  << getName() << "'!" << std::endl;
+		{
+			_users.erase(it++);
+			std::cout << user->getNickName() << " has parted channel '" << getName() << "'" << std::endl;
+		}
+		else
+			++it;
+	}
 }
 
 /*************************************************************

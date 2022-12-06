@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/02 21:09:57 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/06 13:27:21 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,12 @@
 # include "Commands.hpp"
 
 # define LOCAL_HOST "127.0.0.1"
-# define SERVER_PORT 8084
+# define SERVER_DEFAULT_PORT 8084
 # define BUFFER_SIZE 1024
 # define MAX_CLIENT 1000
 # define TIMEOUT 201000
 # define SERVER_VERSION "Ubuntu 22.04.1 LTS"
-# define SERVER_NAME "<ircserv	>"
+# define SERVER_NAME "<ircserv>"
 
 
 # define TIMEOUT_MESS "time out - server automatic shutdown has been requested"
@@ -46,7 +46,7 @@ enum e_server_status{
 	ON_STATUS
 };
 
-enum e_return {
+enum e_poll_return {
 	POLL_FAILURE = -1,
 	POLL_OK,
 };
@@ -62,6 +62,7 @@ typedef std::map<int, std::string>	cmdMap;
 class Server{
 	public :
 		Server();
+		Server(int port, std::string pwd);
 		~Server();
 
 		void					startServer();
@@ -75,14 +76,17 @@ class Server{
 		User					*findUserByNick(std::string name);
 		User					*findUserByName(std::string name);
 		Channel					*addChannel(std::string name, std::string key);
+
+
 		void					sendMsg(int fd, std::string &msg);
+		void					sendToAllUser(std::string &msg);
 
 
 	private :
 
-		std::string			_name;
-		std::string			_password;
 		int					_port;
+		std::string			_password;
+		std::string			_name;
 		std::string			_creationTime;
 
 		/*poll*/

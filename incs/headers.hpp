@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/07 14:50:56 by lchan             #+#    #+#             */
-/*   Updated: 2022/11/30 13:42:49 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/06 13:32:52 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,17 +38,6 @@
 # include <poll.h>
 # include <vector>
 # include <map>
-
-
-
-
-// # define ERROR -1
-
-// # define TRUE 0
-// # define ERROR -1
-
-
-
-
+# include <climits>
 
 #endif

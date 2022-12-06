@@ -6,11 +6,41 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 12:51:53 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/02 15:58:17 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/06 13:32:39 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Utils.hpp"
+
+int	 ircStoi(std::string input){
+
+	std::stringstream	stream;
+	int					i;
+
+	i = 0;
+	stream << input;
+	stream >> i;
+	return (i);
+}
+
+typedef	std::string::iterator strIt;
+
+bool	ircIsAlNum(std::string &s)
+{
+	for (strIt it = s.begin(); it != s.end(); ++it)
+		if (!std::isdigit(*it))
+			return (E_FALSE);
+	return (E_TRUE);
+}
+
+bool	ircIsAllPrintable(std::string &s)
+{
+	for (strIt it = s.begin(); it != s.end(); ++it)
+		if (static_cast<char> (*it) < 32 && static_cast<char>(*it) > 126)
+			return (E_FALSE);
+	return (E_TRUE);
+}
+
 
 void	*ircMemset(void *s, int c, size_t n)
 {
@@ -32,7 +62,7 @@ std::vector<std::string>	ircSplit(std::string str, char c)
 	std::stringstream			input(str);
 	std::string					segment;
 	std::vector<std::string>	segmentVect;
-	
+
 	while (std::getline(input, segment, c))
 		segmentVect.push_back(segment);
 	return segmentVect;

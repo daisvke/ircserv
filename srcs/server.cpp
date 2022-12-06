@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/02 15:50:48 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/06 13:34:19 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,28 @@
 * 				Coplien Form
 *********************************************/
 
-Server::Server() :	_name("unknown"), _password(), _creationTime(getTimeStr()), _addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS),
-					_condenceArrayFlag(ON_STATUS), _opt(1), _nfds(0), _newSd(0)
+Server::Server()
+	:	_port(SERVER_DEFAULT_PORT), _password(), _name(SERVER_NAME), _creationTime(getTimeStr()),
+		_addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS),
+		_condenceArrayFlag(ON_STATUS), _opt(1), _nfds(0), _newSd(0)
 {
 	ircMemset((void *)_buffer, 0, sizeof(_buffer));
 	ircMemset((void *)_fds, 0, sizeof(_fds));
 	std::cout << _creationTime <<"Server constructor called" << std::endl;
+	std::cout << "password = " << _password << std::endl;
+	std::cout << "port = " << _port << std::endl;
+}
+
+Server::Server(int port, std::string pwd)
+	:	_port(port), _password(pwd), _name(SERVER_NAME), _creationTime(getTimeStr()),
+		_addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS),
+		_condenceArrayFlag(ON_STATUS), _opt(1), _nfds(0), _newSd(0)
+{
+	ircMemset((void *)_buffer, 0, sizeof(_buffer));
+	ircMemset((void *)_fds, 0, sizeof(_fds));
+	std::cout << _creationTime <<" Server constructor called" << std::endl;
+	std::cout << "password = " << _password << std::endl;
+	std::cout << "port = " << _port << std::endl;
 }
 
 Server::~Server()
@@ -81,7 +97,7 @@ int	Server::bindSocket()
 {
 	_sockAddr.sin_family = AF_INET;
 	_sockAddr.sin_addr.s_addr = inet_addr(LOCAL_HOST);
-	_sockAddr.sin_port = htons(SERVER_PORT);
+	_sockAddr.sin_port = htons(_port);
 	if ((bind(_listenSd, (sockaddr *) &_sockAddr, _addrlen)) == ERROR)
 		return (E_BIND_ERR);
 	std::cout << "4. bind success" << std::endl;
@@ -174,21 +190,17 @@ int	Server::findReadableFd()
 	*****************************************************************************/
 int	Server::acceptNewSd()
 {
-	//do{
 	_newSd = accept(_listenSd, NULL, NULL);	//ckeck on man to see if other argument are necessary or not
+
 	if (_newSd < 0){
 		if (errno != EWOULDBLOCK)
 			return (turnOffServer("accept() failed"));
-		//break ;
 	}
 	else {
-		//printf("[DEBUG_MESS] acceptNewSd : a new connection has been made ! fd = %d \n", _newSd);
-		_fds[_nfds].fd = _newSd;				//	check if it is necessary to find a way to use the new reusable fd. Maybe accept can do it automatically ?
+		_fds[_nfds].fd = _newSd;			//we can directly use _nfds as an index coz we compressArray at each single connexion
 		_fds[_nfds].events = POLLIN;
 		_nfds++;
 	}
-	//}
-	//while (_newSd != -1);
 	return (POLL_OK);
 }
 
@@ -230,6 +242,13 @@ void	Server::sendMsg(int fd, std::string &msg){
 			if (_fds[i].fd == fd)
 				closeConn(i);
 	}
+}
+
+void	Server::sendToAllUser(std::string &msg){
+	userMap::iterator it = _userMap.begin();
+
+	for (; it != _userMap.end(); ++it)
+		sendMsg((*it).first, msg);
 }
 
 /****************************************************************************

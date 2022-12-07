@@ -35,6 +35,7 @@ void Commands::setupMap() // define it and call once in Server ?
 	_cmdMap["PASS"] = &Commands::pass;
 	_cmdMap[NICK] = &Commands::nick;
 	_cmdMap[USER] = &Commands::user;
+	_cmdMap["WHOOIS"] = &Commands::whois;
 	_cmdMap[OPER] = &Commands::oper;
 	_cmdMap[QUIT] = &Commands::quit;
 	_cmdMap[JOIN] = &Commands::join;
@@ -207,7 +208,7 @@ void	Commands::registerClient(void)
 	_server->sendMsg(_user->getFd(), message);
 }
 
-void	Commands::whois(void) const
+void	Commands::whois(void)
 {
 	std::string	nick = _params[1], message;
 
@@ -349,7 +350,7 @@ void Commands::join(void)
 		{
 			std::string	nick =  (*it).first->getNickName();
 			std::string	prefix = channel->isOper(nick) ? " :@" : " :"; 
-			
+
 			message = _RPL_NAMREPLY(_user->getNickName(), nick, '=', channel->getName(), prefix);
 			_server->sendMsg(_user->getFd(), message);
 		}

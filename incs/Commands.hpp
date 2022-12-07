@@ -35,7 +35,6 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define LIST		"LIST"
 # define INVITE		"INVITE"
 # define KICK		"KICK"
-# define PRIVMSG	"PRIVMSG"
 # define KILL		"KILL"
 # define PING		"PING"
 # define PONG		"PONG"
@@ -111,7 +110,7 @@ class Commands
 		void	pass(void);
 		void	nick(void);
 		void	user(void);
-		void	whois(void) const;
+		void	whois(void);
 		void	oper(void);
 		void	quit(void);
 		void	join(void);

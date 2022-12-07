@@ -66,6 +66,7 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define _ERR_ALREADYREGISTRED(user)		user + " already registered"
 // whois
 # define _RPL_WHOISREGNICK(nick)			"307 " + nick + " :has identified for this nick"
+# define _RPL_ENDOFWHOIS(nick)					"318 " + nick + " :End of /WHOIS list"
 // oper
 # define _RPL_YOUREOPER						"You are oper"
 # define _ERR_PASSWDMISMATCH(nick)			"464 " + nick + " :password incorrect"

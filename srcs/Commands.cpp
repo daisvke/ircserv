@@ -223,6 +223,8 @@ void	Commands::whois(void) const
 	}
 
 	message = _RPL_WHOISREGNICK(nick);
+	_server->sendMsg(_user->getFd(), message);
+	message = _RPL_ENDOFWHOIS(nick);
 	return _server->sendMsg(_user->getFd(), message);
 }
 

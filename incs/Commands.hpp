@@ -60,10 +60,12 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 // nick
 # define _RPL_CURRENTNICK(nick)				"Your nickname is " + nick
 # define _RPL_NICKSUCCESS(nick)				"You're now known as " + nick
-# define _ERR_NONICKNAMEGIVEN				"No nickname given"
+# define _ERR_NONICKNAMEGIVEN(nick)				"431 " + nick + "No nickname given"
 # define _ERR_NICKNAMEINUSE(nick)			"Nick " + nick + " is already in use"
 // user
 # define _ERR_ALREADYREGISTRED(user)		user + " already registered"
+// whois
+# define _RPL_WHOISREGNICK(nick)			"307 " + nick + " :has identified for this nick"
 // oper
 # define _RPL_YOUREOPER						"You are oper"
 # define _ERR_PASSWDMISMATCH(nick)			"464 " + nick + " :password incorrect"
@@ -108,6 +110,7 @@ class Commands
 		void	pass(void);
 		void	nick(void);
 		void	user(void);
+		void	whois(void) const;
 		void	oper(void);
 		void	quit(void);
 		void	join(void);

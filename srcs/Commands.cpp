@@ -128,7 +128,7 @@ void Commands::nick(void)
 	std::remove_if(newNick.begin(), newNick.end(), isspace);
 	if (newNick.empty())
 	{
-		message = _ERR_NONICKNAMEGIVEN;
+		message = _ERR_NONICKNAMEGIVEN(newNick);
 		return _server->sendMsg(_user->getFd(), message);
 	}
 	if (_params.size() == 1)
@@ -165,12 +165,19 @@ void Commands::user(void)
 	}
 
 	std::string userName = _params[1];
-	if (_server->findUserByName(userName) == false)
+/*	if (_server->findUserByName(userName) == false)
 		_user->setUserName(userName);
 	else
 	{
 		std::string	message = _ERR_ALREADYREGISTRED(userName);
 		return _server->sendMsg(_user->getFd(), message);
+	}
+*/
+	_user->setUserName(userName);
+	if (_server->findUserByNick(_user->getNickName()))
+	{
+		std::string	message = _ERR_ALREADYREGISTRED(userName);
+		_server->sendMsg(_user->getFd(), message);
 	}
 
 	_user->setUserName(_params[1]);
@@ -198,6 +205,25 @@ void	Commands::registerClient(void)
 	_server->sendMsg(_user->getFd(), message);
 	message = _RPL_MYINFO(nickName, serverName);
 	_server->sendMsg(_user->getFd(), message);
+}
+
+void	Commands::whois(void) const
+{
+	std::string	nick = _params[1], message;
+
+	if (_params.size() < 2)
+	{
+		std::string message = _ERR_NONICKNAMEGIVEN(nick);
+		return _server->sendMsg(_user->getFd(), message);
+	}
+	if (!_server->findUserByNick(nick))
+	{
+		message = _ERR_NOSUCHNICK(nick);
+		return _server->sendMsg(_user->getFd(), message);
+	}
+
+	message = _RPL_WHOISREGNICK(nick);
+	return _server->sendMsg(_user->getFd(), message);
 }
 
 /*************************************************************
@@ -444,8 +470,7 @@ void Commands::mode(void)
  *************************************************************/
 void Commands::topic(void)
 {
-	std::string	nickName = _user->getNickName();
-	std::string message;
+	std::string	nickName = _user->getNickName(), message;
 
 	if (_params.size() < 2)
 	{
@@ -680,8 +705,7 @@ void Commands::kill(void)
 
 void	Commands::ping(void)
 {
-	std::string message;
-	std::string	servername = _params[1];
+	std::string message, servername = _params[1];
 
 	if (servername != _server->getName())
 	{

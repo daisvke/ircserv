@@ -94,8 +94,12 @@ bool	Channel::isSecret(void) const { return checkMode('s'); }
 bool	Channel::isPrivate(void) const { return checkMode('p'); }
 bool	Channel::isLimited(void) const { return checkMode('l'); }	
 
-bool	Channel::isOper(std::string name) { return getUserMode(name)->find('o') ? true : false; }
-bool	Channel::hasVoice(std::string name) { return getUserMode(name)->find('v') ? true : false; }
+bool	Channel::isOper(std::string name) {
+	return getUserMode(name)->find('o') == std::string::npos ? false : true;
+}
+bool	Channel::hasVoice(std::string name) {
+	return getUserMode(name)->find('v') == std::string::npos ? true : false;
+}
 
 
 /*************************************************************
@@ -107,9 +111,9 @@ bool	Channel::hasVoice(std::string name) { return getUserMode(name)->find('v') ?
  * User is oper on the channel if:
  * 1. user is a global oper	2. user has created the channel
  *************************************************************/
-void Channel::join(User *user, bool isOper)
+void Channel::join(User *user, bool isOp)
 {
-	if (isOper == true || (isOper == false && user->isOperator()))
+	if (isOp == true || user->isOperator())
 	{
 		std::string	mode = "o";
 		_users[user] += mode;

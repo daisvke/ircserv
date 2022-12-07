@@ -75,7 +75,7 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define _ERR_CHANNELISFULL(chan)			"Channel " + chan + " is full"
 # define _ERR_INVITEONLYCHAN(chan)			"Channel " + chan + " is invite only"
 # define _RPL_TOPIC(nick, chan, topic)		"332 " + nick + " #" + chan + " :" + topic
-# define _RPL_NAMREPLY(nick, name, sym, chan) "353 " + nick + " " + sym + " " + chan + " :" + name
+# define _RPL_NAMREPLY(nick, name, symbol, chan, prefix) "353 " + nick + " " + symbol + " " + chan + prefix + name
 # define _RPL_ENDOFNAMES(nick, chan)		"366 " + nick + " " + chan + " :End of /NAMES list"
 // part
 # define _ERR_NOSUCHCHANNEL(nick, chan)		"403 " + nick + " " + chan + " No such channel"

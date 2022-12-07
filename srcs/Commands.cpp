@@ -240,18 +240,15 @@ void Commands::oper(void)
 	}
 
 	User *user = _server->findUserByNick(_params[1]);
-	if (!user)
-	{
-		return;
-	}
-	if (_server->getPassword() != _params[1])
+	if (!user) return ;
+	if (_server->getPassword() != _params[2])
 	{
 		std::string message = _ERR_PASSWDMISMATCH(_user->getNickName());
 		return _server->sendMsg(_user->getFd(), message);
 	}
-	_user->setAsOperator();
+	user->setAsOperator();
 	std::string message = _RPL_YOUREOPER;
-	_server->sendMsg(_user->getFd(), message);
+	_server->sendMsg(user->getFd(), message);
 }
 
 /*************************************************************
@@ -350,7 +347,10 @@ void Commands::join(void)
 		userDirectory	*users = channel->getUserDirectory();
 		for (userDirectory::iterator it(users->begin()); it != users->end(); ++it)
 		{
-			message = _RPL_NAMREPLY(_user->getNickName(), (*it).first->getNickName(), '=', channel->getName());
+			std::string	nick =  (*it).first->getNickName();
+			std::string	prefix = channel->isOper(nick) ? " :@" : " :"; 
+			
+			message = _RPL_NAMREPLY(_user->getNickName(), nick, '=', channel->getName(), prefix);
 			_server->sendMsg(_user->getFd(), message);
 		}
 		message = _RPL_ENDOFNAMES(_user->getNickName(), channel->getName());

@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/07 13:42:05 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/07 13:50:36 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,23 +42,23 @@ std::string &Commands::getRpl() { return (_rpl); }
 void Commands::setupMap() // define it and call once in Server ?
 {
 	_cmdMap["PASS"] = &Commands::pass;
-	_cmdMap[NICK] = &Commands::nick;
-	_cmdMap[USER] = &Commands::user;
+	_cmdMap["NICK"] = &Commands::nick;
+	_cmdMap["USER"] = &Commands::user;
 	_cmdMap["WHOIS"] = &Commands::whois;
 	//	_cmdMap["WHO"] = &Commands::who;
-	_cmdMap[OPER] = &Commands::oper;
-	_cmdMap[QUIT] = &Commands::quit;
-	_cmdMap[JOIN] = &Commands::join;
-	_cmdMap[PART] = &Commands::part;
-	_cmdMap[MODE] = &Commands::mode;
-	_cmdMap[TOPIC] = &Commands::topic;
-	_cmdMap[NAMES] = &Commands::names;
-	_cmdMap[LIST] = &Commands::list;
-	_cmdMap[INVITE] = &Commands::invite;
-	_cmdMap[KICK] = &Commands::kick;
-	_cmdMap[KILL] = &Commands::kill;
-	_cmdMap[PING] = &Commands::ping;
-	_cmdMap[PONG] = &Commands::pong;
+	_cmdMap["OPER"] = &Commands::oper;
+	_cmdMap["QUIT"] = &Commands::quit;
+	_cmdMap["JOIN"] = &Commands::join;
+	_cmdMap["PART"] = &Commands::part;
+	_cmdMap["MODE"] = &Commands::mode;
+	_cmdMap["TOPIC"] = &Commands::topic;
+	_cmdMap["NAMES"] = &Commands::names;
+	_cmdMap["LIST"] = &Commands::list;
+	_cmdMap["INVITE"] = &Commands::invite;
+	_cmdMap["KICK"] = &Commands::kick;
+	_cmdMap["KILL"] = &Commands::kill;
+	_cmdMap["PING"] = &Commands::ping;
+	_cmdMap["PONG"] = &Commands::pong;
 }
 
 // void	Commands::setupRplMap() // set up a map for answers

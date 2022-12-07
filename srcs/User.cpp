@@ -12,13 +12,15 @@
 
 #include "User.hpp"
 
-User::User(): _isOper(false),_isConnected(false) {}
+User::User(): _isPwdVerified(false), _isOper(false),_isConnected(false) {}
 User::~User() {}
 
 /*************************************************************
 * Setters
 *************************************************************/
 void	User::setFd(int fd) { _fd = fd; }
+void	User::setId(std::string id) { _id = id; }
+void	User::setIsPwdVerified(void) { _isPwdVerified = true; }
 void	User::setNickName(std::string nick) { _nickName = nick; }
 void	User::setUserName(std::string user) { _userName = user; }
 void	User::setHostName(std::string host) { _hostName = host; }
@@ -30,7 +32,8 @@ void	User::disconnect(void) { _isConnected = false; }
 /*************************************************************
 * Getters
 *************************************************************/
-int			User::getFd(void) const {return _fd;}
+int			User::getFd(void) const { return _fd; }
+std::string	User::getId(void) const { return _id; }
 std::string	User::getNickName(void) const { return _nickName; }
 std::string	User::getUserName(void) const { return _userName; }
 std::string	User::getHostName(void) const { return _hostName; }
@@ -38,6 +41,7 @@ std::string	User::getRealName(void) const { return _realName; }
 
 bool		User::isOperator(void) const { return _isOper; }
 bool		User::isConnected(void) const { return _isConnected; }
+bool		User::isPwdVerified(void) const { return _isPwdVerified; }
 
 /* debug overload to delete*/
 std::ostream & operator<<(std::ostream & o, User * const &rhs){

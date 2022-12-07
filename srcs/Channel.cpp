@@ -128,7 +128,7 @@ void Channel::part(User *user)
 		if (((*it).first->getNickName() == user->getNickName()))
 		{
 			_users.erase(it);
-			std::cout << user->getNickName() << " has parted channel '" << getName() << "'" << std::endl;
+			std::cout << user->getNickName() << " has parted channel #" << getName() << std::endl;
 			return ;
 		}
 	}

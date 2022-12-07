@@ -83,8 +83,11 @@ public:
 	void deleteChannel(std::string name);
 
 	void sendMsg(int fd, std::string &msg);
+	void sendMessage(int fd, std::string id, std::string &msg);
+
 	void sendToAllUser(std::string &msg);
 
+	void closeFd(int targetFd);
 	void closeAllConn();
 
 private:

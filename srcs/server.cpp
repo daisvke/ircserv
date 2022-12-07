@@ -235,10 +235,26 @@ void Server::readExistingFds(int index)
 
 void Server::sendMsg(int fd, std::string &msg)
 {
-
 	int sendRet;
 
 	msg = ":" + _name + " " + msg + _CRLF;
+//	std::cout << "\033[31m]==================== here 1: \033[0m" << msg << std::endl;
+
+	sendRet = send(fd, msg.c_str(), msg.length(), 0);
+	if (sendRet < 0)
+	{
+		serverPrint("send() failed");
+		for (int i = 0; i < _nfds; i++)
+			if (_fds[i].fd == fd)
+				closeConn(i);
+	}
+}
+
+void Server::sendMessage(int fd, std::string id, std::string &msg)
+{
+	int sendRet;
+
+	msg = ":" + id + " " + msg + _CRLF;
 	sendRet = send(fd, msg.c_str(), msg.length(), 0);
 	if (sendRet < 0)
 	{
@@ -321,6 +337,13 @@ void Server::closeConn(int index)
 	}
 	if (_condenceArrayFlag && index < _nfds)
 		NarrowArray();
+}
+
+void Server::closeFd(int targetFd)
+{
+    for (int i = 0; i < _nfds; i++)
+        if (_fds[i].fd == targetFd)
+            closeConn(i);
 }
 
 void Server::NarrowArray(void)

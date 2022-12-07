@@ -101,10 +101,6 @@ class Commands
 		Commands(Server *server, User *user, std::string &str);
 		~Commands();
 
-	public:
-
-		// getter
-		std::string	&getRpl();
 
 	private:
 
@@ -132,15 +128,13 @@ class Commands
 		void	registerClient(void);
 
 		enum	e_isPriv { _NOT_PRIV, _PRIV };
-		void	sendMsgToChan(Channel *channel, std::string &msg, bool isPriv);
+		void	broadcastToChannel(Channel *channel, std::string msg, bool isPriv);
 
 
 		Server						*_server;
 		User						*_user;
 		std::vector<std::string>	_params;
 		cmdMap						_cmdMap;
-
-		std::string					_rpl;
 };
 
 #endif

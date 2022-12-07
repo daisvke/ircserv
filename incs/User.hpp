@@ -25,6 +25,8 @@ class User
 
 		// setters
 		void	setFd(int fd);
+		void	setId(std::string id);
+		void	setIsPwdVerified(void);
 		void	setNickName(std::string nick);
 		void	setUserName(std::string user);
 		void	setHostName(std::string host);
@@ -35,6 +37,7 @@ class User
 
 		// getters
 		int			getFd(void) const;
+		std::string	getId(void) const;
 		std::string	getNickName(void) const;
 		std::string	getUserName(void) const;
 		std::string	getHostName(void) const;
@@ -42,12 +45,15 @@ class User
 
 		bool		isOperator(void) const;
 		bool		isConnected(void) const;
+		bool		isPwdVerified(void) const;
 
 	private:
 
 		int			_fd;
+		bool		_isPwdVerified;
 		bool		_isOper;
 		bool		_isConnected; // usefull ?
+		std::string	_id;
 		std::string	_nickName;
 		std::string	_userName;
 		std::string	_hostName;

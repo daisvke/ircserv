@@ -37,8 +37,6 @@ Commands::Commands(Server *server, User *user, std::string &str)
 
 Commands::~Commands() {}
 
-std::string &Commands::getRpl() { return (_rpl); }
-
 void Commands::setupMap() // define it and call once in Server ?
 {
 	_cmdMap["PASS"] = &Commands::pass;
@@ -90,26 +88,27 @@ void Commands::routeCmd()
 			return _server->sendMsg(_user->getFd(), message);
 		}
 	}
-	if (_rpl.empty())
-		_rpl = "test\r\n";
 }
 
 /*************************************************************
  * Sends channel message to one or more members of the channel
  *************************************************************/
-
-void Commands::sendMsgToChan(Channel *channel, std::string &msg, bool isPriv)
+void	Commands::broadcastToChannel(Channel *channel, std::string msg, bool isPriv)
 {
 	userDirectory 			*users = channel->getUserDirectory();
-	userDirectory::iterator it = users->begin();
-	std::string				privPrefix = isPriv ?  "PRIVMSG #" + channel->getName() + " :" : "";
+	msg = isPriv ? "PRIVMSG #" + channel->getName() + " " + msg : msg;
 
-	msg = privPrefix + msg;
-
-	for (; it != users->end(); ++it)
+	for (userDirectory::iterator it = users->begin(); it != users->end(); ++it)
+	{
 		if ((*it).first != _user)
-			_server->sendMsg((*it).first->getFd(), msg);
+		{
+			int			userFd = (*it).first->getFd();
+			std::string userId  = _user->getId();
+			_server->sendMessage(userFd, userId, msg);
+		}
+	}
 }
+
 
 /*************************************************************
  * When launched with 'irssi -w <pwd>', a PASS message is sent to ircserv.
@@ -117,18 +116,21 @@ void Commands::sendMsgToChan(Channel *channel, std::string &msg, bool isPriv)
  *************************************************************/
 void Commands::pass(void)
 {
+	int	userFd = _user->getFd();
 	if (_params.size() < 2)
 	{
 		std::string message = _ERR_NEEDMOREPARAMS;
-		return _server->sendMsg(_user->getFd(), message);
+		return _server->sendMsg(userFd, message);
 	}
 
 	if (_params[1] != _server->getPassword())
 	{
 		std::string message = _ERR_PASSWDMISMATCH(_user->getNickName());
-		_server->sendMsg(_user->getFd(), message);
-		_server->closeAllConn();
+		_server->sendMsg(userFd, message);
+		_server->closeFd(userFd);
 	}
+	else
+		_user->setIsPwdVerified();
 }
 
 /*************************************************************
@@ -139,6 +141,8 @@ void Commands::nick(void)
 {
 	std::string message;
 
+	if (_user->isPwdVerified() == false)
+		_server->closeFd(_user->getFd());
 	std::string newNick = _params[1];
 	std::remove_if(newNick.begin(), newNick.end(), isspace);
 	if (newNick.empty())
@@ -162,6 +166,7 @@ void Commands::nick(void)
 	{
 		message = _ERR_NICKNAMEINUSE(newNick);
 		_server->sendMsg(_user->getFd(), message);
+		_server->closeFd(_user->getFd());
 	}
 }
 
@@ -203,6 +208,9 @@ void Commands::user(void)
 		realName += ' ' + _params[i];
 	_user->setRealName(realName);
 
+	std::string	newId = _user->getNickName() + "!" + _user->getUserName() + "@" + _server->getName();
+	_user->setId(newId);
+
 	registerClient();
 }
 
@@ -210,8 +218,8 @@ void Commands::registerClient(void)
 {
 	std::string nickName = _user->getNickName();
 	std::string serverName = _server->getName();
+	
 	std::string message = _RPL_WELCOME(nickName, _user->getUserName());
-
 	_server->sendMsg(_user->getFd(), message);
 	message = _RPL_YOURHOST(nickName, serverName);
 	_server->sendMsg(_user->getFd(), message);
@@ -308,7 +316,8 @@ void Commands::quit(void)
 			{
 				(*channels)[i]->part((*it).first);
 				if (lastWords.empty() == false)
-					sendMsgToChan((*channels)[i], lastWords, _PRIV);
+					broadcastToChannel((*channels)[i], lastWords, _PRIV);
+				return ;
 			}
 		}
 	}
@@ -319,16 +328,17 @@ void Commands::quit(void)
  *************************************************************/
 void Commands::join(void)
 {
+	std::string message;
+
 	if (_params.size() < 2)
 	{
-		std::string message = _ERR_NEEDMOREPARAMS;
+		message = _ERR_NEEDMOREPARAMS;
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
 	std::vector<std::string> channelKeys;
 	std::vector<std::string> channelNames = ircSplit(_params[1], ',');
 	bool isOper;
-	std::string message;
 
 	if (_params.size() > 2)
 		channelKeys = ircSplit(_params[2], ',');
@@ -373,6 +383,14 @@ void Commands::join(void)
 
 		channel->join(_user, isOper);
 
+		//  tell all users that a user has joined
+		if (isOper == false)
+		{
+			message = "JOIN #" + channelName;
+			broadcastToChannel(channel, message, _NOT_PRIV);
+			_server->sendMessage(_user->getFd(), _user->getId(), message);
+		}
+		// Print channel parameters to user
 		if (channel->getTopic().empty() == false)
 		{
 			message = _RPL_TOPIC(_user->getNickName(), channel->getName(), channel->getTopic());
@@ -390,13 +408,6 @@ void Commands::join(void)
 		}
 		message = _RPL_ENDOFNAMES(_user->getNickName(), channel->getName());
 		_server->sendMsg(_user->getFd(), message);
-
-		// If channel already existed, tell all users that a user has joined
-		if (isOper == false)
-		{
-			std::string message = "JOIN #" + channelName;
-			sendMsgToChan(channel, message, _NOT_PRIV);
-		}
 	}
 
 	// handle? => user shouldn't be banned  ERR_BANNEDFROMCHAN
@@ -438,10 +449,11 @@ void Commands::part(void)
 		{
 			if ((*it).first->getNickName() == _user->getNickName())
 			{
-				users->erase((*it).first);
 				// Tell all users that a user has left the channel
 				message = "PART #" + channelName;
-				_server->sendMsg(_user->getFd(), message);
+				broadcastToChannel(channel, message, _NOT_PRIV);
+			
+				users->erase((*it).first);
 
 				if (channel->isEmpty())
 					_server->deleteChannel(channel->getName());
@@ -449,6 +461,7 @@ void Commands::part(void)
 		//		_server->sendMsg(_user->getFd(), message);
 				break ;
 			}
+			++it;
 		}
 		if (it == users->end())
 		{
@@ -713,7 +726,7 @@ void Commands::privmsg(bool isNoticeCmd)
 				return _server->sendMsg(_user->getFd(), errMessage);
 			}
 
-			sendMsgToChan(channel, message, _PRIV);
+			broadcastToChannel(channel, message, _PRIV);
 		}
 		else
 		{

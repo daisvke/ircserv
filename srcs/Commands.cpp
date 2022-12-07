@@ -43,7 +43,7 @@ void Commands::setupMap() // define it and call once in Server ?
 	_cmdMap["NICK"] = &Commands::nick;
 	_cmdMap["USER"] = &Commands::user;
 	_cmdMap["WHOIS"] = &Commands::whois;
-	//	_cmdMap["WHO"] = &Commands::who;
+	_cmdMap["WHO"] = &Commands::who;
 	_cmdMap["OPER"] = &Commands::oper;
 	_cmdMap["QUIT"] = &Commands::quit;
 	_cmdMap["JOIN"] = &Commands::join;
@@ -58,11 +58,6 @@ void Commands::setupMap() // define it and call once in Server ?
 	_cmdMap["PING"] = &Commands::ping;
 	_cmdMap["PONG"] = &Commands::pong;
 }
-
-// void	Commands::setupRplMap() // set up a map for answers
-// {
-
-// }
 
 /*************************************************************
  * Looks for the command on the cmdMap.
@@ -84,7 +79,7 @@ void Commands::routeCmd()
 			(this->*_cmdMap[cmd])();
 		else
 		{
-			std::string message = _ERR_NOSUCHCMD(cmd);
+			std::string message = _ERR_UNKNOWNCOMMAND(_user->getNickName(), cmd);
 			return _server->sendMsg(_user->getFd(), message);
 		}
 	}
@@ -109,7 +104,6 @@ void	Commands::broadcastToChannel(Channel *channel, std::string msg, bool isPriv
 	}
 }
 
-
 /*************************************************************
  * When launched with 'irssi -w <pwd>', a PASS message is sent to ircserv.
  * This function will check if the given pwd is correct.
@@ -119,7 +113,7 @@ void Commands::pass(void)
 	int	userFd = _user->getFd();
 	if (_params.size() < 2)
 	{
-		std::string message = _ERR_NEEDMOREPARAMS;
+		std::string message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
 		return _server->sendMsg(userFd, message);
 	}
 
@@ -142,7 +136,11 @@ void Commands::nick(void)
 	std::string message;
 
 	if (_user->isPwdVerified() == false)
+	{
+		std::string message = _ERR_PASSWDMISMATCH(_user->getNickName());
+		_server->sendMsg(_user->getFd(), message);
 		_server->closeFd(_user->getFd());
+	}
 	std::string newNick = _params[1];
 	std::remove_if(newNick.begin(), newNick.end(), isspace);
 	if (newNick.empty())
@@ -181,7 +179,7 @@ void Commands::user(void)
 {
 	if (_params.size() < 5)
 	{
-		std::string message = _ERR_NEEDMOREPARAMS;
+		std::string message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
@@ -201,9 +199,7 @@ void Commands::user(void)
 	_server->setName(_params[3]);
 	std::string realName;
 	if (_params[4][0] == ':')
-	{
 		_params[4].erase(0, 1);
-	}
 	for (size_t i(4); i < _params.size(); ++i)
 		realName += ' ' + _params[i];
 	_user->setRealName(realName);
@@ -249,7 +245,7 @@ void Commands::whois(void)
 	message = _RPL_ENDOFWHOIS(nick);
 	return _server->sendMsg(_user->getFd(), message);
 }
-/*
+
 void Commands::who(void)
 {
 	std::string nick = _params[1], message;
@@ -270,7 +266,6 @@ void Commands::who(void)
 	message = _RPL_ENDOFWHOIS(nick);
 	return _server->sendMsg(_user->getFd(), message);
 }
-*/
 
 /*************************************************************
  * Used by a user to get oper privileges
@@ -279,7 +274,7 @@ void Commands::oper(void)
 {
 	if (_params.size() < 3)
 	{
-		std::string message = _ERR_NEEDMOREPARAMS;
+		std::string message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
@@ -332,7 +327,7 @@ void Commands::join(void)
 
 	if (_params.size() < 2)
 	{
-		message = _ERR_NEEDMOREPARAMS;
+		message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
@@ -419,7 +414,7 @@ void Commands::part(void)
 	std::string	message;
 	if (_params.size() < 2)
 	{
-		message = _ERR_NEEDMOREPARAMS;
+		message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
@@ -479,7 +474,7 @@ void Commands::mode(void)
 
 	if (_params.size() < 1)
 	{
-		message = _ERR_NEEDMOREPARAMS;
+		message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
@@ -527,7 +522,7 @@ void Commands::topic(void)
 
 	if (_params.size() < 2)
 	{
-		message = _ERR_NEEDMOREPARAMS;
+		message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
@@ -622,7 +617,7 @@ void Commands::invite(void)
 
 	if (_params.size() < 4)
 	{
-		message = _ERR_NEEDMOREPARAMS;
+		message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
@@ -660,7 +655,7 @@ void Commands::kick(void)
 {
 	if (_params.size() < 3)
 	{
-		std::string message = _ERR_NEEDMOREPARAMS;
+		std::string message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
@@ -694,15 +689,18 @@ void Commands::kick(void)
 void Commands::privmsg(bool isNoticeCmd)
 {
 	std::vector<std::string> names = ircSplit(_params[1], ',');
-	std::string message = _params[2];
 	std::string errMessage;
 	std::string nickName = _user->getNickName();
+
+	std::string message = _params[2];
+	for (size_t i(3); i < _params.size(); ++i)
+		message += " " + _params[i];	
 
 	if (_params.size() < 3)
 	{
 		if (isNoticeCmd == false)
 		{
-			errMessage = _ERR_NEEDMOREPARAMS;
+			errMessage = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
 			return _server->sendMsg(_user->getFd(), errMessage);
 		}
 	}
@@ -746,7 +744,7 @@ void Commands::kill(void)
 {
 	if (_params.size() < 3)
 	{
-		std::string message = _ERR_NEEDMOREPARAMS;
+		std::string message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
 		_server->sendMsg(_user->getFd(), message);
 		return;
 	}

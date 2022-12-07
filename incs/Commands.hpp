@@ -51,16 +51,14 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define _RPL_CREATED(nick, datetime)	"003 " + nick + " :This server was created " + datetime
 # define _RPL_MYINFO(nick, server)		"004 " + nick + " " + server + " " + _SERVERVERSION + " " + _USERMODES \
 	+ " " + _CHANMODES + " " + _CHAN_PARAM_MODES
-
 // commands
-# define _ERR_NOSUCHCMD(cmd)				"Unknown command: " + cmd
-# define _ERR_NEEDMOREPARAMS				"Not enough parameters given"
-
+# define _ERR_UNKNOWNCOMMAND(nick, cmd)		"421 " + nick + " " + cmd
+# define _ERR_NEEDMOREPARAMS(nick, cmd)		"461 " + nick + " " + cmd
 // nick
 # define _RPL_CURRENTNICK(nick)				"Your nickname is " + nick
 # define _RPL_NICKSUCCESS(nick)				"You're now known as " + nick
-# define _ERR_NONICKNAMEGIVEN(nick)			"431 " + nick + "No nickname given"
-# define _ERR_NICKNAMEINUSE(nick)			"Nick " + nick + " is already in use"
+# define _ERR_NONICKNAMEGIVEN(nick)			"431 " + nick
+# define _ERR_NICKNAMEINUSE(nick)			"433 " + nick + nick
 // user
 # define _ERR_ALREADYREGISTRED(user)		user + " already registered"
 // whois
@@ -68,7 +66,7 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define _RPL_ENDOFWHOIS(nick)					"318 " + nick + " :End of /WHOIS list"
 // oper
 # define _RPL_YOUREOPER						"You are oper"
-# define _ERR_PASSWDMISMATCH(nick)			"464 " + nick + " :password incorrect"
+# define _ERR_PASSWDMISMATCH(nick)			"464 " + nick
 // join
 # define _ERR_BADCHANNELKEY(chan)			"Wrong key for " + chan
 # define _ERR_CHANNELISFULL(chan)			"Channel " + chan + " is full"
@@ -87,7 +85,7 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define _ERR_CANNOTSENDTOCHAN(nick, chan)	"404 " + nick + " #" + chan
 # define _ERR_CHANOPRIVSNEEDED(nick)		"482 " + nick + " Need to be operator"
 // invite
-# define _ERR_USERONCHANNEL(nick, chan)			"443 " + nick + " Already on channel #" + chan
+# define _ERR_USERONCHANNEL(nick, chan)		"443 " + nick + " Already on channel #" + chan
 
 
 class Server ;
@@ -108,6 +106,7 @@ class Commands
 		void	nick(void);
 		void	user(void);
 		void	whois(void);
+		void	who(void);
 		void	oper(void);
 		void	quit(void);
 		void	join(void);

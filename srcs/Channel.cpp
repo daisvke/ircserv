@@ -140,13 +140,13 @@ void Channel::part(User *user)
 /*************************************************************
  * Prints all members of the channel
  *************************************************************/
-/*void Channel::names(void)
+void Channel::names(void)
 {
 	userDirectory::iterator it = _users.begin();
 
 	for (; it != _users.end(); ++it)
 		std::cout << (*it).first->getNickName() << std::endl; // replace print fct
-}*/
+}
 
 /*************************************************************
  * Modifies user/channel modes.

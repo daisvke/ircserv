@@ -42,7 +42,7 @@ void Commands::setupMap() // define it and call once in Server ?
 	_cmdMap[PART] = &Commands::part;
 	_cmdMap[MODE] = &Commands::mode;
 	_cmdMap[TOPIC] = &Commands::topic;
-//	_cmdMap[NAMES] = &Commands::names;
+	_cmdMap[NAMES] = &Commands::names;
 	_cmdMap[LIST] = &Commands::list;
 	_cmdMap[INVITE] = &Commands::invite;
 	_cmdMap[KICK] = &Commands::kick;
@@ -504,13 +504,15 @@ void Commands::topic(void)
 }
 
 /*************************************************************
+ * This command is built-in on our reference client Irssi
+ * 
  * If no channel name is given as param:
  *	all the channels with all its members are printed.
  * If channel names are given:
  * 	Prints all members of all the given non private, non secret, or currently listening channels.
  * There is no error message for wrong channel names etc.
  *************************************************************/
-/*void Commands::names(void)
+void Commands::names(void)
 {
 	std::vector<Channel *> channels;
 
@@ -533,7 +535,7 @@ void Commands::topic(void)
 			channels[i]->names();
 		}
 	}
-}*/
+}
 
 void Commands::list(void)
 {

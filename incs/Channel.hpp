@@ -54,7 +54,7 @@ class Channel
 		// commands
 		void	join(User *user, bool isOp);
 		void	part(User *user);
-//		void	names(void);
+		void	names(void);
 		bool	checkMode(char c) const;
 
 

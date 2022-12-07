@@ -174,7 +174,7 @@ void Commands::user(void)
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
-	std::string userName = _params[1];
+//	std::string userName = _params[1];
 	/*	if (_server->findUserByName(userName) == false)
 			_user->setUserName(userName);
 		else
@@ -183,12 +183,7 @@ void Commands::user(void)
 			return _server->sendMsg(_user->getFd(), message);
 		}
 	*/
-	_user->setUserName(userName);
-	if (_server->findUserByNick(_user->getNickName()))
-	{
-		std::string message = _ERR_ALREADYREGISTRED(userName);
-		_server->sendMsg(_user->getFd(), message);
-	}
+	//_user->setUserName(userName);
 
 	_user->setUserName(_params[1]);
 	_user->setHostName(_params[2]);

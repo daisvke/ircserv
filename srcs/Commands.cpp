@@ -41,7 +41,8 @@ void Commands::setupMap() // define it and call once in Server ?
 	_cmdMap["PASS"] = &Commands::pass;
 	_cmdMap[NICK] = &Commands::nick;
 	_cmdMap[USER] = &Commands::user;
-	_cmdMap["WHOOIS"] = &Commands::whois;
+	_cmdMap["WHOIS"] = &Commands::whois;
+	//	_cmdMap["WHO"] = &Commands::who;
 	_cmdMap[OPER] = &Commands::oper;
 	_cmdMap[QUIT] = &Commands::quit;
 	_cmdMap[JOIN] = &Commands::join;
@@ -94,15 +95,17 @@ void Commands::routeCmd()
  * Sends channel message to one or more members of the channel
  *************************************************************/
 
-void Commands::sendMsgToChan(Channel *channel, std::string &msg)
+void Commands::sendMsgToChan(Channel *channel, std::string &msg, bool isPriv)
 {
-	userDirectory *users = channel->getUserDirectory();
+	userDirectory 			*users = channel->getUserDirectory();
 	userDirectory::iterator it = users->begin();
+	std::string				privPrefix = isPriv ?  "PRIVMSG #" + channel->getName() + " :" : "";
 
-	msg = "PRIVMSG #" + channel->getName() + " :" + msg;
+	msg = privPrefix + msg;
 
 	for (; it != users->end(); ++it)
-		_server->sendMsg((*it).first->getFd(), msg);
+		if ((*it).first != _user)
+			_server->sendMsg((*it).first->getFd(), msg);
 }
 
 /*************************************************************
@@ -154,7 +157,7 @@ void Commands::nick(void)
 	}
 	else
 	{
-		message = _ERR_NICKNAMEINUSE(newNick); //
+		message = _ERR_NICKNAMEINUSE(newNick);
 		_server->sendMsg(_user->getFd(), message);
 	}
 }
@@ -235,6 +238,28 @@ void Commands::whois(void)
 	message = _RPL_ENDOFWHOIS(nick);
 	return _server->sendMsg(_user->getFd(), message);
 }
+/*
+void Commands::who(void)
+{
+	std::string nick = _params[1], message;
+
+	if (_params.size() < 2)
+	{
+		std::string message = _ERR_NONICKNAMEGIVEN(nick);
+		return _server->sendMsg(_user->getFd(), message);
+	}
+	if (!_server->findUserByNick(nick))
+	{
+		message = _ERR_NOSUCHNICK(nick);
+		return _server->sendMsg(_user->getFd(), message);
+	}
+
+	message = _RPL_WHOISREGNICK(nick);
+	_server->sendMsg(_user->getFd(), message);
+	message = _RPL_ENDOFWHOIS(nick);
+	return _server->sendMsg(_user->getFd(), message);
+}
+*/
 
 /*************************************************************
  * Used by a user to get oper privileges
@@ -280,7 +305,7 @@ void Commands::quit(void)
 			{
 				(*channels)[i]->part((*it).first);
 				if (lastWords.empty() == false)
-					sendMsgToChan((*channels)[i], lastWords);
+					sendMsgToChan((*channels)[i], lastWords, _PRIV);
 			}
 		}
 	}
@@ -317,10 +342,7 @@ void Commands::join(void)
 			channel = _server->addChannel(channelName, channelKeys[i]);
 			isOper = true;
 		}
-		else
-		{
-			isOper = false;
-		}
+		else isOper = false;
 
 		if (channel && channel->getUserDirectory()->count(_user))
 			return;
@@ -348,11 +370,6 @@ void Commands::join(void)
 
 		channel->join(_user, isOper);
 
-		message = _user->getNickName() + " has joined channel #" + channelName;
-		sendMsgToChan(channel, message);
-
-		std::string message = _user->getNickName() + " JOIN #" + channelName;
-
 		if (channel->getTopic().empty() == false)
 		{
 			message = _RPL_TOPIC(_user->getNickName(), channel->getName(), channel->getTopic());
@@ -370,6 +387,13 @@ void Commands::join(void)
 		}
 		message = _RPL_ENDOFNAMES(_user->getNickName(), channel->getName());
 		_server->sendMsg(_user->getFd(), message);
+
+		// If channel already existed, tell all users that a user has joined
+		if (isOper == false)
+		{
+			std::string message = "JOIN #" + channelName;
+			sendMsgToChan(channel, message, _NOT_PRIV);
+		}
 	}
 
 	// handle? => user shouldn't be banned  ERR_BANNEDFROMCHAN
@@ -381,9 +405,10 @@ void Commands::join(void)
  *************************************************************/
 void Commands::part(void)
 {
+	std::string	message;
 	if (_params.size() < 2)
 	{
-		std::string message = _ERR_NEEDMOREPARAMS;
+		message = _ERR_NEEDMOREPARAMS;
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
@@ -399,7 +424,7 @@ void Commands::part(void)
 
 		if (!channel)
 		{
-			std::string message = _ERR_NOSUCHCHANNEL(_user->getNickName(), channelName);
+			message = _ERR_NOSUCHCHANNEL(_user->getNickName(), channelName);
 			_server->sendMsg(_user->getFd(), message);
 			continue;
 		}
@@ -411,14 +436,14 @@ void Commands::part(void)
 			if ((*it).first->getNickName() == _user->getNickName())
 			{
 				users->erase((*it).first);
-				std::cout << _user->getNickName() << " left channel #" << channel->getName() << std::endl;
-				std::string message = ":" + _user->getNickName() + " PART #" + channelName + " " + reason;
-				//	std::string	message = "PART #" + channel->getName();
+				// Tell all users that a user has left the channel
+				message = "PART #" + channelName;
 				_server->sendMsg(_user->getFd(), message);
+
 				if (channel->isEmpty())
 					_server->deleteChannel(channel->getName());
-				//	message = _ERR_NOSUCHCHANNEL(_user->getNickName(), channelName);
-				//	_server->sendMsg(_user->getFd(), message);
+		//		message = _ERR_NOSUCHCHANNEL(_user->getNickName(), channelName);
+		//		_server->sendMsg(_user->getFd(), message);
 				break ;
 			}
 		}
@@ -659,45 +684,47 @@ void Commands::privmsg(bool isNoticeCmd)
 	std::string errMessage;
 	std::string nickName = _user->getNickName();
 
-	if (_params.size() < 2)
+	if (_params.size() < 3)
 	{
 		if (isNoticeCmd == false)
 		{
 			errMessage = _ERR_NEEDMOREPARAMS;
-			_server->sendMsg(_user->getFd(), errMessage);
+			return _server->sendMsg(_user->getFd(), errMessage);
 		}
-		return;
 	}
 
 	for (size_t i(0); i < names.size(); ++i)
 	{
-		User *target = _server->findUserByNick(names[i]);
-		if (!target)
-		{
-			if (isNoticeCmd == false)
-			{
-				errMessage = _ERR_NOSUCHNICK(names[i]);
-				_server->sendMsg(_user->getFd(), errMessage);
-			}
-			return;
-		}
 		if (names[i][0] == '#')
 		{
-			Channel *channel = _server->findChannel(names[i]);
+			std::string	name = names[i].erase(0, 1);
+			Channel *channel = _server->findChannel(name);
 			if (!channel)
 			{
-				errMessage = _ERR_NOSUCHCHANNEL(nickName, names[i]);
+				errMessage = _ERR_NOSUCHCHANNEL(nickName, name);
 				return _server->sendMsg(_user->getFd(), errMessage);
 			}
 			if (channel->isModerated() && !(_user->isOperator() || channel->hasVoice(nickName)))
 			{
-				errMessage = _ERR_CANNOTSENDTOCHAN(nickName, names[i]);
+				errMessage = _ERR_CANNOTSENDTOCHAN(nickName, name);
 				return _server->sendMsg(_user->getFd(), errMessage);
 			}
-			sendMsgToChan(channel, message);
+
+			sendMsgToChan(channel, message, _PRIV);
 		}
 		else
+		{
+			User *target = _server->findUserByNick(names[i]);
+			if (!target)
+			{
+				if (isNoticeCmd == false)
+				{
+					errMessage = _ERR_NOSUCHNICK(names[i]);
+					return _server->sendMsg(_user->getFd(), errMessage);
+				}
+			}
 			_server->sendMsg(target->getFd(), message);
+		}
 	}
 }
 

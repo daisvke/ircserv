@@ -59,7 +59,7 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 // nick
 # define _RPL_CURRENTNICK(nick)				"Your nickname is " + nick
 # define _RPL_NICKSUCCESS(nick)				"You're now known as " + nick
-# define _ERR_NONICKNAMEGIVEN(nick)				"431 " + nick + "No nickname given"
+# define _ERR_NONICKNAMEGIVEN(nick)			"431 " + nick + "No nickname given"
 # define _ERR_NICKNAMEINUSE(nick)			"Nick " + nick + " is already in use"
 // user
 # define _ERR_ALREADYREGISTRED(user)		user + " already registered"
@@ -73,20 +73,21 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define _ERR_BADCHANNELKEY(chan)			"Wrong key for " + chan
 # define _ERR_CHANNELISFULL(chan)			"Channel " + chan + " is full"
 # define _ERR_INVITEONLYCHAN(chan)			"Channel " + chan + " is invite only"
-# define _RPL_TOPIC(nick, chan, topic)		"332 " + nick + " #" + chan + " :" + topic
+# define _RPL_TOPIC(nick, chan, topic)		"332 " + nick + " " + chan + " :" + topic
 # define _RPL_NAMREPLY(nick, name, symbol, chan, prefix) "353 " + nick + " " + symbol + " " + chan + prefix + name
-# define _RPL_ENDOFNAMES(nick, chan)		"366 " + nick + " " + chan + " :End of /NAMES list"
+# define _RPL_ENDOFNAMES(nick, chan)		"366 " + nick + " " + chan
 // part
-# define _ERR_NOSUCHCHANNEL(nick, chan)		"403 " + nick + " " + chan + " No such channel"
+# define _ERR_NOSUCHCHANNEL(nick, chan)		"403 " + nick + " #" + chan
+# define _ERR_NOSUCHCHANIMIT(nick, chan)	"403 " + nick + " #" + chan
 # define _ERR_NOTONCHANNEL(nick, chan)		"442 " + nick + " " + nick + " is not on channel #" + chan
 // ping
 # define _ERR_NOSUCHSERVER(server)			server + " :No such server"
 // privmsg
-# define _ERR_NOSUCHNICK(nick)				"401 " + nick + " No such nick"
-# define _ERR_CANNOTSENDTOCHAN(nick, chan)	"404 " + nick + " Cannot send to channel '" + chan + "'"
+# define _ERR_NOSUCHNICK(nick)				"401 " + nick
+# define _ERR_CANNOTSENDTOCHAN(nick, chan)	"404 " + nick + " #" + chan
 # define _ERR_CHANOPRIVSNEEDED(nick)		"482 " + nick + " Need to be operator"
 // invite
-# define _ERR_USERONCHANNEL(nick, chan)			"443 " + nick + " Already on channel " + chan
+# define _ERR_USERONCHANNEL(nick, chan)			"443 " + nick + " Already on channel #" + chan
 
 
 class Server ;
@@ -129,7 +130,9 @@ class Commands
 		void	setupMap();
 		void	routeCmd();
 		void	registerClient(void);
-		void	sendMsgToChan(Channel *channel, std::string &msg);
+
+		enum	e_isPriv { _NOT_PRIV, _PRIV };
+		void	sendMsgToChan(Channel *channel, std::string &msg, bool isPriv);
 
 
 		Server						*_server;

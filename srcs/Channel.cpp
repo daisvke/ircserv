@@ -113,11 +113,9 @@ bool	Channel::hasVoice(std::string name) {
  *************************************************************/
 void Channel::join(User *user, bool isOp)
 {
-	if (isOp == true || user->isOperator())
-	{
-		std::string	mode = "o";
-		_users[user] += mode;
-	}
+	std::string	mode;
+	if (isOp == true || user->isOperator()) mode = "o";
+	_users[user] += mode;
 }
 
 /*************************************************************

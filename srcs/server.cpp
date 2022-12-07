@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/06 13:34:19 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/07 13:04:23 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,18 +148,17 @@ void Server::initServer()
  *************************************************************/
 int Server::checkPollRet(int ret)
 {
-
 	switch (ret)
 	{
-	case -1:
-		serverPrint(POLL_ERR_MESS);
-		return (POLL_FAILURE);
-	case 0:
-		serverPrint(TIMEOUT_MESS);
-		return (POLL_FAILURE);
-	default:
-		_status = ON_STATUS;
-		return (POLL_OK);
+		case -1:
+			serverPrint(POLL_ERR_MESS);
+			return (POLL_FAILURE);
+		case 0:
+			serverPrint(TIMEOUT_MESS);
+			return (POLL_FAILURE);
+		default:
+			_status = ON_STATUS;
+			return (POLL_OK);
 	}
 }
 
@@ -169,11 +168,13 @@ int Server::findReadableFd()
 	{
 		if (_fds[index].revents == 0)
 			continue;					   // do next loop,
-		if (_fds[index].revents != POLLIN) // If revents is not POLLIN it's an unexpected result;
-		{
-			_status = OFF_STATUS;
-			return (POLL_FAILURE);
-		}
+		// if (_fds[index].revents != POLLIN)
+		// {
+		// 	//_status = OFF_STATUS;
+		// 	return (POLL_FAILURE);
+		// }
+		else if (_fds[index].revents == POLLHUP)
+			printf("deconnection spoted");
 		else
 		{
 			printf("[DEBUG_MESS] findReadableFd : returning : = %d \n", index);
@@ -316,7 +317,7 @@ void Server::closeConn(int index)
 	{
 		deleteUser(fd);
 		close(fd);
-		fd = -1;
+		_fds[index].fd = -1;
 	}
 	if (_condenceArrayFlag && index < _nfds)
 		NarrowArray();

@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/02 21:53:06 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/07 13:42:05 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,9 @@ Commands::Commands(Server *server, User *user, std::string &str)
 	if (_params[0] == "CAP")
 		return;
 
+	std::string message = _ERR_PASSWDMISMATCH(_user->getNickName());
+	_server->sendMsg(_user->getFd(), message);
+	return ;
 	std::cout << std::endl
 			  << "/=================================" << std::endl;
 	for (size_t i(0); i < _params.size(); ++i)
@@ -747,7 +750,7 @@ void Commands::kill(void)
 		return; /* ERR_NOSUCHNICK */
 	}
 
-	std::string msg = QUIT + _params[1];
+	std::string msg = "QUIT" + _params[1];
 	Commands cmd(_server, target, msg);
 }
 

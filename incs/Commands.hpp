@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:10 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/02 21:51:38 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/07 11:31:01 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,21 +23,21 @@
 
 enum	e_isOper { _ISNOTOPER, _ISOPER };
 
-# define NICK		"NICK"
-# define USER		"USER"
-# define OPER		"OPER"
-# define QUIT		"QUIT"
-# define JOIN		"JOIN"
-# define PART		"PART"
-# define MODE		"MODE"
-# define TOPIC		"TOPIC"
-# define NAMES		"NAMES"
-# define LIST		"LIST"
-# define INVITE		"INVITE"
-# define KICK		"KICK"
-# define KILL		"KILL"
-# define PING		"PING"
-# define PONG		"PONG"
+// # define NICK		"NICK"
+// # define USER		"USER"
+// # define OPER		"OPER"
+// # define QUIT		"QUIT"
+// # define JOIN		"JOIN"
+// # define PART		"PART"
+// # define MODE		"MODE"
+// # define TOPIC		"TOPIC"
+// # define NAMES		"NAMES"
+// # define LIST		"LIST"
+// # define INVITE		"INVITE"
+// # define KICK		"KICK"
+// # define KILL		"KILL"
+// # define PING		"PING"
+// # define PONG		"PONG"
 
 # define _NETWORKNAME		"IRC-LCHAN-DTANIGAWcom"
 # define _SERVERVERSION		"0.0.1"
@@ -69,7 +69,7 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 // oper
 # define _RPL_YOUREOPER						"You are oper"
 # define _ERR_PASSWDMISMATCH(nick)			"464 " + nick + " :password incorrect"
-// join	
+// join
 # define _ERR_BADCHANNELKEY(chan)			"Wrong key for " + chan
 # define _ERR_CHANNELISFULL(chan)			"Channel " + chan + " is full"
 # define _ERR_INVITEONLYCHAN(chan)			"Channel " + chan + " is invite only"

@@ -16,7 +16,6 @@ Channel::Channel(std::string name, std::string key)
 	: _name(name), _topic(), _key(key), _userLimit()
 {
 		if (key.empty() == false) { _modes += "k"; }
-
 }
 
 Channel::~Channel() {}
@@ -93,6 +92,7 @@ bool	Channel::isInviteOnly(void) const { return checkMode('n'); }
 bool	Channel::isSecret(void) const { return checkMode('s'); }
 bool	Channel::isPrivate(void) const { return checkMode('p'); }
 bool	Channel::isLimited(void) const { return checkMode('l'); }	
+bool	Channel::isEmpty(void) const { return _users.size() == 0; }
 
 bool	Channel::isOper(std::string name) {
 	return getUserMode(name)->find('o') == std::string::npos ? false : true;
@@ -125,15 +125,14 @@ void Channel::join(User *user, bool isOp)
  *************************************************************/
 void Channel::part(User *user)
 {
-	for (userDirectory::iterator it = _users.begin(); it != _users.end();)
+	for (userDirectory::iterator it = _users.begin(); it != _users.end(); ++it)
 	{
 		if (((*it).first->getNickName() == user->getNickName()))
 		{
-			_users.erase(it++);
+			_users.erase(it);
 			std::cout << user->getNickName() << " has parted channel '" << getName() << "'" << std::endl;
+			return ;
 		}
-		else
-			++it;
 	}
 }
 

@@ -12,48 +12,48 @@
 
 #include "server.hpp"
 
-
 /*********************************************
-* 				Coplien Form
-*********************************************/
+ * 				Coplien Form
+ *********************************************/
 
 Server::Server()
-	:	_port(SERVER_DEFAULT_PORT), _password(), _name(SERVER_NAME), _creationTime(getTimeStr()),
-		_addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS),
-		_condenceArrayFlag(ON_STATUS), _opt(1), _nfds(0), _newSd(0)
+	: _port(SERVER_DEFAULT_PORT), _password(), _name(SERVER_NAME), _creationTime(getTimeStr()),
+	  _addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS),
+	  _condenceArrayFlag(ON_STATUS), _opt(1), _nfds(0), _newSd(0)
 {
 	ircMemset((void *)_buffer, 0, sizeof(_buffer));
 	ircMemset((void *)_fds, 0, sizeof(_fds));
-	std::cout << _creationTime <<"Server constructor called" << std::endl;
+	std::cout << _creationTime << "Server constructor called" << std::endl;
 	std::cout << "password = " << _password << std::endl;
 	std::cout << "port = " << _port << std::endl;
 }
 
 Server::Server(int port, std::string pwd)
-	:	_port(port), _password(pwd), _name(SERVER_NAME), _creationTime(getTimeStr()),
-		_addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS),
-		_condenceArrayFlag(ON_STATUS), _opt(1), _nfds(0), _newSd(0)
+	: _port(port), _password(pwd), _name(SERVER_NAME), _creationTime(getTimeStr()),
+	  _addrlen(sizeof(_sockAddr)), _listenSd(-1), _status(OFF_STATUS),
+	  _condenceArrayFlag(ON_STATUS), _opt(1), _nfds(0), _newSd(0)
 {
 	ircMemset((void *)_buffer, 0, sizeof(_buffer));
 	ircMemset((void *)_fds, 0, sizeof(_fds));
-	std::cout << _creationTime <<" Server constructor called" << std::endl;
+	std::cout << _creationTime << " Server constructor called" << std::endl;
 	std::cout << "password = " << _password << std::endl;
 	std::cout << "port = " << _port << std::endl;
 }
 
 Server::~Server()
 {
-	closeAllConn(); std::cout << "Server destructor called" << std::endl;
+	closeAllConn();
+	std::cout << "Server destructor called" << std::endl;
 }
 
 /*********************************************
  * 				initServer
  *********************************************/
 
-	/*************************************************************
-	* Create stream socket to receive incoming connections
-	*************************************************************/
-int	Server::setSocket()
+/*************************************************************
+ * Create stream socket to receive incoming connections
+ *************************************************************/
+int Server::setSocket()
 {
 	_listenSd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if (_listenSd == ERROR)
@@ -63,64 +63,63 @@ int	Server::setSocket()
 	return (E_SOCK_SUCCESS);
 }
 
-	/*************************************************************
-	* Allow socket descriptor to be reuseable
-	*************************************************************/
-int	Server::setSocketopt()
+/*************************************************************
+ * Allow socket descriptor to be reuseable
+ *************************************************************/
+int Server::setSocketopt()
 {
-	if (setsockopt(_listenSd, SOL_SOCKET, SO_REUSEADDR
-		| SO_REUSEPORT, &_opt, sizeof(_opt)) == ERROR)
+	if (setsockopt(_listenSd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &_opt, sizeof(_opt)) == ERROR)
 		return (E_SETSOCKOPT_ERR);
 	std::cout << "2. socketopt success" << std::endl;
 	return (E_SOCK_SUCCESS);
 }
 
-	/*************************************************************
-	* Set socket to be nonblocking. (FIONDBIO )
-	* 	--> (similar to O_NONBLOCK flag with the fcntl subroutine)
-	* All incoming connections will inherit that state from listening socket
-	*************************************************************/
-int	Server::setNonBlocking()
+/*************************************************************
+ * Set socket to be nonblocking. (FIONDBIO )
+ * 	--> (similar to O_NONBLOCK flag with the fcntl subroutine)
+ * All incoming connections will inherit that state from listening socket
+ *************************************************************/
+int Server::setNonBlocking()
 {
 	int on = 1;
 	int ret = ioctl(_listenSd, FIONBIO, (char *)&on);
-  	if (ret < 0)
-  		return (E_SETNONBLOKING_ERR);
+	if (ret < 0)
+		return (E_SETNONBLOKING_ERR);
 	std::cout << "3. setNonBlocking success" << std::endl;
 	return (E_SOCK_SUCCESS);
 }
 
-	/*************************************************************
-	* Bind the socket
-	*************************************************************/
-int	Server::bindSocket()
+/*************************************************************
+ * Bind the socket
+ *************************************************************/
+int Server::bindSocket()
 {
 	_sockAddr.sin_family = AF_INET;
 	_sockAddr.sin_addr.s_addr = inet_addr(LOCAL_HOST);
 	_sockAddr.sin_port = htons(_port);
-	if ((bind(_listenSd, (sockaddr *) &_sockAddr, _addrlen)) == ERROR)
+	if ((bind(_listenSd, (sockaddr *)&_sockAddr, _addrlen)) == ERROR)
 		return (E_BIND_ERR);
 	std::cout << "4. bind success" << std::endl;
 	return (E_SOCK_SUCCESS);
 }
 
-	/*************************************************************
-	* Set the listen back log and initial listening socket
-	*************************************************************/
-int	Server::setListenSocket()
+/*************************************************************
+ * Set the listen back log and initial listening socket
+ *************************************************************/
+int Server::setListenSocket()
 {
-	if (listen(_listenSd, MAX_CLIENT) == ERROR )
+	if (listen(_listenSd, MAX_CLIENT) == ERROR)
 		return (E_LISTEN_ERR);
 	_fds[0].fd = _listenSd;
 	_fds[0].events = POLLIN;
 	std::cout << "5. listening" << std::endl;
-		return (E_SOCK_SUCCESS);
+	return (E_SOCK_SUCCESS);
 }
 
-	/*************************************************************
-	* Server initialisation function
-	*************************************************************/
-void	Server::initServer()
+/*************************************************************
+ * Server initialisation function
+ *************************************************************/
+void Server::initServer()
 {
 	std::string names[5] = {
 		"socket",
@@ -129,13 +128,12 @@ void	Server::initServer()
 		"bind",
 		"listen",
 	};
-	int	(Server::*funkTab[5])() = {
+	int (Server::*funkTab[5])() = {
 		&Server::setSocket,
 		&Server::setSocketopt,
 		&Server::setNonBlocking,
 		&Server::bindSocket,
-		&Server::setListenSocket
-	};
+		&Server::setListenSocket};
 
 	for (int i = 0; i < 5; i++)
 		if ((this->*funkTab[i])() == ERROR)
@@ -145,32 +143,33 @@ void	Server::initServer()
 	serverPrint(SERVER_START_MESS);
 }
 
-
-
 /*************************************************************
-* Poll / wait for newconn
-*************************************************************/
-int	Server::checkPollRet( int ret ){
+ * Poll / wait for newconn
+ *************************************************************/
+int Server::checkPollRet(int ret)
+{
 
-	switch (ret){
-		case -1:
-			serverPrint(POLL_ERR_MESS);
-			return (POLL_FAILURE);
-		case 0:
-			serverPrint(TIMEOUT_MESS);
-			return (POLL_FAILURE);
-		default:
-			_status = ON_STATUS;
-			return (POLL_OK);
+	switch (ret)
+	{
+	case -1:
+		serverPrint(POLL_ERR_MESS);
+		return (POLL_FAILURE);
+	case 0:
+		serverPrint(TIMEOUT_MESS);
+		return (POLL_FAILURE);
+	default:
+		_status = ON_STATUS;
+		return (POLL_OK);
 	}
 }
 
-int	Server::findReadableFd()
+int Server::findReadableFd()
 {
-	for (int index = 0; index < _nfds;  index++){
+	for (int index = 0; index < _nfds; index++)
+	{
 		if (_fds[index].revents == 0)
-			continue;						//do next loop,
-		if (_fds[index].revents != POLLIN)		//If revents is not POLLIN it's an unexpected result;
+			continue;					   // do next loop,
+		if (_fds[index].revents != POLLIN) // If revents is not POLLIN it's an unexpected result;
 		{
 			_status = OFF_STATUS;
 			return (POLL_FAILURE);
@@ -184,54 +183,59 @@ int	Server::findReadableFd()
 	return (POLL_FAILURE);
 }
 
-	/****************************************************************************
-	Accept all incoming connections that are queued up on the listening socket
-	before we loop back and call poll again.
-	*****************************************************************************/
-int	Server::acceptNewSd()
+/****************************************************************************
+Accept all incoming connections that are queued up on the listening socket
+before we loop back and call poll again.
+*****************************************************************************/
+int Server::acceptNewSd()
 {
-	_newSd = accept(_listenSd, NULL, NULL);	//ckeck on man to see if other argument are necessary or not
+	_newSd = accept(_listenSd, NULL, NULL); // ckeck on man to see if other argument are necessary or not
 
-	if (_newSd < 0){
+	if (_newSd < 0)
+	{
 		if (errno != EWOULDBLOCK)
 			return (turnOffServer("accept() failed"));
 	}
-	else {
-		_fds[_nfds].fd = _newSd;			//we can directly use _nfds as an index coz we compressArray at each single connexion
+	else
+	{
+		_fds[_nfds].fd = _newSd; // we can directly use _nfds as an index coz we compressArray at each single connexion
 		_fds[_nfds].events = POLLIN;
 		_nfds++;
 	}
 	return (POLL_OK);
 }
 
-
 /****************************************************************************
 	receive all incoming data that send by _fds[index]
 	before we loop back and call poll again.
 	recv returns the number of bytes received, -1 if an error occured and 0 for EOF
 	*****************************************************************************/
-void	Server::readExistingFds(int index){
-	//printf("readExistingFds : fd is readable, a new message has been received: index = %d , fd = %d \n", index, _fds[index].fd);
+void Server::readExistingFds(int index)
+{
+	// printf("readExistingFds : fd is readable, a new message has been received: index = %d , fd = %d \n", index, _fds[index].fd);
 
 	int recvRet;
 
 	recvRet = recv(_fds[index].fd, _buffer, sizeof(_buffer), 0);
-	if (recvRet < 0){
-		if (errno != EWOULDBLOCK){
+	if (recvRet < 0)
+	{
+		if (errno != EWOULDBLOCK)
+		{
 			serverPrint("recv() failed");
 			closeConn(index);
 		}
 	}
-	else if (recvRet == 0)									// not sure about this one.
+	else if (recvRet == 0) // not sure about this one.
 		closeConn(index);
 	else
 		handleCmd(_fds[index].fd);
 	ircMemset((void *)_buffer, 0, sizeof(_buffer));
 }
 
-void	Server::sendMsg(int fd, std::string &msg){
+void Server::sendMsg(int fd, std::string &msg)
+{
 
-	int	sendRet;
+	int sendRet;
 
 	msg = ":" + _name + " " + msg + _CRLF;
 	sendRet = send(fd, msg.c_str(), msg.length(), 0);
@@ -244,7 +248,8 @@ void	Server::sendMsg(int fd, std::string &msg){
 	}
 }
 
-void	Server::sendToAllUser(std::string &msg){
+void Server::sendToAllUser(std::string &msg)
+{
 	userMap::iterator it = _userMap.begin();
 
 	for (; it != _userMap.end(); ++it)
@@ -256,25 +261,16 @@ void	Server::sendToAllUser(std::string &msg){
 	-> _listenSd (listen socket descriptor) is readable (a new connection is incomming)
 	-> _fds[i] (an existing connection) is readable
  ****************************************************************************/
-void	Server::reactToEvent(int index){
+void Server::reactToEvent(int index)
+{
 
 	if (index == POLL_FAILURE)
-		return ;
+		return;
 	else if (_fds[index].fd == _listenSd)
 		acceptNewSd();
 	else
 		readExistingFds(index);
 }
-
-
-
-
-
-
-
-
-
-
 
 /*******************************************
 * poll is blocking until
@@ -283,24 +279,28 @@ void	Server::reactToEvent(int index){
 	-> it times out
 * poll has to be in the loop (recalled each time). it actes like a reset
 ********************************************/
-void	Server::waitForConn(){
+void Server::waitForConn()
+{
 
-	do {
+	do
+	{
 		if (checkPollRet(poll(_fds, _nfds, TIMEOUT)) == POLL_FAILURE)
-			break ;
+			break;
 		else
 			reactToEvent(findReadableFd());
-	}
-	while (_status == ON_STATUS);
+	} while (_status == ON_STATUS);
 	closeAllConn();
 }
 
-void	Server::startServer(){
-	try {
-			initServer();
-			waitForConn();
+void Server::startServer()
+{
+	try
+	{
+		initServer();
+		waitForConn();
 	}
-	catch (std::exception &e){
+	catch (std::exception &e)
+	{
 		std::cout << e.what() << std::endl;
 	}
 }
@@ -308,11 +308,12 @@ void	Server::startServer(){
 /******************************************
 	Server management Utils
 *******************************************/
-void	Server::closeConn(int index)
+void Server::closeConn(int index)
 {
-	int	fd = _fds[index].fd;
+	int fd = _fds[index].fd;
 
-	if (fd > -1){
+	if (fd > -1)
+	{
 		deleteUser(fd);
 		close(fd);
 		fd = -1;
@@ -321,41 +322,44 @@ void	Server::closeConn(int index)
 		NarrowArray();
 }
 
-void	Server::NarrowArray(void)
+void Server::NarrowArray(void)
 {
-	for (int i = 0; i < _nfds; i++){
-		if(_fds[i].fd == -1){
+	for (int i = 0; i < _nfds; i++)
+	{
+		if (_fds[i].fd == -1)
+		{
 			for (int j = i; j < _nfds; j++)
-				_fds[j].fd = _fds[j+1].fd;
+				_fds[j].fd = _fds[j + 1].fd;
 			i--;
 			_nfds--;
 		}
 	}
 }
 
-void	Server::deleteUser(int index)
+void Server::deleteUser(int index)
 {
-	userMap::iterator	userIterator;
-	cmdMap::iterator	cmdIterator;
+	userMap::iterator userIterator;
+	cmdMap::iterator cmdIterator;
 
 	userIterator = _userMap.find(index);
-	if (userIterator != _userMap.end()){ //Do we have to delete user from all channel ?
+	if (userIterator != _userMap.end())
+	{ // Do we have to delete user from all channel ?
 		delete (_userMap[index]);
 		_userMap.erase(index);
 	}
-	cmdIterator  = _cmdMap.find(index);
+	cmdIterator = _cmdMap.find(index);
 	if (cmdIterator != _cmdMap.end())
 		_cmdMap.erase(index);
 }
 
-int		Server::turnOffServer(std::string str)
+int Server::turnOffServer(std::string str)
 {
 	serverPrint(str);
 	_status = OFF_STATUS;
 	return (POLL_FAILURE);
 }
 
-void	Server::closeAllConn()
+void Server::closeAllConn()
 {
 	_condenceArrayFlag = 0;
 	for (int i = 0; i < _nfds; i++)
@@ -366,15 +370,18 @@ void	Server::closeAllConn()
 /******************************************
 	Server Utils
 *******************************************/
-Channel	*Server::findChannel(std::string name){
-	for (size_t i(0); i < _channels.size(); ++i) {
+Channel *Server::findChannel(std::string name)
+{
+	for (size_t i(0); i < _channels.size(); ++i)
+	{
 		if (_channels[i]->getName() == name)
 			return _channels[i];
 	}
 	return 0;
 }
 
-User	*Server::findUserByNick(std::string name){
+User *Server::findUserByNick(std::string name)
+{
 
 	for (userMap::iterator it = _userMap.begin(); it != _userMap.end(); ++it)
 		if ((it->second)->getNickName() == name)
@@ -387,7 +394,8 @@ User	*Server::findUserByNick(std::string name){
 	// return 0;
 }
 
-User	*Server::findUserByName(std::string name){
+User *Server::findUserByName(std::string name)
+{
 
 	for (userMap::iterator it = _userMap.begin(); it != _userMap.end(); ++it)
 		if ((it->second)->getUserName() == name)
@@ -400,20 +408,35 @@ User	*Server::findUserByName(std::string name){
 	// return 0;
 }
 
-Channel	*Server::addChannel(std::string name, std::string key)
+Channel *Server::addChannel(std::string name, std::string key)
 {
-	if (name[0] == '#') { name.erase(0, 1); }
-	Channel	*channel = new Channel(name, key);
+	if (name[0] == '#')
+	{
+		name.erase(0, 1);
+	}
+	Channel *channel = new Channel(name, key);
 	_channels.push_back(channel);
 	return channel;
 }
 
-void		Server::setName(std::string name) { _name = name; }
-std::string	Server::getName(void) const { return _name; }
-std::string	Server::getPassword(void) const { return _password; }
+void Server::deleteChannel(std::string name)
+{
+	for (std::vector<Channel *>::iterator it = _channels.begin(); it != _channels.end(); ++it)
+	{
+		if ((*it)->getName() == name)
+		{
+			delete (*it);
+			_channels.erase(it);
+			return ;
+		}
+	}
+}
 
-std::vector<Channel *>	Server::getChannels(void) const { return _channels; }
+void Server::setName(std::string name) { _name = name; }
+std::string Server::getName(void) const { return _name; }
+std::string Server::getPassword(void) const { return _password; }
 
+std::vector<Channel *> *Server::getChannels(void) { return &_channels; }
 
 /**************************************
  * https://www.ibm.com/docs/en/i/7.2?topic=designs-using-poll-instead-select
@@ -422,14 +445,14 @@ std::vector<Channel *>	Server::getChannels(void) const { return _channels; }
  * structure of a sockadd_in *
 
 	struct sockaddr_in {
-    	short            sin_family;   // e.g. AF_INET
-   	 	unsigned short   sin_port;     // e.g. htons(3490)
-   	 	struct in_addr   sin_addr;     // see struct in_addr, below
-	   	 	char             sin_zero[8];  // zero this if you want 	to
+		short            sin_family;   // e.g. AF_INET
+		unsigned short   sin_port;     // e.g. htons(3490)
+		struct in_addr   sin_addr;     // see struct in_addr, below
+			char             sin_zero[8];  // zero this if you want 	to
 			};
 
 	struct in_addr {
-    	unsigned long s_addr;  // load with inet_aton()
+		unsigned long s_addr;  // load with inet_aton()
 	};
 
  * different type of communication *
@@ -440,4 +463,4 @@ std::vector<Channel *>	Server::getChannels(void) const { return _channels; }
  * protocol : man protocol
 */
 
-//c++ srcs/main.cpp srcs/server.cpp incs/headers.hpp incs/server.hpp
+// c++ srcs/main.cpp srcs/server.cpp incs/headers.hpp incs/server.hpp

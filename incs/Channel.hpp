@@ -50,6 +50,7 @@ class Channel
 		bool	isLimited(void) const;
 		bool	isOper(std::string name);
 		bool	hasVoice(std::string name);
+		bool	isEmpty(void) const;
 
 		// commands
 		void	join(User *user, bool isOp);

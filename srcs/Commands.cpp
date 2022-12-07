@@ -383,13 +383,10 @@ void Commands::join(void)
 
 		channel->join(_user, isOper);
 
-		//  tell all users that a user has joined
-		if (isOper == false)
-		{
-			message = "JOIN #" + channelName;
-			broadcastToChannel(channel, message, _NOT_PRIV);
-			_server->sendMessage(_user->getFd(), _user->getId(), message);
-		}
+		message = "JOIN #" + channelName;
+		broadcastToChannel(channel, message, _NOT_PRIV);
+		_server->sendMessage(_user->getFd(), _user->getId(), message);
+
 		// Print channel parameters to user
 		if (channel->getTopic().empty() == false)
 		{
@@ -452,6 +449,7 @@ void Commands::part(void)
 				// Tell all users that a user has left the channel
 				message = "PART #" + channelName;
 				broadcastToChannel(channel, message, _NOT_PRIV);
+				_server->sendMessage(_user->getFd(), _user->getId(), message);
 			
 				users->erase((*it).first);
 

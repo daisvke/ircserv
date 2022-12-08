@@ -51,6 +51,7 @@ class Channel
 		bool	isOper(std::string name);
 		bool	hasVoice(std::string name);
 		bool	isEmpty(void) const;
+		bool	isMember(std::string nick);
 
 		// commands
 		void	join(User *user, bool isOp);

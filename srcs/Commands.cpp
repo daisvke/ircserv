@@ -770,45 +770,57 @@ void Commands::privmsg(bool isNoticeCmd)
 
 void Commands::kill(void)
 {
+	std::string	userNick = _user->getNickName();
+	std::string message;
+	int			userFd = _user->getFd();
+
 	if (_params.size() < 3)
 	{
-		std::string message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
-		_server->sendMsg(_user->getFd(), message);
-		return;
+		message = _ERR_NEEDMOREPARAMS(userNick, _params[0]);
+		return _server->sendMsg(userFd, message);
 	}
 	if (_user->isOperator() == false)
 	{
-		return; /*ERR_NOPRIVILEGES*/
+		message = _ERR_NOPRIVILEGES(userNick);
+		return _server->sendMsg(userFd, message);
 	}
 
-	User *target = _server->findUserByNick(_params[1]);
+	User 		*target = _server->findUserByNick(_params[1]);
+	std::string	targetNick = target->getNickName();
 	if (!target)
 	{
-		return; /* ERR_NOSUCHNICK */
+		message = _ERR_NOSUCHNICK(userNick);
+		return _server->sendMsg(userFd, message);
 	}
+	std::string comment = concatArrayStrs(_params, 2);
 
-	std::string msg = "QUIT" + _params[1];
-	Commands cmd(_server, target, msg);
+	message = "KILL " + targetNick + " " + comment;
+	// Find which channels target was in, and send KILL message
+	//	to all users on these channels
+	std::vector<Channel *>	channels = *_server->getChannels();
+	for (size_t i(0); i < channels.size(); ++i)
+	{
+		if (channels[i]->isMember(targetNick))
+			broadcastToChannel(channels[i], message, _NOT_PRIV);
+	}
+	_server->sendMessage(_user->getFd(), _user->getId(), message);
 }
 
 void Commands::ping(void)
 {
-	std::string message, servername = _params[1];
+	std::string message = "PING", servername = _params[1];
 
 	if (servername != _server->getName())
 	{
 		message = _ERR_NOSUCHSERVER(_server->getName());
 		return _server->sendMsg(_user->getFd(), message);
 	}
-	message = "PING";
 	_server->sendMsg(_user->getFd(), message);
 }
 
 void Commands::pong(void)
 {
-	std::string message;
-
-	message = "PONG";
+	std::string message = "PONG";
 	_server->sendMsg(_user->getFd(), message);
 }
 
@@ -824,28 +836,3 @@ void printMap(std::map<std::string, T> &mymap)
 				  << "val : " << it->second << std::endl;
 	}
 }
-
-// Commands::Commands(Server *server, User *user, t_message msg)
-// 	: _server(server), _user(user), _message(msg) { routeCmd(); }
-
-// void	Commands::routeCmd()
-// {
-// 	switch (_message.cmd)
-// 	{
-// 		case _NICK:		nick(); break;
-// 		case _USER:		user(); break;
-// 		case _OPER:		oper(); break;
-// 		case _QUIT:		quit(); break;
-// 		case _JOIN:		join(); break;
-// 		case _PART:		part(); break;
-// 		case _MODE:		mode(); break;
-// 		case _TOPIC:	topic(); break;
-// 		case _NAMES:	names(); break;
-// 		case _LIST:		list(); break;
-// 		case _INVITE:	invite(); break;
-// 		case _KICK:		kick(); break;
-// 		case _KILL:		kill(); break;
-
-// 		default:		std::cerr << "erroooor cmd not found" << std::endl; //replace fct
-// 	}
-// }

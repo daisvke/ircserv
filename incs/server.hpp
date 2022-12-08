@@ -91,10 +91,10 @@ public:
 	void closeAllConn();
 
 private:
-	int _port;
-	std::string _password;
-	std::string _name;
-	std::string _creationTime;
+	int			_port;
+	std::string	_password;
+	std::string	_name;
+	std::string	_creationTime;
 
 	/*poll*/
 	struct sockaddr_in _sockAddr;
@@ -150,5 +150,4 @@ private:
 
 #endif
 
-// std::vector<User *>		_users;
 // irssi -n Warlink -p 8084 -c localhost

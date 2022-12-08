@@ -101,6 +101,16 @@ bool	Channel::hasVoice(std::string name) {
 	return getUserMode(name)->find('v') == std::string::npos ? false : true;
 }
 
+bool	Channel::isMember(std::string nick) {
+	for (userDirectory::iterator it = _users.begin(); it != _users.end(); ++it)
+	{
+		if (((*it).first->getNickName() == nick))
+			return true;
+	}
+	return false;
+}
+
+
 
 /*************************************************************
  * Commands

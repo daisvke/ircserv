@@ -12,7 +12,7 @@
 
 #include "User.hpp"
 
-User::User(): _isPwdVerified(false), _isOper(false),_isConnected(false) {}
+User::User(): _isPwdVerified(false), _isOper(false) {}
 User::~User() {}
 
 /*************************************************************
@@ -26,8 +26,6 @@ void	User::setUserName(std::string user) { _userName = user; }
 void	User::setHostName(std::string host) { _hostName = host; }
 void	User::setRealName(std::string real) { _realName = real; }
 void	User::setAsOperator(void) { _isOper = true; }
-void	User::connect(void) { _isConnected = true; }
-void	User::disconnect(void) { _isConnected = false; }
 
 /*************************************************************
 * Getters
@@ -40,7 +38,6 @@ std::string	User::getHostName(void) const { return _hostName; }
 std::string	User::getRealName(void) const { return _realName; }
 
 bool		User::isOperator(void) const { return _isOper; }
-bool		User::isConnected(void) const { return _isConnected; }
 bool		User::isPwdVerified(void) const { return _isPwdVerified; }
 
 /* debug overload to delete*/
@@ -48,7 +45,6 @@ std::ostream & operator<<(std::ostream & o, User * const &rhs){
 
 	o	<< "_fd :" << rhs->getFd() << " "
 		<< "_isOper: " << rhs->isOperator() << " "
-		<< "_isConnected: " << rhs->isConnected() << " "
 		<< "_nickName: " << rhs->getNickName() << " "
 		<< "_userName: " << rhs->getUserName();
 	return (o);

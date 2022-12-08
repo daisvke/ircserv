@@ -47,8 +47,9 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 // user
 # define _ERR_ALREADYREGISTRED(user)		user + " already registered"
 // whois
-# define _RPL_WHOISREGNICK(nick)			"307 " + nick + " :has identified for this nick"
-# define _RPL_ENDOFWHOIS(nick)					"318 " + nick + " :End of /WHOIS list"
+# define _RPL_WHOISREGNICK(nick)			"307 " + nick + " " + nick + " :has identified for this nick"
+# define _RPL_WHOISOPERATOR(nick)			"313 " + nick + " " + nick + " :is an IRC operator"
+# define _RPL_ENDOFWHOIS(nick)				"318 " + nick + " :End of /WHOIS list"
 // oper
 # define _RPL_YOUREOPER						"You are oper"
 # define _ERR_PASSWDMISMATCH(nick)			"464 " + nick
@@ -72,6 +73,7 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 // invite
 # define _ERR_USERONCHANNEL(nick, chan)		"443 " + nick + " Already on channel " + chan
 // mode
+# define _ERR_USERSDONTMATCH(nick)			"502 " + nick + " :Cant change mode for other users"
 # define _RPL_UMODEIS(nick, modes)			"221 " + nick + " " + modes
 # define _RPL_CHANNELMODEIS(nick, chan, modes, args)	"324 " + nick + " " + chan + " " + modes + " " + args
 // topic
@@ -121,8 +123,8 @@ class Commands
 		void	ping(void);
 		void	pong(void);
 
-		void	setupMap();
-		void	routeCmd();
+		void	setupMap(void);
+		void	routeCmd(void);
 		void	registerClient(void);
 
 		enum	e_isPriv { _NOT_PRIV, _PRIV };

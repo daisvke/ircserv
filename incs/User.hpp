@@ -32,8 +32,6 @@ class User
 		void	setHostName(std::string host);
 		void	setRealName(std::string real);
 		void	setAsOperator(void);
-		void	connect(void);
-		void	disconnect(void);
 
 		// getters
 		int			getFd(void) const;
@@ -44,7 +42,6 @@ class User
 		std::string	getRealName(void) const;
 
 		bool		isOperator(void) const;
-		bool		isConnected(void) const;
 		bool		isPwdVerified(void) const;
 
 	private:
@@ -52,7 +49,6 @@ class User
 		int			_fd;
 		bool		_isPwdVerified;
 		bool		_isOper;
-		bool		_isConnected; // usefull ?
 		std::string	_id;
 		std::string	_nickName;
 		std::string	_userName;

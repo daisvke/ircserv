@@ -229,13 +229,14 @@ void Commands::registerClient(void)
 void Commands::whois(void)
 {
 	std::string nick = _params[1], message;
+	User		*user;
 
 	if (_params.size() < 2)
 	{
-		std::string message = _ERR_NONICKNAMEGIVEN(nick);
+		message = _ERR_NONICKNAMEGIVEN(nick);
 		return _server->sendMsg(_user->getFd(), message);
 	}
-	if (!_server->findUserByNick(nick))
+	if (!(user = _server->findUserByNick(nick)))
 	{
 		message = _ERR_NOSUCHNICK(nick);
 		return _server->sendMsg(_user->getFd(), message);
@@ -243,6 +244,11 @@ void Commands::whois(void)
 
 	message = _RPL_WHOISREGNICK(nick);
 	_server->sendMsg(_user->getFd(), message);
+	if (user->isOperator())
+	{
+		message = _RPL_WHOISOPERATOR(nick);
+		_server->sendMsg(_user->getFd(), message);
+	}
 	message = _RPL_ENDOFWHOIS(nick);
 	return _server->sendMsg(_user->getFd(), message);
 }
@@ -300,7 +306,6 @@ void Commands::quit(void)
 	std::string lastWords = _params[1].erase(0, 1);
 	std::vector<Channel *> *channels = _server->getChannels();
 
-	_user->disconnect();
 	for (size_t i(0); i < channels->size(); ++i)
 	{
 		userDirectory *users = (*channels)[i]->getUserDirectory();
@@ -513,11 +518,21 @@ void Commands::mode(void)
 	}
 	else // user modes
 	{
+		std::string targetNick = _params[1];
+		if (!_server->findUserByNick(userNick))
+		{
+			message = _ERR_NOSUCHNICK(userNick);
+			return _server->sendMsg(_user->getFd(), message);
+		}	
+		if (targetNick != userNick)
+		{
+			message = _ERR_USERSDONTMATCH(userNick);
+			return _server->sendMsg(_user->getFd(), message);
+		}	
 		if (_params.size() < 3)
 		{
-			// replace by _RPL_CHANNELMODEIS
-	//		message = _RPL_UMODEIS(userNick, *channel->getUserMode(userNick));
-	//		return _server->sendMsg(userFd, message);
+		//	message = _RPL_UMODEIS(userNick, _user->);
+		//	return _server->sendMsg(userFd, message);
 		}
 	}
 }

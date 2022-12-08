@@ -44,6 +44,7 @@ class User
 		bool		isOperator(void) const;
 		bool		isPwdVerified(void) const;
 
+
 	private:
 
 		int			_fd;

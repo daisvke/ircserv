@@ -469,20 +469,29 @@ void Commands::part(void)
 }
 
 /*************************************************************
+ * MODE <target> [<modestring> [<mode arguments>...]]
  * Used by a channel oper to change the mode of the channel.
  * The mode can be add ('+'), or removed ('-').
  * Parsing concerning the signs are done by the reference client Irssi
  *************************************************************/
 void Commands::mode(void)
 {
-	std::string message;
+	std::string message, mode;
 	std::string	userNick = _user->getNickName();
 	int			userFd = _user->getFd();
+	std::string modes;
 
 	if (_params.size() < 2)
 	{
 		message = _ERR_NEEDMOREPARAMS(userNick, _params[0]);
 		return _server->sendMsg(userFd, message);
+	}
+	if (_params.size() > 2) // modestring present: parse
+	{
+		modes = _params[2];
+		bool remove = _params[2].find('-') ? true : false;
+		char sign = remove == true ? '-' : '+';
+		modes.erase(std::remove(modes.begin(), modes.end(), sign), modes.end());
 	}
 
 	if (_params[1][0] == '#') // channel modes
@@ -506,12 +515,6 @@ void Commands::mode(void)
 			message = _ERR_CHANOPRIVSNEEDED(userNick);
 			return _server->sendMsg(userFd, message);
 		}
-
-		bool remove = _params[2].find('-') ? true : false;
-		char sign = remove == true ? '-' : '+';
-		std::string modes = _params[2];
-		modes.erase(std::remove(modes.begin(), modes.end(), sign), modes.end());
-
 		std::string params = _params[3];
 		for (size_t i(0); i < modes.size(); ++i)
 			channel->modifyModes(modes[i], params, remove);
@@ -529,11 +532,15 @@ void Commands::mode(void)
 			message = _ERR_USERSDONTMATCH(userNick);
 			return _server->sendMsg(_user->getFd(), message);
 		}	
+		// If no modestring is given, print current modes
 		if (_params.size() < 3)
 		{
-		//	message = _RPL_UMODEIS(userNick, _user->);
-		//	return _server->sendMsg(userFd, message);
+			mode = _user->isOperator() ? "o" : "";
+			message = _RPL_UMODEIS(userNick, mode);
+			return _server->sendMsg(userFd, message);
 		}
+		// else, apply given existing modes
+	//	if (_params.find('o') == std::string::npos)
 	}
 }
 

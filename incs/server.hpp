@@ -69,7 +69,7 @@ public:
 	Server(int port, std::string pwd);
 	~Server();
 
-	void startServer();
+	void startServer(void);
 	/* Note to delete: putting these functions here in public
 	to be able to use them with Command class */
 	void setName(std::string name);
@@ -88,7 +88,7 @@ public:
 	void sendToAllUser(std::string &msg);
 
 	void closeFd(int targetFd);
-	void closeAllConn();
+	void closeAllConn(void);
 
 private:
 	int			_port;

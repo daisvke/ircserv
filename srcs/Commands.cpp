@@ -91,7 +91,7 @@ void Commands::routeCmd()
 void	Commands::broadcastToChannel(Channel *channel, std::string msg, bool isPriv)
 {
 	userDirectory 			*users = channel->getUserDirectory();
-	msg = isPriv ? "PRIVMSG #" + channel->getName() + " " + msg : msg;
+	msg = isPriv ? "PRIVMSG " + channel->getName() + " " + msg : msg;
 
 	for (userDirectory::iterator it = users->begin(); it != users->end(); ++it)
 	{
@@ -342,7 +342,7 @@ void Commands::join(void)
 
 	for (size_t i(0); i < channelNames.size(); ++i)
 	{
-		std::string channelName = channelNames[i][0] == '#' ? channelNames[i].erase(0, 1) : channelNames[i];
+		std::string channelName = channelNames[i];
 		Channel *channel = _server->findChannel(channelName);
 
 		if (!channel)
@@ -378,7 +378,7 @@ void Commands::join(void)
 
 		channel->join(_user, isOper);
 
-		message = "JOIN #" + channelName;
+		message = "JOIN " + channelName;
 		broadcastToChannel(channel, message, _NOT_PRIV);
 		_server->sendMessage(_user->getFd(), _user->getId(), message);
 
@@ -424,7 +424,7 @@ void Commands::part(void)
 
 	for (size_t i(0); i < channelNames.size(); ++i)
 	{
-		std::string channelName = channelNames[i][0] == '#' ? channelNames[i].erase(0, 1) : channelNames[i];
+		std::string channelName = channelNames[i];
 		Channel *channel = _server->findChannel(channelName);
 
 		if (!channel)
@@ -441,7 +441,7 @@ void Commands::part(void)
 			if ((*it).first->getNickName() == _user->getNickName())
 			{
 				// Tell all users that a user has left the channel
-				message = "PART #" + channelName;
+				message = "PART " + channelName;
 				broadcastToChannel(channel, message, _NOT_PRIV);
 				_server->sendMessage(_user->getFd(), _user->getId(), message);
 			
@@ -463,7 +463,8 @@ void Commands::part(void)
 
 /*************************************************************
  * Used by a channel oper to change the mode of the channel.
- * The mode can be add ('+'), or removed ('-'). By default it is added.
+ * The mode can be add ('+'), or removed ('-').
+ * Parsing concerning the signs are done by the reference client Irssi
  *************************************************************/
 void Commands::mode(void)
 {
@@ -527,9 +528,6 @@ void Commands::topic(void)
 	std::string	fullTopicName = concatArrayStrs(_params, 2);
 	std::string	channelName = _params[1];
 
-	if (channelName[0] == '#')
-		channelName = channelName.erase(0, 1);
-
 	Channel *channel = _server->findChannel(channelName);
 	if (!channel)
 	{
@@ -544,7 +542,7 @@ void Commands::topic(void)
 	if (channel->isTopicProtected() == false || _user->isOperator() == true)
 	{
 		channel->setTopic(fullTopicName);
-		message = "TOPIC #" + channelName + " " + fullTopicName;
+		message = "TOPIC ga" + channelName + " " + fullTopicName;
 		broadcastToChannel(channel, message, _NOT_PRIV);
 		_server->sendMessage(_user->getFd(), _user->getId(), message);
 	}

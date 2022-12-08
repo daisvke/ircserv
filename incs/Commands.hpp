@@ -59,20 +59,20 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define _RPL_NAMREPLY(nick, name, symbol, chan, prefix) "353 " + nick + " " + symbol + " " + chan + prefix + name
 # define _RPL_ENDOFNAMES(nick, chan)		"366 " + nick + " " + chan
 // part
-# define _ERR_NOSUCHCHANNEL(nick, chan)		"403 " + nick + " #" + chan
-# define _ERR_NOSUCHCHANIMIT(nick, chan)	"403 " + nick + " #" + chan
-# define _ERR_NOTONCHANNEL(nick, chan)		"442 " + nick + " " + nick + " is not on channel #" + chan
+# define _ERR_NOSUCHCHANNEL(nick, chan)		"403 " + nick + " " + chan
+# define _ERR_NOSUCHCHANIMIT(nick, chan)	"403 " + nick + " " + chan
+# define _ERR_NOTONCHANNEL(nick, chan)		"442 " + nick + " " + nick + " is not on channel " + chan
 // ping
 # define _ERR_NOSUCHSERVER(server)			server + " :No such server"
 // privmsg
 # define _ERR_NOSUCHNICK(nick)				"401 " + nick
-# define _ERR_CANNOTSENDTOCHAN(nick, chan)	"404 " + nick + " #" + chan
+# define _ERR_CANNOTSENDTOCHAN(nick, chan)	"404 " + nick + " " + chan
 # define _ERR_CHANOPRIVSNEEDED(nick)		"482 " + nick
 // invite
-# define _ERR_USERONCHANNEL(nick, chan)		"443 " + nick + " Already on channel #" + chan
+# define _ERR_USERONCHANNEL(nick, chan)		"443 " + nick + " Already on channel " + chan
 // topic
-# define _RPL_TOPICWHOTIME(nick, chan, setat)	"333 " + nick + " #" + chan + " " + nick + " " + setat
-# define _RPL_TOPICCHANGESUCCESS(nick, chan, topic)	nick + " changed the topic of #" + chan + " to: " + topic
+# define _RPL_TOPICWHOTIME(nick, chan, setat)	"333 " + nick + " " + chan + " " + nick + " " + setat
+# define _RPL_TOPICCHANGESUCCESS(nick, chan, topic)	nick + " changed the topic of " + chan + " to: " + topic
 
 
 class Server ;

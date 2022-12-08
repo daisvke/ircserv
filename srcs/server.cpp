@@ -434,10 +434,6 @@ User *Server::findUserByName(std::string name)
 
 Channel *Server::addChannel(std::string name, std::string key)
 {
-	if (name[0] == '#')
-	{
-		name.erase(0, 1);
-	}
 	Channel *channel = new Channel(name, key);
 	_channels.push_back(channel);
 	return channel;

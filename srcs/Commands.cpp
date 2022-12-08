@@ -476,22 +476,16 @@ void Commands::part(void)
  *************************************************************/
 void Commands::mode(void)
 {
-	std::string message, mode;
-	std::string	userNick = _user->getNickName();
-	int			userFd = _user->getFd();
-	std::string modes;
+	std::string 			message, mode;
+	std::string				userNick = _user->getNickName();
+	int						userFd = _user->getFd();
+	std::string 			modes;
+	std::map<char, char>	foundModes;
 
 	if (_params.size() < 2)
 	{
 		message = _ERR_NEEDMOREPARAMS(userNick, _params[0]);
 		return _server->sendMsg(userFd, message);
-	}
-	if (_params.size() > 2) // modestring present: parse
-	{
-		modes = _params[2];
-		bool remove = _params[2].find('-') ? true : false;
-		char sign = remove == true ? '-' : '+';
-		modes.erase(std::remove(modes.begin(), modes.end(), sign), modes.end());
 	}
 
 	if (_params[1][0] == '#') // channel modes
@@ -508,21 +502,48 @@ void Commands::mode(void)
 			return _server->sendMsg(userFd, message);
 		}
 
-		bool isChanOper = channel->isOper(userNick);
+		if (_params.size() > 2) // modestring present: parse
+		{
+			modes = _params[2];
+			char	sign;
 
+			for (size_t i(0); i < modes.size(); ++i)
+			{
+				sign = modes[i];
+				if (modes[i] == '-' || modes [i] == '+')
+				{
+					while (modes[i] == '-' || modes [i] == '+')
+					{
+						if (modes[i] != sign)
+							sign = 0; break ;
+						++i;
+					}
+				}
+				++i;
+				if (sign == 0) continue ;
+				else foundModes[modes[i]] = sign;
+			}
+		}
+
+		bool isChanOper = channel->isOper(userNick);
 		if (isChanOper == false)
 		{
 			message = _ERR_CHANOPRIVSNEEDED(userNick);
 			return _server->sendMsg(userFd, message);
 		}
-		std::string params = _params[3];
+		// Get mode parameters if found
+		std::string params;
+		if (_params.size() > 3) 
+			params = _params[3];
+
 		for (size_t i(0); i < modes.size(); ++i)
 			channel->modifyModes(modes[i], params, remove);
 	}
 	else // user modes
 	{
 		std::string targetNick = _params[1];
-		if (!_server->findUserByNick(userNick))
+		User		*user = _server->findUserByNick(userNick);
+		if (!user)
 		{
 			message = _ERR_NOSUCHNICK(userNick);
 			return _server->sendMsg(_user->getFd(), message);
@@ -539,8 +560,6 @@ void Commands::mode(void)
 			message = _RPL_UMODEIS(userNick, mode);
 			return _server->sendMsg(userFd, message);
 		}
-		// else, apply given existing modes
-	//	if (_params.find('o') == std::string::npos)
 	}
 }
 

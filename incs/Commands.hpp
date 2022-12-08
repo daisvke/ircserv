@@ -26,8 +26,9 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 
 # define _NETWORKNAME		"IRC-LCHAN-DTANIGAWcom"
 # define _SERVERVERSION		"0.0.1"
-# define _USERMODES			"ovinsk"
-# define _CHANMODES			"ovtimnsplk"
+//# define _USERMODES			"ovinsk"
+# define _USERMODES			"o"
+# define _CHANMODES			"ovtimnslk"
 # define _CHAN_PARAM_MODES	"ovlk"
 
 // authentification

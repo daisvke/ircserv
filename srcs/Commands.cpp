@@ -382,6 +382,7 @@ void Commands::join(void)
 		broadcastToChannel(channel, message, _NOT_PRIV);
 		_server->sendMessage(_user->getFd(), _user->getId(), message);
 
+
 		// Print channel parameters to user
 		if (channel->getTopic().empty() == false)
 		{
@@ -401,8 +402,6 @@ void Commands::join(void)
 		message = _RPL_ENDOFNAMES(_user->getNickName(), channel->getName());
 		_server->sendMsg(_user->getFd(), message);
 	}
-
-	// handle? => user shouldn't be banned  ERR_BANNEDFROMCHAN
 }
 
 /*************************************************************
@@ -450,8 +449,6 @@ void Commands::part(void)
 
 				if (channel->isEmpty())
 					_server->deleteChannel(channel->getName());
-		//		message = _ERR_NOSUCHCHANNEL(_user->getNickName(), channelName);
-		//		_server->sendMsg(_user->getFd(), message);
 				break ;
 			}
 			++it;
@@ -518,34 +515,41 @@ void Commands::mode(void)
  *************************************************************/
 void Commands::topic(void)
 {
-	std::string nickName = _user->getNickName(), message;
+	std::string userNick = _user->getNickName(), message;
+	int			userFd = _user->getFd();
 
 	if (_params.size() < 2)
 	{
-		message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
-		return _server->sendMsg(_user->getFd(), message);
+		message = _ERR_NEEDMOREPARAMS(userNick, _params[0]);
+		return _server->sendMsg(userFd, message);
 	}
 
-	Channel *channel = _server->findChannel(_params[1].erase(0, 1));
+	std::string	fullTopicName = concatArrayStrs(_params, 2);
+	std::string	channelName = _params[1];
+
+	if (channelName[0] == '#')
+		channelName = channelName.erase(0, 1);
+
+	Channel *channel = _server->findChannel(channelName);
 	if (!channel)
 	{
-		message = _ERR_NOSUCHCHANNEL(nickName, _params[1]);
+		message = _ERR_NOSUCHCHANNEL(userNick, channelName);
 		return _server->sendMsg(_user->getFd(), message);
 	}
 	if (_params.size() == 2)
 	{
-		message = channel->getTopic();
-		_server->sendMsg(_user->getFd(), message);
+		message = _RPL_TOPIC(userNick, channelName, fullTopicName);
+		return _server->sendMsg(userFd, message);
 	}
-
-	std::string newTopic = _params[2];
 	if (channel->isTopicProtected() == false || _user->isOperator() == true)
-		channel->setTopic(newTopic);
-	else
 	{
-		message = _ERR_CHANOPRIVSNEEDED(nickName);
-		return _server->sendMsg(_user->getFd(), message);
+		channel->setTopic(fullTopicName);
+		message = "TOPIC #" + channelName + " " + fullTopicName;
+		broadcastToChannel(channel, message, _NOT_PRIV);
+		_server->sendMessage(_user->getFd(), _user->getId(), message);
 	}
+	message = _ERR_CHANOPRIVSNEEDED(userNick);
+	_server->sendMsg(userFd, message);
 }
 
 /*************************************************************
@@ -692,10 +696,6 @@ void Commands::privmsg(bool isNoticeCmd)
 	std::string errMessage;
 	std::string nickName = _user->getNickName();
 
-	std::string message = _params[2];
-	for (size_t i(3); i < _params.size(); ++i)
-		message += " " + _params[i];	
-
 	if (_params.size() < 3)
 	{
 		if (isNoticeCmd == false)
@@ -704,6 +704,8 @@ void Commands::privmsg(bool isNoticeCmd)
 			return _server->sendMsg(_user->getFd(), errMessage);
 		}
 	}
+
+	std::string message = concatArrayStrs(_params, 2);
 
 	for (size_t i(0); i < names.size(); ++i)
 	{

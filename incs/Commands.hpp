@@ -23,26 +23,10 @@
 
 enum	e_isOper { _ISNOTOPER, _ISOPER };
 
-// # define NICK		"NICK"
-// # define USER		"USER"
-// # define OPER		"OPER"
-// # define QUIT		"QUIT"
-// # define JOIN		"JOIN"
-// # define PART		"PART"
-// # define MODE		"MODE"
-// # define TOPIC		"TOPIC"
-// # define NAMES		"NAMES"
-// # define LIST		"LIST"
-// # define INVITE		"INVITE"
-// # define KICK		"KICK"
-// # define KILL		"KILL"
-// # define PING		"PING"
-// # define PONG		"PONG"
-
 # define _NETWORKNAME		"IRC-LCHAN-DTANIGAWcom"
 # define _SERVERVERSION		"0.0.1"
 # define _USERMODES			"ovinsk"
-# define _CHANMODES			"ovtimnsplk"//b ?
+# define _CHANMODES			"ovtimnsplk"
 # define _CHAN_PARAM_MODES	"ovlk"
 
 // authentification
@@ -83,9 +67,12 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 // privmsg
 # define _ERR_NOSUCHNICK(nick)				"401 " + nick
 # define _ERR_CANNOTSENDTOCHAN(nick, chan)	"404 " + nick + " #" + chan
-# define _ERR_CHANOPRIVSNEEDED(nick)		"482 " + nick + " Need to be operator"
+# define _ERR_CHANOPRIVSNEEDED(nick)		"482 " + nick
 // invite
 # define _ERR_USERONCHANNEL(nick, chan)		"443 " + nick + " Already on channel #" + chan
+// topic
+# define _RPL_TOPICWHOTIME(nick, chan, setat)	"333 " + nick + " #" + chan + " " + nick + " " + setat
+# define _RPL_TOPICCHANGESUCCESS(nick, chan, topic)	nick + " changed the topic of #" + chan + " to: " + topic
 
 
 class Server ;
@@ -137,45 +124,3 @@ class Commands
 };
 
 #endif
-
-
-
-/*************/
-/* to delete */
-/*************/
-/*
-
-	// Commands(Server *server, User *user, t_message msg);
-
-	t_message	_message;
-	std::map<std::string, f>	_cmdMap;
-	std::map<std::string, f> _cmdMap;
-	std::map<std::string, void(Commands::*)(void)>   _cmdMap;
-
-enum	e_commands
-{
-	_NICK,
-	_USER,
-	_OPER,
-	_QUIT,
-	_JOIN,
-	_PART,
-	_MODE,
-	_TOPIC,
-	_NAMES,
-	_LIST,
-	_INVITE,
-	_KICK,
-	_KILL
-};
-*/
-/*************************************************************
-* Contains the message sent by the user.
-* The 'params' variable contains the whole input, including
-* 	the command and the parameters
-*************************************************************/
-// typedef struct s_message
-// {
-// 	int							cmd;
-// 	std::vector<std::string>	params;
-// }	t_message;

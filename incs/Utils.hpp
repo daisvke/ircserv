@@ -31,7 +31,8 @@ bool						ircIsAlNum(std::string &s);
 bool						ircIsAllPrintable(std::string &s);
 void						*ircMemset(void *s, int c, size_t n);
 std::vector<std::string>	ircSplit(std::string str, char c);
-std::string					ircTime();
-std::string					getTimeStr();
+std::string					ircTime(void);
+std::string					getTimeStr(void);
+std::string					concatArrayStrs(std::vector<std::string> array, size_t index);
 
 #endif

@@ -17,6 +17,7 @@
 # include <algorithm>
 # include <map>
 
+# include "Utils.hpp"
 # include "User.hpp"
 # include "Channel.hpp"
 # include "server.hpp"
@@ -70,9 +71,16 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define _ERR_CHANOPRIVSNEEDED(nick)		"482 " + nick
 // invite
 # define _ERR_USERONCHANNEL(nick, chan)		"443 " + nick + " Already on channel " + chan
+// mode
+# define _RPL_UMODEIS(nick, modes)			"221 " + nick + " " + modes
+# define _RPL_CHANNELMODEIS(nick, chan, modes, args)	"324 " + nick + " " + chan + " " + modes + " " + args
 // topic
 # define _RPL_TOPICWHOTIME(nick, chan, setat)	"333 " + nick + " " + chan + " " + nick + " " + setat
 # define _RPL_TOPICCHANGESUCCESS(nick, chan, topic)	nick + " changed the topic of " + chan + " to: " + topic
+// list
+# define _RPL_LISTSTART(nick)				"321 " + nick + " Channel :Users Name"
+# define _RPL_LIST(nick, chan, clientCount, topic)	"322 " + nick + " " + chan + " " + clientCount + " :" + topic
+# define _RPL_LISTEND(nick)					"323 " + nick + " :End of /LIST"
 
 
 class Server ;

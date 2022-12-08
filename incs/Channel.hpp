@@ -36,7 +36,7 @@ class Channel
 		std::string		getTopic(void) const;
 		userDirectory	*getUserDirectory(void);
 		std::string		getKey(void) const;
-		size_t			getUserNbr(void) const;
+		size_t			countUsers(void) const;
 		size_t			getUserLimit(void) const;
 		std::string		*getUserMode(std::string name);
 

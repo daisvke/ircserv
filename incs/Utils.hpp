@@ -35,4 +35,12 @@ std::string					ircTime(void);
 std::string					getTimeStr(void);
 std::string					concatArrayStrs(std::vector<std::string> array, size_t index);
 
+template<typename T>
+std::string toString(const T& value)
+{
+    std::ostringstream oss;
+    oss << value;
+    return oss.str();
+}
+
 #endif

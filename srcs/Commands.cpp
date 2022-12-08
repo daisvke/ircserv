@@ -352,9 +352,10 @@ void Commands::join(void)
 		}
 		else isOper = false;
 
-		if (channel && channel->getUserDirectory()->count(_user))
+		if (channel->getUserDirectory()->count(_user))
 			return;
-		if (channel && (channel->isLimited() == false || (channel->isLimited() == true && channel->getUserNbr() < channel->getUserLimit())))
+		if (channel->isLimited() == false
+			|| (channel->isLimited() == true && channel->countUsers() < channel->getUserLimit()))
 		{
 			if (channel->isKeyProtected())
 			{
@@ -370,7 +371,7 @@ void Commands::join(void)
 				return _server->sendMsg(_user->getFd(), message);
 			}
 		}
-		else if (channel && channel->isLimited() == true && channel->getUserNbr() >= channel->getUserLimit())
+		else if (channel->isLimited() == true && channel->countUsers() >= channel->getUserLimit())
 		{
 			_ERR_CHANNELISFULL(channelName);
 			return;
@@ -469,33 +470,35 @@ void Commands::part(void)
 void Commands::mode(void)
 {
 	std::string message;
+	std::string	userNick = _user->getNickName();
+	int			userFd = _user->getFd();
 
-	if (_params.size() < 1)
+	if (_params.size() < 2)
 	{
-		message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
-		return _server->sendMsg(_user->getFd(), message);
+		message = _ERR_NEEDMOREPARAMS(userNick, _params[0]);
+		return _server->sendMsg(userFd, message);
 	}
 
-	if (_params[1][0] == '#')
+	if (_params[1][0] == '#') // channel modes
 	{
-		Channel *channel = _server->findChannel(_params[1].erase(0, 1));
+		Channel *channel = _server->findChannel(_params[1]);
 		if (!channel)
 		{
-			message = _ERR_NOSUCHCHANNEL(_user->getNickName(), _params[1]);
-			return _server->sendMsg(_user->getFd(), message);
+			message = _ERR_NOSUCHCHANNEL(userNick, _params[1]);
+			return _server->sendMsg(userFd, message);
 		}
 		if (_params.size() < 3)
 		{
-			message = *channel->getUserMode(_user->getNickName());
-			return _server->sendMsg(_user->getFd(), message);
+			message = _RPL_UMODEIS(userNick, *channel->getUserMode(userNick));
+			return _server->sendMsg(userFd, message);
 		}
 
-		bool isChanOper = channel->isOper(_user->getNickName());
+		bool isChanOper = channel->isOper(userNick);
 
 		if (isChanOper == false)
 		{
-			message = _ERR_CHANOPRIVSNEEDED(_user->getNickName());
-			return _server->sendMsg(_user->getFd(), message);
+			message = _ERR_CHANOPRIVSNEEDED(userNick);
+			return _server->sendMsg(userFd, message);
 		}
 
 		bool remove = _params[2].find('-') ? true : false;
@@ -506,6 +509,15 @@ void Commands::mode(void)
 		std::string params = _params[3];
 		for (size_t i(0); i < modes.size(); ++i)
 			channel->modifyModes(modes[i], params, remove);
+	}
+	else // user modes
+	{
+		if (_params.size() < 3)
+		{
+			// replace by _RPL_CHANNELMODEIS
+	//		message = _RPL_UMODEIS(userNick, *channel->getUserMode(userNick));
+	//		return _server->sendMsg(userFd, message);
+		}
 	}
 }
 
@@ -532,7 +544,7 @@ void Commands::topic(void)
 	if (!channel)
 	{
 		message = _ERR_NOSUCHCHANNEL(userNick, channelName);
-		return _server->sendMsg(_user->getFd(), message);
+		return _server->sendMsg(userFd, message);
 	}
 	if (_params.size() == 2)
 	{
@@ -542,9 +554,9 @@ void Commands::topic(void)
 	if (channel->isTopicProtected() == false || _user->isOperator() == true)
 	{
 		channel->setTopic(fullTopicName);
-		message = "TOPIC ga" + channelName + " " + fullTopicName;
+		message = "TOPIC " + channelName + " " + fullTopicName;
 		broadcastToChannel(channel, message, _NOT_PRIV);
-		_server->sendMessage(_user->getFd(), _user->getId(), message);
+		_server->sendMessage(userFd, _user->getId(), message);
 	}
 	message = _ERR_CHANOPRIVSNEEDED(userNick);
 	_server->sendMsg(userFd, message);
@@ -584,6 +596,10 @@ void Commands::names(void)
 	}
 }
 
+/*************************************************************
+* If no parameter is given, prints info about all the channels.
+* If channel names are given, they are the only onces to be handled.
+ *************************************************************/
 void Commands::list(void)
 {
 	std::vector<Channel *> channels;
@@ -597,20 +613,26 @@ void Commands::list(void)
 				channels.push_back(chan);
 	}
 	else
-		std::vector<Channel *> channels = *_server->getChannels();
+		channels = *_server->getChannels();
+
+	int 		userFd = _user->getFd();
+	std::string	userNick = _user->getNickName();
+
+	message = _RPL_LISTSTART(userNick);
+	_server->sendMsg(userFd, message);
 
 	for (size_t i(0); i < channels.size(); ++i)
 	{
-
 		if (!(channels[i]->isTopicProtected() || channels[i]->isPrivate()))
 		{
-			int userFd = _user->getFd();
-			message = channels[i]->getName();
-			_server->sendMsg(userFd, message);
-			message = channels[i]->getTopic();
+			std::string	userCount = toString(channels[i]->countUsers());
+			message = _RPL_LIST(userNick, \
+				channels[i]->getName(), userCount, channels[i]->getTopic());
 			_server->sendMsg(userFd, message);
 		}
 	}
+	message = _RPL_LISTEND(userNick);
+	_server->sendMsg(userFd, message);
 }
 
 void Commands::invite(void)
@@ -709,7 +731,7 @@ void Commands::privmsg(bool isNoticeCmd)
 	{
 		if (names[i][0] == '#')
 		{
-			std::string	name = names[i].erase(0, 1);
+			std::string	name = names[i];
 			Channel *channel = _server->findChannel(name);
 			if (!channel)
 			{

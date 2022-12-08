@@ -72,7 +72,7 @@ std::string		Channel::getName(void) const { return _name; }
 std::string 	Channel::getTopic(void) const { return _topic; }
 userDirectory	*Channel::getUserDirectory(void) { return &_users; }
 std::string		Channel::getKey(void) const { return _key; }
-size_t			Channel::getUserNbr(void) const { return _users.size(); }
+size_t			Channel::countUsers(void) const { return _users.size(); }
 size_t			Channel::getUserLimit(void) const { return _userLimit; }
 
 std::string *Channel::getUserMode(std::string name)

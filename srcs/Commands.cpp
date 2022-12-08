@@ -55,6 +55,7 @@ void Commands::setupMap() // define it and call once in Server ?
 	_cmdMap["INVITE"] = &Commands::invite;
 	_cmdMap["KICK"] = &Commands::kick;
 	_cmdMap["KILL"] = &Commands::kill;
+	_cmdMap["kill"] = &Commands::kill;
 	_cmdMap["PING"] = &Commands::ping;
 	_cmdMap["PONG"] = &Commands::pong;
 }
@@ -794,16 +795,14 @@ void Commands::kill(void)
 	}
 	std::string comment = concatArrayStrs(_params, 2);
 
+	// Killing target
 	message = "KILL " + targetNick + " " + comment;
-	// Find which channels target was in, and send KILL message
-	//	to all users on these channels
-	std::vector<Channel *>	channels = *_server->getChannels();
-	for (size_t i(0); i < channels.size(); ++i)
-	{
-		if (channels[i]->isMember(targetNick))
-			broadcastToChannel(channels[i], message, _NOT_PRIV);
-	}
-	_server->sendMessage(_user->getFd(), _user->getId(), message);
+	int	targetFd = target->getFd();
+	_server->sendMessage(targetFd, _user->getId(), message);
+	_server->closeFd(targetFd);
+	// KILL success notice
+	message = _RPL_KILLSUCCESS(targetNick);
+	_server->sendMessage(userFd, _user->getId(), message);
 }
 
 void Commands::ping(void)

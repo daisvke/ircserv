@@ -85,6 +85,7 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define _RPL_KICKSUCCESS(chan, nick, comment)	"KICK " + chan + " " + nick + " " + comment
 // kill
 # define _ERR_NOPRIVILEGES(nick)			"481 " + nick + " :Permission Denied- You're not an IRC operator"
+# define _RPL_KILLSUCCESS(target)			target + " has been killed"
 
 class Server ;
 

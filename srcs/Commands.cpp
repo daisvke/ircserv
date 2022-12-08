@@ -343,9 +343,9 @@ void Commands::join(void)
 	for (size_t i(0); i < channelNames.size(); ++i)
 	{
 		std::string channelName = channelNames[i];
-		Channel *channel = _server->findChannel(channelName);
+		Channel *channel;
 
-		if (!channel)
+		if (!(channel = _server->findChannel(channelName)))
 		{
 			channel = _server->addChannel(channelName, channelKeys[i]);
 			isOper = true;
@@ -426,9 +426,9 @@ void Commands::part(void)
 	for (size_t i(0); i < channelNames.size(); ++i)
 	{
 		std::string channelName = channelNames[i];
-		Channel *channel = _server->findChannel(channelName);
+		Channel		*channel;
 
-		if (!channel)
+		if (!(channel = _server->findChannel(channelName)))
 		{
 			message = _ERR_NOSUCHCHANNEL(_user->getNickName(), channelName);
 			_server->sendMsg(_user->getFd(), message);
@@ -678,32 +678,39 @@ void Commands::kick(void)
 {
 	std::string	userNick = _user->getNickName();
 	int			userFd = _user->getFd();
+	std::string message;
+
 	if (_params.size() < 3)
 	{
-		std::string message = _ERR_NEEDMOREPARAMS(userNick, _params[0]);
+		message = _ERR_NEEDMOREPARAMS(userNick, _params[0]);
 		return _server->sendMsg(userFd, message);
 	}
 
 	User *target = _server->findUserByNick(_params[2]);
+	Channel *channel;
 
-	if (!Channel *channel = _server->findChannel(_params[1]))
+	if (!(channel = _server->findChannel(_params[1])))
 	{
-		return; /* ERR_NOSUCHCHANNEL */
+		message = _ERR_NOSUCHCHANNEL(userNick, channel->getName());
+		return _server->sendMsg(userFd, message);
 	}
+ 	// Can only use KICK if oper
 	if (channel->isOper(userNick) == false)
 	{
-		std::string message = _ERR_CHANOPRIVSNEEDED(_user->getNickName());
-		return _server->sendMsg(_user->getFd(), message);
+		std::string message = _ERR_CHANOPRIVSNEEDED(userNick);
+		return _server->sendMsg(userFd, message);
 	}
+	// Use the comment if it is given
+	std::string comment;
+	if (_params.size() > 3)
+		comment = concatArrayStrs(_params, 3);
+
+	message = _RPL_KICKSUCCESS(channel->getName(), target->getNickName(), comment);
+	broadcastToChannel(channel, message, _NOT_PRIV);
+	_server->sendMessage(_user->getFd(), _user->getId(), message);
 
 	channel->part(target);
-
-	if (_params.size() > 3)
-	{
-		std::string comment = _params[3];
-		std::cout << comment << std::endl; // replace print fct
-	}
-	// handle err_notonchannel ?
+	// handle  ERR_USERNOTINCHANNEL (441) and  ERR_NOTONCHANNEL (442) ?
 }
 
 /*************************************************************

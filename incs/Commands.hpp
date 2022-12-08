@@ -81,6 +81,8 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define _RPL_LISTSTART(nick)				"321 " + nick + " Channel :Users Name"
 # define _RPL_LIST(nick, chan, clientCount, topic)	"322 " + nick + " " + chan + " " + clientCount + " :" + topic
 # define _RPL_LISTEND(nick)					"323 " + nick + " :End of LIST"
+// kick
+# define _RPL_KICKSUCCESS(chan, nick, comment)	"KICK " + chan + " " + nick + " " + comment
 
 
 class Server ;

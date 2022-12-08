@@ -98,7 +98,7 @@ bool	Channel::isOper(std::string name) {
 	return getUserMode(name)->find('o') == std::string::npos ? false : true;
 }
 bool	Channel::hasVoice(std::string name) {
-	return getUserMode(name)->find('v') == std::string::npos ? true : false;
+	return getUserMode(name)->find('v') == std::string::npos ? false : true;
 }
 
 

@@ -676,21 +676,21 @@ void Commands::invite(void)
  *************************************************************/
 void Commands::kick(void)
 {
+	std::string	userNick = _user->getNickName();
+	int			userFd = _user->getFd();
 	if (_params.size() < 3)
 	{
-		std::string message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
-		return _server->sendMsg(_user->getFd(), message);
+		std::string message = _ERR_NEEDMOREPARAMS(userNick, _params[0]);
+		return _server->sendMsg(userFd, message);
 	}
 
 	User *target = _server->findUserByNick(_params[2]);
-	std::string user = _user->getNickName();
-	Channel *channel = _server->findChannel(_params[1]);
 
-	if (!channel)
+	if (!Channel *channel = _server->findChannel(_params[1]))
 	{
 		return; /* ERR_NOSUCHCHANNEL */
 	}
-	if (channel->isOper(user) == false)
+	if (channel->isOper(userNick) == false)
 	{
 		std::string message = _ERR_CHANOPRIVSNEEDED(_user->getNickName());
 		return _server->sendMsg(_user->getFd(), message);

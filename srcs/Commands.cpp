@@ -626,8 +626,7 @@ void Commands::list(void)
 		if (!(channels[i]->isTopicProtected() || channels[i]->isPrivate()))
 		{
 			std::string	userCount = toString(channels[i]->countUsers());
-			message = _RPL_LIST(userNick, \
-				channels[i]->getName(), userCount, channels[i]->getTopic());
+			message = _RPL_LIST(userNick, channels[i]->getName(), userCount, channels[i]->getTopic());
 			_server->sendMsg(userFd, message);
 		}
 	}

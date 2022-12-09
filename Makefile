@@ -35,7 +35,7 @@ OBJS			=	$(addprefix $(OBJS_DIR), $(OBJS_FILES))
 INC				=	-I incs/
 INC_DIR			=	incs/
 INC_FILES		=	headers.hpp \
-					server.hpp \
+					Server.hpp \
 					User.hpp \
 					Channel.hpp \
 					Utils.hpp \

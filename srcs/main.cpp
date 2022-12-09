@@ -11,7 +11,7 @@
 /* ************************************************************************** */
 
 #include "headers.hpp"
-#include "server.hpp"
+#include "Server.hpp"
 #include <typeinfo>
 
 bool	checkPort(std::string port)

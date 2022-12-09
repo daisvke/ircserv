@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.hpp                                         :+:      :+:    :+:   */
+/*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -30,7 +30,6 @@
 #define SERVER_START_MESS "Server lauched"
 #define POLL_ERR_MESS "Poll() failed"
 #define _CRLF "\r\n"
-
 
 enum e_socket
 {
@@ -92,10 +91,10 @@ public:
 	void closeAllConn(void);
 
 private:
-	int			_port;
-	std::string	_password;
-	std::string	_name;
-	std::string	_creationTime;
+	int _port;
+	std::string _password;
+	std::string _name;
+	std::string _creationTime;
 
 	/*poll*/
 	struct sockaddr_in _sockAddr;

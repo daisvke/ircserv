@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "server.hpp"
+#include "Server.hpp"
 
 /*********************************************
  * 				Coplien Form
@@ -484,4 +484,4 @@ std::vector<Channel *> *Server::getChannels(void) { return &_channels; }
  * protocol : man protocol
 */
 
-// c++ srcs/main.cpp srcs/Server.cpp incs/headers.hpp incs/server.hpp
+// c++ srcs/main.cpp srcs/Server.cpp incs/headers.hpp incs/Server.hpp

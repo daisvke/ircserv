@@ -46,8 +46,6 @@ void Channel::modifyTargetMode(char c, std::string target, char sign)
 
 void Channel::setChannelMode(char c, std::string params)
 {
-	std::cout << "\033[31m================================== just in setchan\033[0m" <<std::endl;
-
 	switch (c)
 	{
 		case 'l':
@@ -55,11 +53,8 @@ void Channel::setChannelMode(char c, std::string params)
 			break;
 		case 'k':
 			_key = params;
-		default:
-			_modes += c;
 	}
-	std::cout << "\033[31m================================== in setchanmodes\033[0m" <<std::endl;
-
+	_modes += c;
 }
 
 /*************************************************************

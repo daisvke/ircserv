@@ -519,17 +519,13 @@ void Commands::mode(void)
 										channel->getModes(), concatParams);
 			return _server->sendMsg(userFd, message);
 		}
-std::cout << "\033[31m================================== 2\033[0m" <<std::endl;
 
 		modes = _params[2];
 		// Get mode parameters if found
 		std::vector<std::string> params;
 		if (_params.size() > 3)
-		{
-			for (size_t i(0); i < _params.size(); ++i)
+			for (size_t i(3); i < _params.size(); ++i)
 				params.push_back(_params[i]);
-		}
-	std::cout << "\033[31m================================== 3\033[0m" <<std::endl;
 
 		if (_params.size() > 2) // modestring present: parse
 		{
@@ -546,14 +542,21 @@ std::cout << "\033[31m================================== 2\033[0m" <<std::endl;
 				else return ;
 
 				std::string channelModes = _CHANMODES;
+				bool		needsParam;
 
 				while (i < modes.size() && !(modes[i] == '-' || modes[i] == '+'))
 				{
 					// If the found mode needs a param that is not found, ignore it
 					std::string	paramModes = _CHAN_PARAM_MODES;
 					if (paramModes.find(modes[i]) != std::string::npos)
-						if (params.empty() == false)
-							break ;
+					{
+						needsParam = true;
+						if (params.empty() == true)
+						{
+							++i;
+							continue ;
+						}
+					}
 					if (channelModes.find(modes[i]) == std::string::npos)
 					{
 						message = _ERR_UNKNOWNMODE(userNick, modes[i]);
@@ -563,7 +566,8 @@ std::cout << "\033[31m================================== 2\033[0m" <<std::endl;
 					}
 					// Save validated mode with its sign
 					if ((channel->getModes().find(modes[i]) == std::string::npos && sign == '+')
-					|| (channel->getModes().find(modes[i]) != std::string::npos && sign == '-'))
+					|| (channel->getModes().find(modes[i]) != std::string::npos && sign == '-')
+					|| (channel->getModes().find(modes[i]) != std::string::npos && needsParam == true))
 						foundModes[modes[i]] = sign;
 					++i;
 				}
@@ -577,18 +581,17 @@ std::cout << "\033[31m================================== 2\033[0m" <<std::endl;
 				message = _ERR_CHANOPRIVSNEEDED(userNick);
 				return _server->sendMsg(userFd, message);
 			}
-			// Apply mode mdifications
+			// Apply mode modifications
 			std::map<char, char>::iterator	it;
 			size_t							i = 0;
 			std::string						concatModes;
 
 			for (it = foundModes.begin(); it != foundModes.end(); ++it)
 			{
-				std::string	tmpParams = i < params.size() ? params[i] : "";
+				std::string	tmpParams = i < params.size() ? params[i++] : "";
 				channel->modifyModes((*it).first, tmpParams, (*it).second);
 
 				concatModes += toString((*it).second) + (*it).first;
-				++i;
 			}
 			concatParams = params.empty() ? "" : modes + " " + concatArrayStrs(params, 0);
 			message = _RPL_CHANNELMODEIS(userNick, channel->getName(), \

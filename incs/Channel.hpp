@@ -36,6 +36,7 @@ class Channel
 		// getters
 		std::string		getName(void) const;
 		std::string		getTopic(void) const;
+		std::string		getModes(void) const;
 		userDirectory	*getUserDirectory(void);
 		std::string		getKey(void) const;
 		size_t			countUsers(void) const;

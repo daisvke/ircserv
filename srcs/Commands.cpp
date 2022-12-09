@@ -202,6 +202,13 @@ void Commands::user(void)
 	*/
 	//_user->setUserName(userName);
 
+	if (_user->getNickName().empty() == true)
+	{
+		_server->closeFd(_user->getFd());
+		std::string message = _ERR_NONICK;
+		return _server->sendMsg(_user->getFd(), message);
+	}
+
 	_user->setUserName(_params[1]);
 	_user->setHostName(_params[2]);
 	_server->setName(_params[3]);
@@ -337,11 +344,13 @@ void Commands::quit(void)
 void Commands::join(void)
 {
 	std::string message;
+	std::string	userNick = _user->getNickName();
+	int			userFd = _user->getFd();
 
 	if (_params.size() < 2)
 	{
-		message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
-		return _server->sendMsg(_user->getFd(), message);
+		message = _ERR_NEEDMOREPARAMS(userNick, _params[0]);
+		return _server->sendMsg(userFd, message);
 	}
 
 	std::vector<std::string> channelKeys;
@@ -375,13 +384,16 @@ void Commands::join(void)
 				if (channelKeys[i] != channel->getKey())
 				{
 					message = _ERR_BADCHANNELKEY(channelName);
-					return _server->sendMsg(_user->getFd(), message);
+					return _server->sendMsg(userFd, message);
 				}
 			}
+				std::cout << "\033[31m =====================> 1\033[0m" << std::endl;
+
 			if (channel->isInviteOnly())
 			{
-				message = _ERR_INVITEONLYCHAN(channelName);
-				return _server->sendMsg(_user->getFd(), message);
+				std::cout << "\033[31m =====================> 2\033[0m" << std::endl;
+				message = _ERR_INVITEONLYCHAN(userNick, channelName);
+				return _server->sendMsg(userFd, message);
 			}
 		}
 		else if (channel->isLimited() == true && channel->countUsers() >= channel->getUserLimit())
@@ -394,14 +406,14 @@ void Commands::join(void)
 
 		message = "JOIN " + channelName;
 		broadcastToChannel(channel, message, _NOT_PRIV);
-		_server->sendMessage(_user->getFd(), _user->getId(), message);
+		_server->sendMessage(userFd, _user->getId(), message);
 
 
 		// Print channel parameters to user
 		if (channel->getTopic().empty() == false)
 		{
-			message = _RPL_TOPIC(_user->getNickName(), channel->getName(), channel->getTopic());
-			_server->sendMsg(_user->getFd(), message);
+			message = _RPL_TOPIC(userNick, channel->getName(), channel->getTopic());
+			_server->sendMsg(userFd, message);
 		}
 
 		userDirectory *users = channel->getUserDirectory();
@@ -410,11 +422,11 @@ void Commands::join(void)
 			std::string nick = (*it).first->getNickName();
 			std::string prefix = channel->isOper(nick) ? " :@" : " :";
 
-			message = _RPL_NAMREPLY(_user->getNickName(), nick, '=', channel->getName(), prefix);
+			message = _RPL_NAMREPLY(userNick, nick, '=', channel->getName(), prefix);
 			_server->sendMsg(_user->getFd(), message);
 		}
-		message = _RPL_ENDOFNAMES(_user->getNickName(), channel->getName());
-		_server->sendMsg(_user->getFd(), message);
+		message = _RPL_ENDOFNAMES(userNick, channel->getName());
+		_server->sendMsg(userFd, message);
 	}
 }
 
@@ -550,6 +562,8 @@ void Commands::mode(void)
 		std::map<char, char>::iterator	it;
 		for (it = foundModes.begin(); it != foundModes.end(); ++it)
 			channel->modifyModes((*it).first, params, (*it).second);
+		message = _RPL_CHANNELMODEIS(userNick, channel->getName(), channel->getModes(), "params");
+		return _server->sendMsg(userFd, message);
 	}
 	else // user modes
 	{
@@ -766,7 +780,7 @@ void Commands::kick(void)
 	std::string comment;
 	if (_params.size() > 3)
 		comment = concatArrayStrs(_params, 3);
-		
+
 	// Kick target out of the channel using PART message
 	message = "PART " + channelName;
 	broadcastToChannel(channel, message, _NOT_PRIV);

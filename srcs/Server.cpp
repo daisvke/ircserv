@@ -68,7 +68,9 @@ int Server::setSocket()
  *************************************************************/
 int Server::setSocketopt()
 {
-	if (setsockopt(_listenSd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &_opt, sizeof(_opt)) == ERROR)
+	socklen_t	val = 1;
+
+	if (setsockopt(_listenSd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &val, sizeof(socklen_t)) == ERROR)
 		return (E_SETSOCKOPT_ERR);
 	std::cout << "2. socketopt success" << std::endl;
 	return (E_SOCK_SUCCESS);
@@ -95,7 +97,7 @@ int Server::setNonBlocking()
 int Server::bindSocket()
 {
 	_sockAddr.sin_family = AF_INET;
-	_sockAddr.sin_addr.s_addr = inet_addr(LOCAL_HOST);
+	_sockAddr.sin_addr.s_addr = INADDR_ANY;//inet_addr(LOCAL_HOST);
 	_sockAddr.sin_port = htons(_port);
 	if ((bind(_listenSd, (sockaddr *)&_sockAddr, _addrlen)) == ERROR)
 		return (E_BIND_ERR);

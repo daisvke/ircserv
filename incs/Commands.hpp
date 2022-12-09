@@ -41,6 +41,7 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define _ERR_ERRONEUSNICKNAME(nick)		"432 " + nick + ":Erroneus nickname"
 # define _ERR_NICKNAMEINUSE(nick)			"433 " + nick + nick
 // user
+# define _ERR_NONICK						"You don't have a nick!"
 # define _ERR_ALREADYREGISTRED(user)		user + " already registered"
 // whois
 # define _RPL_WHOISREGNICK(nick)			"307 " + nick + " " + nick + " :has identified for this nick"
@@ -50,9 +51,9 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define _RPL_YOUREOPER						"You are oper"
 # define _ERR_PASSWDMISMATCH(nick)			"464 " + nick
 // join
+# define _ERR_INVITEONLYCHAN(nick, chan)	"473 " + nick + " " + chan + " :Cannot join channel (+i)"
 # define _ERR_BADCHANNELKEY(chan)			"Wrong key for " + chan
 # define _ERR_CHANNELISFULL(chan)			"Channel " + chan + " is full"
-# define _ERR_INVITEONLYCHAN(chan)			"Channel " + chan + " is invite only"
 # define _RPL_TOPIC(nick, chan, topic)		"332 " + nick + " " + chan + " :" + topic
 # define _RPL_NAMREPLY(nick, name, symbol, chan, prefix) "353 " + nick + " " + symbol + " " + chan + prefix + name
 # define _RPL_ENDOFNAMES(nick, chan)		"366 " + nick + " " + chan

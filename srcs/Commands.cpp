@@ -792,6 +792,11 @@ void Commands::kick(void)
 	}
 
 	User *target = _server->findUserByNick(targetNick);
+	if (!target)
+	{
+		message = _ERR_NOSUCHNICK(targetNick);
+		return _server->sendMsg(_user->getFd(), message);
+	}
 
  	// Can only use KICK if oper
 	if (channel->isOper(userNick) == false)
@@ -867,7 +872,8 @@ void Commands::privmsg(bool isNoticeCmd)
 					return _server->sendMsg(_user->getFd(), errMessage);
 				}
 			}
-			_server->sendMsg(target->getFd(), message);
+			else
+				_server->sendMsg(target->getFd(), message);
 		}
 	}
 }

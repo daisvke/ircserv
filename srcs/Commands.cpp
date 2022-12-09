@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/09 15:58:01 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 17:53:05 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,14 @@ Commands::Commands(Server *server, User *user, std::string &str)
 	// std::string message = _ERR_PASSWDMISMATCH(_user->getNickName());
 	// _server->sendMsg(_user->getFd(), message);
 	// return ;
-	std::cout << std::endl
-			  << "/=================================" << std::endl;
-	for (size_t i(0); i < _params.size(); ++i)
-	{
-		std::cout << _params[i] << std::endl;
-	}
-	std::cout << "=================================/" << std::endl
-			  << std::endl;
+	// std::cout << std::endl
+	// 		  << "/=================================" << std::endl;
+	// for (size_t i(0); i < _params.size(); ++i)
+	// {
+	// 	std::cout << _params[i] << std::endl;
+	// }
+	// std::cout << "=================================/" << std::endl
+	// 		  << std::endl;
 
 	setupMap();
 	routeCmd();
@@ -92,12 +92,13 @@ void Commands::routeCmd()
 void	Commands::broadcastToChannel(Channel *channel, std::string msg, bool isPriv)
 {
 	userDirectory 			*users = channel->getUserDirectory();
-	msg = isPriv ? "PRIVMSG " + channel->getName() + " " + msg : msg;
+
 
 	for (userDirectory::iterator it = users->begin(); it != users->end(); ++it)
 	{
 		if ((*it).first != _user)
 		{
+			msg = isPriv ? "PRIVMSG " + channel->getName() + " " + msg : msg;
 			int			userFd = (*it).first->getFd();
 			std::string userId  = _user->getId();
 			_server->sendMessage(userFd, userId, msg);
@@ -145,7 +146,7 @@ void Commands::nick(void)
 	std::string newNick = _params[1];
 	std::remove_if(newNick.begin(), newNick.end(), isspace);
 	/****** just added, to delete if incorrect*/
-	if (newNick.size() > 9 || newNick.find("#") != std::string::npos)
+	if (newNick.size() > 9 || !isalpha(*(newNick.begin())) /*!= std::string::npos*/)
 	{
 		message = _ERR_ERRONEUSNICKNAME(newNick);
 		return _server->sendMsg(_user->getFd(), message);

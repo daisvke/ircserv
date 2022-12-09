@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/29 18:58:55 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/02 15:30:24 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 18:46:32 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,14 @@ void	Server::updateServerMaps(int key){
 	std::pair<userMap::iterator,bool>	userMapRet;
 	std::pair<cmdMap::iterator,bool>	cmdMapret;
 
-	userMapRet = _userMap.insert(std::pair<int, User *>(key, new User));
-	if (userMapRet.second == true)
-		_userMap[key]->setFd(key);
-	cmdMapret = _cmdMap.insert(std::pair<int, std::string>(key, _buffer));
+	if (_userMap.find(key) == _userMap.end())
+	{
+		userMapRet = _userMap.insert(std::pair<int, User *>(key, new User));
+		if (userMapRet.second == true)
+			_userMap[key]->setFd(key);
+	}
+	if (_cmdMap.find(key) != _cmdMap.end())
+		cmdMapret = _cmdMap.insert(std::pair<int, std::string>(key, _buffer));
 	if (cmdMapret.second == false)
 		_cmdMap[key] += _buffer;
 }

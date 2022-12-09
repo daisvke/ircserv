@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 15:55:19 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/07 13:36:19 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 18:09:23 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,3 +62,7 @@ int main(int ac, char **av)
 
 //TODO : max size of message = 210;
 //TODO : max size for nickname = 9;
+// irssi -w pass -n irssiLuc -p 6667 -c localhost
+//nc -C localhost 6667
+
+

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.cpp                                         :+:      :+:    :+:   */
+/*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/09 15:56:22 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 18:49:10 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ Server::Server(int port, std::string pwd)
 Server::~Server()
 {
 	closeAllConn();
+	closeAllChannel();
 	std::cout << "Server destructor called" << std::endl;
 }
 
@@ -240,8 +241,8 @@ void Server::sendMsg(int fd, std::string &msg)
 	int sendRet;
 
 	msg = ":" + _name + " " + msg + _CRLF;
-//	std::cout << "\033[31m]==================== here 1: \033[0m" << msg << std::endl;
 
+	std::cout << "\033[31m]==================== sendMsg 1: \033[0m" << msg << std::endl;
 	sendRet = send(fd, msg.c_str(), msg.length(), 0);
 	if (sendRet < 0)
 	{
@@ -258,6 +259,7 @@ void Server::sendMessage(int fd, std::string id, std::string &msg)
 
 	msg = ":" + id + " " + msg + _CRLF;
 	sendRet = send(fd, msg.c_str(), msg.length(), 0);
+	std::cout << "\033[31m]==================== sendMessage 1: \033[0m" << msg << std::endl;
 	if (sendRet < 0)
 	{
 		serverPrint("send() failed");
@@ -362,8 +364,6 @@ void Server::NarrowArray(void)
 	}
 }
 
-
-
 void Server::deleteUser(int fd)
 {
 	userMap::iterator					userIt;
@@ -374,15 +374,12 @@ void Server::deleteUser(int fd)
 	userIt = _userMap.find(fd);
 	if (userIt != _userMap.end())
 	{
-		//remove all from chan
-		for (size_t i(0); i < _channels.size(); ++i)
+		for (size_t i(0); i < _channels.size(); ++i)	//remove all from chan
 			_channels[i]->part(_userMap[fd]);
-		//delete from _userMap
-		delete (_userMap[fd]);
+		delete ((_userMap[fd]));						//delete from _userMap
 		_userMap.erase(fd);
 	}
-	// delete from _cmdMap
-	cmdIt = _cmdMap.find(fd);
+	cmdIt = _cmdMap.find(fd);							// delete from _cmdMap
 	if (cmdIt != _cmdMap.end())
 		_cmdMap.erase(fd);
 }
@@ -400,6 +397,12 @@ void Server::closeAllConn()
 	for (int i = 0; i < _nfds; i++)
 		if (_fds[i].fd > 0)
 			closeConn(i);
+}
+
+void Server::closeAllChannel()
+{
+	for (size_t i = 0; i < _channels.size(); i++)
+		delete(_channels[i]);
 }
 
 /******************************************

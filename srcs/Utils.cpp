@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/17 12:51:53 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/06 13:32:39 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 17:49:27 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ bool	ircIsAllPrintable(std::string &s)
 			return (E_FALSE);
 	return (E_TRUE);
 }
-
 
 void	*ircMemset(void *s, int c, size_t n)
 {

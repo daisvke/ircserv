@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 14:15:27 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/09 22:54:21 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 23:05:24 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,18 +60,18 @@ void	Bot::connectToServer(){
 	if ((_listenBSd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == BOT_ERROR)
 		throw std::invalid_argument("Bot socket fail");
 	else
-		std::cout << " Bot socket success" << std::endl;
+		std::cout << "Bot socket success" << std::endl;
  	if (setsockopt(_listenBSd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
 		throw std::invalid_argument("Bot setsockopt fail");
 	else
-		std::cout << " Bot socketopt success" << std::endl;
+		std::cout << "Bot socketopt success" << std::endl;
 	_addrBot.sin_family = AF_INET;
 	_addrBot.sin_addr.s_addr = inet_addr(LOCAL_HOST);
 	_addrBot.sin_port = htons(_port);
 	if (connect(_listenBSd, (sockaddr *) &_addrBot, sizeof(_addrBot)) == BOT_ERROR)
 		throw std::invalid_argument("bot connect fail");
 	else
-		std::cout << "bot is now connected" << std::endl;
+		std::cout << "Bot is now connected" << std::endl;
 
 	_status = ON_STATUS;
 }
@@ -115,9 +115,9 @@ void	Bot::checkServerRpl()
 	if (_flag > 63)
 		throw std::invalid_argument("unexpected error");
 	else
-		std::cout << "bot is lauched \n" << std::endl;
+		std::cout << "Bot authentified \n" << std::endl;
 }
-
+ 
 /*********************************************
  * 		make reply
  *********************************************/

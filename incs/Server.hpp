@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/09 18:59:49 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 23:19:28 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,20 +16,20 @@
 #include "headers.hpp"
 #include "Commands.hpp"
 
-#define LOCAL_HOST "127.0.0.1"
-#define SERVER_DEFAULT_PORT 8084
-#define BUFFER_SIZE 1024
-#define MAX_PWD 100
-#define MAX_CLIENT 1000
-#define TIMEOUT 1000000
-#define SERVER_VERSION "Ubuntu 22.04.1 LTS"
-#define SERVER_NAME "<ircserv>"
+#define LOCAL_HOST			"127.0.0.1"
+#define SERVER_DEFAULT_PORT	8084
+#define BUFFER_SIZE			1024
+#define MAX_PWD				100
+#define MAX_CLIENT			1000
+#define TIMEOUT				1000000
+#define SERVER_VERSION		"Ubuntu 22.04.1 LTS"
+#define SERVER_NAME			"<ircserv>"
 
-#define TIMEOUT_MESS "time out - server automatic shutdown has been requested"
-#define ACCEPTED "the server has accepted your connection"
-#define SERVER_START_MESS "Server lauched"
-#define POLL_ERR_MESS "Poll() failed"
-#define _CRLF "\r\n"
+#define TIMEOUT_MESS		"time out - server automatic shutdown has been requested"
+#define ACCEPTED			"the server has accepted your connection"
+#define SERVER_START_MESS	"Server lauched"
+#define POLL_ERR_MESS		"Poll() failed"
+#define _CRLF				"\r\n"
 
 enum e_socket
 {
@@ -59,96 +59,89 @@ enum e_poll_return
  * the map will be used by the server to updated its _cmdBuffer
  *************************************************************/
 
-typedef std::map<int, User *> userMap;
-typedef std::map<int, std::string> cmdMap;
+typedef std::map<int, User *>		userMap;
+typedef std::map<int, std::string>	cmdMap;
 
 class Server
 {
-public:
-	Server();
-	Server(int port, std::string pwd);
-	~Server();
+	public:
+		Server();
+		Server(int port, std::string pwd);
+		~Server();
 
-	void startServer(void);
-	/* Note to delete: putting these functions here in public
-	to be able to use them with Command class */
-	void setName(std::string name);
-	std::string getName(void) const;
-	std::string getPassword(void) const;
-	std::vector<Channel *> *getChannels(void);
-	Channel *findChannel(std::string name);
-	User *findUserByNick(std::string name);
-	User *findUserByName(std::string name);
-	Channel *addChannel(std::string name, std::string key);
-	void deleteChannel(std::string name);
+		void					startServer(void);
+		//getter/setter
+		std::string				getName(void) const;
+		std::string				getPassword(void) const;
+		void					setName(std::string name);
+		//user
+		User	*findUserByNick(std::string name);
+		User	*findUserByName(std::string name);
+		//channel
+		Channel					*findChannel(std::string name);
+		std::vector<Channel *> *getChannels(void);
+		Channel					*addChannel(std::string name, std::string key);
+		void					deleteChannel(std::string name);
+		//send
+		void	sendMsg(int fd, std::string &msg);
+		void	sendMessage(int fd, std::string id, std::string &msg);
+		void	sendToAllUser(std::string &msg);
+		//close
+		void	closeFd(int targetFd);
+		void	closeAllConn(void);
+		void	closeAllChannel(void);
 
-	void sendMsg(int fd, std::string &msg);
-	void sendMessage(int fd, std::string id, std::string &msg);
+	private:
+		int			_port;
+		std::string	_password;
+		std::string	_name;
+		std::string	_creationTime;
 
-	void sendToAllUser(std::string &msg);
+		/*poll*/
+		struct sockaddr_in	_sockAddr;
+		int					_addrlen;
+		int					_listenSd;
+		bool				_status;
+		bool				_condenceArrayFlag;
+		char				_buffer[BUFFER_SIZE];
+		int					_opt;
+		int					_nfds;
+		int					_newSd;
+		struct pollfd		_fds[MAX_CLIENT];
+		/*user/chann maps and vectors*/
+		userMap					_userMap;
+		cmdMap					_cmdMap;
+		cmdMap					_cmdMsgMap;
+		std::vector<Channel *>	_channels;
 
-	void closeFd(int targetFd);
-	void closeAllConn(void);
-	void closeAllChannel(void);
-
-private:
-	int _port;
-	std::string _password;
-	std::string _name;
-	std::string _creationTime;
-
-	/*poll*/
-	struct sockaddr_in _sockAddr;
-	int _addrlen;
-	int _listenSd;
-	bool _status;
-	bool _condenceArrayFlag;
-	char _buffer[BUFFER_SIZE];
-	int _opt;
-	int _nfds;
-	int _newSd;
-	struct pollfd _fds[MAX_CLIENT];
-
-	/*cmd*/
-	userMap _userMap;
-	cmdMap _cmdMap;
-	cmdMap _cmdMsgMap;
-	std::vector<Channel *> _channels;
-
-	/*init the server */
-	void initServer();
-	int setSocket();
-	int setSocketopt();
-	int setNonBlocking();
-	int bindSocket();
-	int setListenSocket();
-
-	/*poll management */
-	int checkPollRet(int ret);
-	int findReadableFd();
-	int acceptNewSd();
-	void readExistingFds(int fd);
-	void reactToEvent(int index);
-	void waitForConn();
-
-	/*react to cmd */
-	void updateServerMaps(int fd);
-	void cmdMaker(int fd);
-	void execCmd(int key, std::string &str);
-	void handleCmd(int fd);
-
-	/*react management Utils */
-	template <typename T>
-	void serverPrint(T &str) { std::cout << "[+] " << str << std::endl; }
-	void closeConn(int index);
-	void NarrowArray(void);
-	void deleteUser(int fd);
-	int turnOffServer(std::string str);
-
-	/*visual utils*/
-	void PrintInfo(void);
+		/*init the server */
+		void	initServer();
+		int		setSocket();
+		int		setSocketopt();
+		int		setNonBlocking();
+		int		bindSocket();
+		int		setListenSocket();
+		/*poll management */
+		int		checkPollRet(int ret);
+		int		findReadableFd();
+		int		acceptNewSd();
+		void	readExistingFds(int fd);
+		void	reactToEvent(int index);
+		void	waitForConn();
+		/*react to cmd */
+		void	updateServerMaps(int fd);
+		void	cmdMaker(int fd);
+		void	execCmd(int key, std::string &str);
+		void	handleCmd(int fd);
+		/*react management Utils */
+		template <typename T>
+		void	serverPrint(T &str) { std::cout << "[+] " << str << std::endl; }
+		void	closeConn(int index);
+		void	NarrowArray(void);
+		void	deleteUser(int fd);
+		int		turnOffServer(std::string str);
+		/*visual utils*/
+		void	PrintInfo(void);
 };
-
 #endif
 
-// irssi -n Warlink -p 8084 -c localhost

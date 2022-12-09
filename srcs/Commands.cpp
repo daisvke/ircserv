@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/07 13:51:54 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 12:28:56 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -496,6 +496,7 @@ void Commands::mode(void)
 			message = _ERR_NOSUCHCHANNEL(userNick, _params[1]);
 			return _server->sendMsg(userFd, message);
 		}
+		// If no modestring is given, only prints the current channel modes
 		if (_params.size() < 3)
 		{
 			message = _RPL_UMODEIS(userNick, *channel->getUserMode(userNick));
@@ -515,7 +516,10 @@ void Commands::mode(void)
 					while (modes[i] == '-' || modes [i] == '+')
 					{
 						if (modes[i] != sign)
-							sign = 0; break ;
+						{
+							sign = 0;
+							break ;
+						}
 						++i;
 					}
 				}
@@ -533,11 +537,12 @@ void Commands::mode(void)
 		}
 		// Get mode parameters if found
 		std::string params;
-		if (_params.size() > 3)
+		if (_params.size() > 3) 
 			params = _params[3];
-
-		for (size_t i(0); i < modes.size(); ++i)
-			channel->modifyModes(modes[i], params, remove);
+		// Apply mode mdifications
+		std::map<char, char>::iterator	it;
+		for (it = foundModes.begin(); it != foundModes.end(); ++it)
+			channel->modifyModes((*it).first, params, (*it).second);
 	}
 	else // user modes
 	{
@@ -547,12 +552,12 @@ void Commands::mode(void)
 		{
 			message = _ERR_NOSUCHNICK(userNick);
 			return _server->sendMsg(_user->getFd(), message);
-		}
+		}	
 		if (targetNick != userNick)
 		{
 			message = _ERR_USERSDONTMATCH(userNick);
 			return _server->sendMsg(_user->getFd(), message);
-		}
+		}	
 		// If no modestring is given, print current modes
 		if (_params.size() < 3)
 		{
@@ -630,7 +635,7 @@ void Commands::names(void)
 	for (size_t i(0); i < channels.size(); ++i)
 	{
 
-		if (!(channels[i]->isTopicProtected() || channels[i]->isPrivate()))
+		if (channels[i]->isTopicProtected() == false)
 		{
 			std::cout << channels[i]->getName() << std::endl; // replace print fct
 			channels[i]->names();
@@ -665,7 +670,7 @@ void Commands::list(void)
 
 	for (size_t i(0); i < channels.size(); ++i)
 	{
-		if (!(channels[i]->isTopicProtected() || channels[i]->isPrivate()))
+		if (channels[i]->isTopicProtected() == false)
 		{
 			std::string	userCount = toString(channels[i]->countUsers());
 			message = _RPL_LIST(userNick, channels[i]->getName(), userCount, channels[i]->getTopic());
@@ -828,13 +833,14 @@ void Commands::kill(void)
 	}
 
 	User 		*target = _server->findUserByNick(_params[1]);
-	std::string	targetNick = target->getNickName();
 	if (!target)
 	{
 		message = _ERR_NOSUCHNICK(userNick);
 		return _server->sendMsg(userFd, message);
 	}
+	
 	std::string comment = concatArrayStrs(_params, 2);
+	std::string	targetNick = target->getNickName();
 
 	// Killing target
 	message = "KILL " + targetNick + " " + comment;

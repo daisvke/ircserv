@@ -420,11 +420,6 @@ User *Server::findUserByNick(std::string name)
 		if ((it->second)->getNickName() == name)
 			return it->second;
 	return 0;
-	// for (size_t i(0); i < _users.size(); ++i) {
-	// 	if (_users[i]->getNickName() == name)
-	// 		return _users[i];
-	// }
-	// return 0;
 }
 
 User *Server::findUserByName(std::string name)
@@ -434,11 +429,6 @@ User *Server::findUserByName(std::string name)
 		if ((it->second)->getUserName() == name)
 			return it->second;
 	return 0;
-	// for (size_t i(0); i < _users.size(); ++i) {
-	// 	if (_users[i]->getUserName() == name)
-	// 		return _users[i];
-	// }
-	// return 0;
 }
 
 Channel *Server::addChannel(std::string name, std::string key)

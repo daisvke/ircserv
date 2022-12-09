@@ -13,7 +13,7 @@
 #include "Channel.hpp"
 
 Channel::Channel(std::string name, std::string key)
-	: _name(name), _topic(), _key(key), _userLimit()
+	: _name(name), _topic(), _modes("+"), _key(key), _userLimit()
 {
 		if (key.empty() == false) { _modes += "k"; }
 }
@@ -26,7 +26,7 @@ Channel::~Channel() {}
 
 void Channel::setTopic(std::string name) { _topic = name; }
 
-void Channel::modifyTargetMode(char c, std::string target, bool remove)
+void Channel::modifyTargetMode(char c, std::string target, char sign)
 {
 	userDirectory::iterator it = _users.begin();
 
@@ -35,14 +35,13 @@ void Channel::modifyTargetMode(char c, std::string target, bool remove)
 		if ((*it).first->getNickName() == target)
 		{
 			std::string *mode = &((*it).second);
-			if (remove == true)
+			if (sign == '+')
 				*mode += c;
 			else
 				mode->erase(c);
 		}
 		++it;
 	}
-	std::cout << "Client name " << target << " not found!" << std::endl; // replace
 }
 
 void Channel::setChannelMode(char c, std::string params)
@@ -88,9 +87,9 @@ std::string *Channel::getUserMode(std::string name)
 bool	Channel::isKeyProtected(void) const { return checkMode('k'); }
 bool	Channel::isTopicProtected(void) const { return checkMode('t'); }
 bool	Channel::isModerated(void) const { return checkMode('m'); }
-bool	Channel::isInviteOnly(void) const { return checkMode('n'); }
+bool	Channel::isInviteOnly(void) const { return checkMode('i'); }
 bool	Channel::isSecret(void) const { return checkMode('s'); }
-bool	Channel::isPrivate(void) const { return checkMode('p'); }
+bool	Channel::isInternalOnly(void) const { return checkMode('n'); }
 bool	Channel::isLimited(void) const { return checkMode('l'); }	
 bool	Channel::isEmpty(void) const { return _users.size() == 0; }
 
@@ -162,30 +161,27 @@ void Channel::names(void)
  * If the mode is already set, and remove is true,
  *	then the mode is removed.
  *************************************************************/
-void Channel::modifyModes(char c, std::string params, bool remove)
+void Channel::modifyModes(char c, std::string params, char sign)
 {
-	std::string channelModes = "lktmnspib";
+//	std::string channelModes = "lktmnspib";
+	std::string channelModes = _CHANMODES;
 
+	// User modes
 	if (c == 'o' || c == 'v')
-		modifyTargetMode(c, params, remove);
+		modifyTargetMode(c, params, sign);
 
-	if (channelModes.find(c) != std::string::npos)
+	// Channel modes
+	if (channelModes.find(c) == std::string::npos)
 		return; /* ERR_UNKNOWNMODE */
-	if (_modes.find(c) != std::string::npos)
-	{
+	if (sign == '+' && checkMode(c) == _FOUND)
 		setChannelMode(c, params);
-	}
-	else if (remove == true)
-	{
+	else if (sign == '-' && _modes.find(c) != std::string::npos)
 		_modes.erase(c);
-	}
-
-	// handle b ? n-v
 }
 
 bool Channel::checkMode(char c) const
 {
 	if (_modes.find(c) != std::string::npos)
-		return true;
-	return false;
+		return _FOUND;
+	return _NOT_FOUND;
 }

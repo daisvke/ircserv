@@ -1,12 +1,14 @@
 #ifndef CHANNEL_HPP
-#define CHANNEL_HPP
+# define CHANNEL_HPP
 
-#include <map>
-#include <iostream>
-#include <algorithm>
-#include <cstring>
+# include <map>
+# include <iostream>
+# include <algorithm>
+# include <cstring>
 
-#include "User.hpp"
+# include "main.hpp"
+# include "User.hpp"
+
 
 enum	e_chanReturn { SUCCESS, ERROR };
 
@@ -26,8 +28,8 @@ class Channel
 
 		// setters
 		void	setTopic(std::string name);
-		void	modifyModes(char mode, std::string params, bool remove);
-		void	modifyTargetMode(char c, std::string target, bool remove);
+		void	modifyModes(char mode, std::string params, char sign);
+		void	modifyTargetMode(char c, std::string target, char sign);
 		void	setUserLimit(std::string limit);
 		void	setChannelMode(char c, std::string params);
 
@@ -46,7 +48,7 @@ class Channel
 		bool	isModerated(void) const;
 		bool	isInviteOnly(void) const;
 		bool	isSecret(void) const;
-		bool	isPrivate(void) const;
+		bool	isInternalOnly(void) const;
 		bool	isLimited(void) const;
 		bool	isOper(std::string name);
 		bool	hasVoice(std::string name);

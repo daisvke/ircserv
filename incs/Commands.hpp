@@ -17,19 +17,13 @@
 # include <algorithm>
 # include <map>
 
+# include "main.hpp"
 # include "Utils.hpp"
 # include "User.hpp"
 # include "Channel.hpp"
 # include "server.hpp"
 
 enum	e_isOper { _ISNOTOPER, _ISOPER };
-
-# define _NETWORKNAME		"IRC-LCHAN-DTANIGAWcom"
-# define _SERVERVERSION		"0.0.1"
-//# define _USERMODES			"ovinsk"
-# define _USERMODES			"o"
-# define _CHANMODES			"ovtimnslk"
-# define _CHAN_PARAM_MODES	"ovlk"
 
 // authentification
 # define _RPL_WELCOME(nick, user)		"001 " + nick + " :Welcome to the " + _NETWORKNAME + " Network, " + user

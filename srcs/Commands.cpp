@@ -496,10 +496,10 @@ void Commands::part(void)
  *************************************************************/
 void Commands::mode(void)
 {
-	std::string 			message, mode;
+	std::string 			concatParams, message, mode, modes;
 	std::string				userNick = _user->getNickName();
 	int						userFd = _user->getFd();
-	std::string 			modes;
+	char					sign;
 	std::map<char, char>	foundModes;
 
 	if (_params.size() < 2)
@@ -507,7 +507,7 @@ void Commands::mode(void)
 		message = _ERR_NEEDMOREPARAMS(userNick, _params[0]);
 		return _server->sendMsg(userFd, message);
 	}
-
+std::cout << "\033[31m================================== 1\033[0m" <<std::endl;
 	if (_params[1][0] == '#') // channel modes
 	{
 		Channel *channel = _server->findChannel(_params[1]);
@@ -519,52 +519,79 @@ void Commands::mode(void)
 		// If no modestring is given, only prints the current channel modes
 		if (_params.size() < 3)
 		{
-			message = _RPL_UMODEIS(userNick, *channel->getUserMode(userNick));
+			int	userLimit = channel->getUserLimit();
+			concatParams = userLimit > 0 ? toString(userLimit) : "";
+			message = _RPL_CHANNELMODEIS(userNick, channel->getName(), \
+										channel->getModes(), concatParams);
 			return _server->sendMsg(userFd, message);
 		}
+std::cout << "\033[31m================================== 2\033[0m" <<std::endl;
+
+		modes = _params[2];
+		// Get mode parameters if found
+		std::vector<std::string> params;
+		if (_params.size() > 3)
+		{
+			for (size_t i(0); i < _params.size(); ++i)
+				params.push_back(_params[i]);
+		}
+	std::cout << "\033[31m================================== 3\033[0m" <<std::endl;
 
 		if (_params.size() > 2) // modestring present: parse
 		{
-			modes = _params[2];
-			char	sign;
-
-			for (size_t i(0); i < modes.size(); ++i)
+			size_t	i = 0;
+			while (i < modes.size())
 			{
-				sign = modes[i];
-				if (modes[i] == '-' || modes [i] == '+')
+				if (modes[i] == '-' || modes[i] == '+')
 				{
-					while (modes[i] == '-' || modes [i] == '+')
-					{
-						if (modes[i] != sign)
-						{
-							sign = 0;
-							break ;
-						}
+					while (i < modes.size() && (modes[i] == '-' || modes[i] == '+')) {
+						sign = modes[i];
 						++i;
 					}
 				}
-				++i;
-				if (sign == 0) continue ;
-				else foundModes[modes[i]] = sign;
+				else return ;
+
+				while (i < modes.size() && !(modes[i] == '-' || modes[i] == '+'))
+				{
+					// If the found mode needs a param that is not found, ignore it
+					std::string	paramModes = _CHAN_PARAM_MODES;
+					if (paramModes.find(modes[i]) != std::string::npos)
+						if (params.empty() == false)
+							break ;
+					foundModes[modes[i]] = sign;
+					++i;
+				}
 			}
 		}
-
-		bool isChanOper = channel->isOper(userNick);
-		if (isChanOper == false)
+		if (foundModes.empty() == false)
 		{
-			message = _ERR_CHANOPRIVSNEEDED(userNick);
+			bool isChanOper = channel->isOper(userNick);
+			if (isChanOper == false)
+			{
+				message = _ERR_CHANOPRIVSNEEDED(userNick);
+				return _server->sendMsg(userFd, message);
+			}
+			// Apply mode mdifications
+			std::map<char, char>::iterator	it;
+			size_t	i = 0;
+			std::string	concatModes;
+
+			for (it = foundModes.begin(); it != foundModes.end(); ++it)
+			{
+				std::string	tmpParams = i < params.size() ? params[i] : "";
+				channel->modifyModes((*it).first, tmpParams, (*it).second);
+
+				concatModes += toString((*it).second) + (*it).first;
+				++i;
+
+			}
+			concatParams = params.empty() ? "" : modes + " " + concatArrayStrs(params, 0);
+			message = _RPL_CHANNELMODEIS(userNick, channel->getName(), \
+										concatModes, concatParams);
+
 			return _server->sendMsg(userFd, message);
 		}
-		// Get mode parameters if found
-		std::string params;
-		if (_params.size() > 3)
-			params = _params[3];
-		// Apply mode mdifications
-		std::map<char, char>::iterator	it;
-		for (it = foundModes.begin(); it != foundModes.end(); ++it)
-			channel->modifyModes((*it).first, params, (*it).second);
-		message = _RPL_CHANNELMODEIS(userNick, channel->getName(), channel->getModes(), "params");
-		return _server->sendMsg(userFd, message);
+
 	}
 	else // user modes
 	{

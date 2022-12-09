@@ -108,7 +108,10 @@ std::string	concatArrayStrs(std::vector<std::string> array, size_t index)
 {
 	std::string	concatenatedStr = array[index];
 
-	for (size_t i(++index); i < array.size(); ++i)
-		concatenatedStr += " " + array[i];
+	if (array.empty())
+		concatenatedStr = "";
+	else
+		for (size_t i(++index); i < array.size(); ++i)
+			concatenatedStr += " " + array[i];
 	return concatenatedStr;
 }

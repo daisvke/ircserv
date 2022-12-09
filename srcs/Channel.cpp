@@ -46,21 +46,20 @@ void Channel::modifyTargetMode(char c, std::string target, char sign)
 
 void Channel::setChannelMode(char c, std::string params)
 {
-	std::string modes = "timnsp";
-	if (modes.find(c) != std::string::npos)
-	{
-		_modes += c;
-		return;
-	};
+	std::cout << "\033[31m================================== just in setchan\033[0m" <<std::endl;
 
 	switch (c)
 	{
-	case 'l':
-		_userLimit = atoi(params.c_str());
-		break;
-	case 'k':
-		_key = params;
+		case 'l':
+			_userLimit = atoi(params.c_str());
+			break;
+		case 'k':
+			_key = params;
+		default:
+			_modes += c;
 	}
+	std::cout << "\033[31m================================== in setchanmodes\033[0m" <<std::endl;
+
 }
 
 /*************************************************************
@@ -174,7 +173,8 @@ void Channel::modifyModes(char c, std::string params, char sign)
 	// Channel modes
 	if (channelModes.find(c) == std::string::npos)
 		return; /* ERR_UNKNOWNMODE */
-	if (sign == '+' && checkMode(c) == _FOUND)
+
+	if (sign == '+' && checkMode(c) == _NOT_FOUND)
 		setChannelMode(c, params);
 	else if (sign == '-' && _modes.find(c) != std::string::npos)
 		_modes.erase(c);

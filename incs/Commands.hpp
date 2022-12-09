@@ -11,17 +11,17 @@
 /* ************************************************************************** */
 
 #ifndef COMMANDS_HPP
-#define COMMANDS_HPP
+# define COMMANDS_HPP
 
-#include <vector>
-#include <algorithm>
-#include <map>
-
-#include "main.hpp"
-#include "Utils.hpp"
-#include "User.hpp"
-#include "Channel.hpp"
-#include "Server.hpp"
+# include <vector>
+# include <algorithm>
+# include <map>
+ 
+# include "main.hpp"
+# include "Utils.hpp"
+# include "User.hpp"
+# include "Channel.hpp"
+# include "Server.hpp"
 
 enum e_isOper
 {

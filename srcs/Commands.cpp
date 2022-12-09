@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/09 23:26:25 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/10 00:15:08 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -159,7 +159,6 @@ void Commands::nick(void)
 		message = _RPL_CURRENTNICK(_user->getNickName());
 		return _server->sendMsg(_user->getFd(), message);
 	}
-
 	if (_server->findUserByNick(newNick) == false)
 	{
 		_user->setNickName(newNick);
@@ -356,6 +355,16 @@ void Commands::join(void)
 
 	if (_params.size() > 2)
 		channelKeys = ircSplit(_params[2], ',');
+	/*just added, add # before channelName + troncate if too long*/
+	for (size_t i = 0; i < channelNames.size(); ++i)
+	{
+		if ((channelNames[i].at(0)) != '#')
+			channelNames[i] = "#" + channelNames[i];
+		if (channelNames[i].size() > 50)
+			channelNames[i].erase(channelNames[i].begin() + 50, channelNames[i].end());
+	}
+	/*just added, delete if not useful*/
+
 	while (channelKeys.size() != channelNames.size())
 		channelKeys.push_back("");
 

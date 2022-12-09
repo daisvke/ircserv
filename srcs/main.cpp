@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 15:55:19 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/09 18:09:23 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 20:26:28 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,3 +66,19 @@ int main(int ac, char **av)
 //nc -C localhost 6667
 
 
+// join chann name with #
+// channel name are case insensitive
+// channel name are 50 size
+// channel begin with #
+
+// join avec ,
+// join avec mdp and join sans mdp --> error de message
+
+// segfault a chaque fois que des utilisateurs ne sont pas connu
+
+// quand /part --> name is still in user list
+// quand notice coucou coucou, segfault
+
+
+//dcc send irssiLuc2 "/Documents/coucou.txt"
+//dcc get irssiLuc "coucou.txt"

@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/09 17:53:05 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 20:32:29 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,17 +19,14 @@ Commands::Commands(Server *server, User *user, std::string &str)
 	if (_params[0] == "CAP")
 		return;
 
-	// std::string message = _ERR_PASSWDMISMATCH(_user->getNickName());
-	// _server->sendMsg(_user->getFd(), message);
-	// return ;
-	// std::cout << std::endl
-	// 		  << "/=================================" << std::endl;
-	// for (size_t i(0); i < _params.size(); ++i)
-	// {
-	// 	std::cout << _params[i] << std::endl;
-	// }
-	// std::cout << "=================================/" << std::endl
-	// 		  << std::endl;
+	std::cout << std::endl
+			  << "/========received msg ===========" << std::endl;
+	for (size_t i(0); i < _params.size(); ++i)
+	{
+		std::cout << _params[i] << std::endl;
+	}
+	std::cout << "=================================/" << std::endl
+			  << std::endl;
 
 	setupMap();
 	routeCmd();
@@ -944,3 +941,5 @@ void printMap(std::map<std::string, T> &mymap)
 				  << "val : " << it->second << std::endl;
 	}
 }
+
+

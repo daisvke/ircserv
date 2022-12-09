@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/09 18:49:10 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 18:54:16 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,9 @@ Server::Server()
 {
 	ircMemset((void *)_buffer, 0, sizeof(_buffer));
 	ircMemset((void *)_fds, 0, sizeof(_fds));
-	std::cout << _creationTime << "Server constructor called" << std::endl;
-	std::cout << "password = " << _password << std::endl;
-	std::cout << "port = " << _port << std::endl;
+	// std::cout << _creationTime << "Server constructor called" << std::endl;
+	// std::cout << "password = " << _password << std::endl;
+	// std::cout << "port = " << _port << std::endl;
 }
 
 Server::Server(int port, std::string pwd)
@@ -35,9 +35,9 @@ Server::Server(int port, std::string pwd)
 {
 	ircMemset((void *)_buffer, 0, sizeof(_buffer));
 	ircMemset((void *)_fds, 0, sizeof(_fds));
-	std::cout << _creationTime << " Server constructor called" << std::endl;
-	std::cout << "password = " << _password << std::endl;
-	std::cout << "port = " << _port << std::endl;
+	// std::cout << _creationTime << " Server constructor called" << std::endl;
+	// std::cout << "password = " << _password << std::endl;
+	// std::cout << "port = " << _port << std::endl;
 }
 
 Server::~Server()
@@ -173,8 +173,9 @@ int Server::findReadableFd()
 			continue;					   // do next loop,
 		if (_fds[index].revents != POLLIN)
 		{
+			break ;
 			//_status = OFF_STATUS;
-			return (POLL_FAILURE);
+			// return (POLL_FAILURE);
 		}
 		// else if (_fds[index].revents == POLLHUP)
 		// 	printf("deconnection spoted");

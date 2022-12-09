@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/09 18:38:33 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 18:59:49 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@
 #define BUFFER_SIZE 1024
 #define MAX_PWD 100
 #define MAX_CLIENT 1000
-#define TIMEOUT 10000
+#define TIMEOUT 1000000
 #define SERVER_VERSION "Ubuntu 22.04.1 LTS"
 #define SERVER_NAME "<ircserv>"
 

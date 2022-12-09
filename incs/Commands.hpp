@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:10 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/09 15:57:33 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 20:39:51 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ enum e_isOper
 #define _ERR_PASSWDMISMATCH(nick) "464 " + nick
 // join
 #define _ERR_INVITEONLYCHAN(nick, chan) "473 " + nick + " " + chan + " :Cannot join channel (+i)"
-#define _ERR_BADCHANNELKEY(chan) "Wrong key for " + chan
+#define _ERR_BADCHANNELKEY(chan) "475 Wrong key for " + chan
 #define _ERR_CHANNELISFULL(chan) "Channel " + chan + " is full"
 #define _RPL_TOPIC(nick, chan, topic) "332 " + nick + " " + chan + " :" + topic
 #define _RPL_NAMREPLY(nick, name, symbol, chan, prefix) "353 " + nick + " " + symbol + " " + chan + prefix + name

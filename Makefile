@@ -6,7 +6,7 @@ NAME			=	ircserv
 # C X X  F L A G S #
 
 CXX				=	c++
-CXXFLAGS		=	-Wall -Wextra -std=c++98 #-Werror
+CXXFLAGS		=	-Wall -Wextra -std=c++98  #-Werror
 DEBUG			=	-g3
 
 

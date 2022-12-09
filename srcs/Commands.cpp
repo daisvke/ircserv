@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/07 13:51:54 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 12:28:56 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -215,7 +215,7 @@ void Commands::registerClient(void)
 {
 	std::string nickName = _user->getNickName();
 	std::string serverName = _server->getName();
-	
+
 	std::string message = _RPL_WELCOME(nickName, _user->getUserName());
 	_server->sendMsg(_user->getFd(), message);
 	message = _RPL_YOURHOST(nickName, serverName);
@@ -451,7 +451,7 @@ void Commands::part(void)
 				message = "PART " + channelName;
 				broadcastToChannel(channel, message, _NOT_PRIV);
 				_server->sendMessage(_user->getFd(), _user->getId(), message);
-			
+
 				users->erase((*it).first);
 
 				if (channel->isEmpty())
@@ -533,7 +533,7 @@ void Commands::mode(void)
 		}
 		// Get mode parameters if found
 		std::string params;
-		if (_params.size() > 3) 
+		if (_params.size() > 3)
 			params = _params[3];
 
 		for (size_t i(0); i < modes.size(); ++i)
@@ -547,12 +547,12 @@ void Commands::mode(void)
 		{
 			message = _ERR_NOSUCHNICK(userNick);
 			return _server->sendMsg(_user->getFd(), message);
-		}	
+		}
 		if (targetNick != userNick)
 		{
 			message = _ERR_USERSDONTMATCH(userNick);
 			return _server->sendMsg(_user->getFd(), message);
-		}	
+		}
 		// If no modestring is given, print current modes
 		if (_params.size() < 3)
 		{

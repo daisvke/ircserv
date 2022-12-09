@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 14:15:27 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/08 23:54:39 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 13:18:47 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
  * 				constructor / destructor
  *********************************************/
 
-Bot::Bot(int port, std::string pwd): _port(port), _pwd(pwd), _chanName("BotChan"),
+Bot::Bot(int port, std::string pwd): _port(port), _pwd(pwd), _chanName(CHAN_NAME),
 									 _status(OFF_STATUS), _flag(0)
 {setupBot( );
 }
@@ -95,38 +95,28 @@ void	Bot::creatChannel()
 
 void	Bot::checkServerRpl()
 {
-	int	i = 0;
-	int cnt = 0;
-	std::string rplTab[6] = {"001", "002", "003", "004", "353", "366"};
+	std::string rplTab[7] = {"JOIN", "001", "002", "003", "004", "353", "366"};
 
-	std::cout << " initial _strBuffer " << _strBuffer << std::endl;
 	do {
-		std::cout << ">>>>>>>>>>> loop nbr : " << cnt++ << std::endl;
 		waitForCompleteRecv();
-		std::cout << "complete Recv = " << _strBuffer << std::endl;
-		if (_strBuffer.find("You're now known as Bot"))
+		if (_strBuffer.find("You're now known as Bot") != std::string::npos)
 		{
 			extractCmd(_strBuffer);
-			std::cout << "after extraction" << _strBuffer << std::endl;
 			continue ;
 		}
-		// else if (_strBuff.find(" "));
-		// 	throw std::invalid_argument("Channel creation failed");
 		_splitBuffer = ircSplit(extractCmd(_strBuffer), ' ');
-		for (unsigned long j = 0; j < _splitBuffer.size(); ++j)
-			std::cout << j  << " : "<< _splitBuffer[j] << std::endl;
-		for (; i < 6; ++i){
+		for (int i = 0; i < 7; ++i){
 			if (_splitBuffer.size() < 1)
 				throw std::invalid_argument("Channel creation failed");
 			else if (rplTab[i] == _splitBuffer[1])
 			{
 				std::cout << _flag << std::endl;
-				_flag += ircStoi(rplTab[i]);
+				//_flag |= 1 << i;
+				_flag |= (1<<i);
 			}
 		}
-	} while (_flag < 729);
-
-	if (_flag > 729)
+	} while (_flag < 63);
+	if (_flag > 63)
 	{
 		std::cout << "_flag = " << _flag << std::endl;
 		throw std::invalid_argument("unexpected error");
@@ -141,11 +131,12 @@ void	Bot::checkServerRpl()
 
 void	Bot::setRplBuffer(){
 
-		botMap::iterator it = _botMap.find(_splitBuffer[0]);;
-		if (it != _botMap.end())
-			_rplBuffer = _botMap[_splitBuffer[0]];
-		else
-			_rplBuffer = "I dont get it";
+	_rplBuffer = "PRIVMSG #BotChan";
+	botMap::iterator it = _botMap.find(_splitBuffer[0]);;
+	if (it != _botMap.end())
+		_rplBuffer += _botMap[_splitBuffer[0]];
+	else
+		_rplBuffer += "I dont get it";
 }
 
 void	Bot::sendRpl()
@@ -161,6 +152,7 @@ void	Bot::sendRpl()
 		if (_rplBuffer.empty() == false){
 			std::cout << "sending : " << _rplBuffer << std::endl;
 			send(_listenBSd, _rplBuffer.c_str(), _rplBuffer.size(), 0);
+			_rplBuffer.clear();
 		}
 	}
 }
@@ -192,11 +184,17 @@ void	Bot::concatRecv()
 
 void	Bot::waitForCompleteRecv()
 {
-	do {
-
+	while ((_strBuffer.empty() || _strBuffer.find("\r\n") == std::string::npos)
+		&& _status == ON_STATUS)
+	{
 		readBuffer();
 		concatRecv();
-	} while(_strBuffer.find("\r\n") == std::string::npos);
+	}
+	std::cout << "waitforCompleteRecv : \n" << _strBuffer << std::endl;
+// 	do {
+// 		readBuffer();
+// 		concatRecv();
+// 	} while(_strBuffer.find("\r\n") == std::string::npos);
 }
 
 void	Bot::botExec()

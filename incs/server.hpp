@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/07 13:32:42 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 11:18:14 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,7 @@ private:
 	void serverPrint(T &str) { std::cout << "[+] " << str << std::endl; }
 	void closeConn(int index);
 	void NarrowArray(void);
-	void deleteUser(int index);
+	void deleteUser(int fd);
 	int turnOffServer(std::string str);
 
 	/*visual utils*/

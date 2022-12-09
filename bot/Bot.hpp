@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 13:53:21 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/08 23:32:30 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 12:56:42 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@
 
 # define LOCAL_HOST "127.0.0.1"
 # define MAX_PWD 100
+# define CHAN_NAME "#BotChan"
 //# define message(time, MAX_AFK - time)
 
 # define BOT_CONN_CAP		"CAP LS \r\n"

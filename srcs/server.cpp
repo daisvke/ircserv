@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/07 13:04:23 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 12:36:57 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,13 +168,13 @@ int Server::findReadableFd()
 	{
 		if (_fds[index].revents == 0)
 			continue;					   // do next loop,
-		// if (_fds[index].revents != POLLIN)
-		// {
-		// 	//_status = OFF_STATUS;
-		// 	return (POLL_FAILURE);
-		// }
-		else if (_fds[index].revents == POLLHUP)
-			printf("deconnection spoted");
+		if (_fds[index].revents != POLLIN)
+		{
+			//_status = OFF_STATUS;
+			return (POLL_FAILURE);
+		}
+		// else if (_fds[index].revents == POLLHUP)
+		// 	printf("deconnection spoted");
 		else
 		{
 			printf("[DEBUG_MESS] findReadableFd : returning : = %d \n", index);
@@ -360,20 +360,29 @@ void Server::NarrowArray(void)
 	}
 }
 
-void Server::deleteUser(int index)
-{
-	userMap::iterator userIterator;
-	cmdMap::iterator cmdIterator;
 
-	userIterator = _userMap.find(index);
-	if (userIterator != _userMap.end())
-	{ // Do we have to delete user from all channel ?
-		delete (_userMap[index]);
-		_userMap.erase(index);
+
+void Server::deleteUser(int fd)
+{
+	userMap::iterator					userIt;
+	cmdMap::iterator					cmdIt;
+	userDirectory::iterator				usDirIt;
+	std::vector<Channel *>::iterator	chanIt;
+
+	userIt = _userMap.find(fd);
+	if (userIt != _userMap.end())
+	{
+		//remove all from chan
+		for (size_t i(0); i < _channels.size(); ++i)
+			_channels[i]->part(_userMap[fd]);
+		//delete from _userMap
+		delete (_userMap[fd]);
+		_userMap.erase(fd);
 	}
-	cmdIterator = _cmdMap.find(index);
-	if (cmdIterator != _cmdMap.end())
-		_cmdMap.erase(index);
+	// delete from _cmdMap
+	cmdIt = _cmdMap.find(fd);
+	if (cmdIt != _cmdMap.end())
+		_cmdMap.erase(fd);
 }
 
 int Server::turnOffServer(std::string str)

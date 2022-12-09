@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 15:55:19 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/09 20:26:28 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 23:21:51 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,11 @@ int main(int ac, char **av)
 	Server.startServer();
 }
 
-//TODO : max size of message = 210;
-//TODO : max size for nickname = 9;
+
 // irssi -w pass -n irssiLuc -p 6667 -c localhost
 //nc -C localhost 6667
 
+//TODO : max size of message = 210;
 
 // join chann name with #
 // channel name are case insensitive

@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 14:15:27 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/09 23:05:24 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 23:46:32 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,28 +16,41 @@
 /*********************************************
  * 				constructor / destructor
  *********************************************/
-
 Bot::Bot(int port, std::string pwd): _port(port), _pwd(pwd), _chanName(CHAN_NAME),
-									 _status(OFF_STATUS), _flag(0)
-{setupBot( );
-}
+									 _status(OFF_STATUS), _flag(0), _rplIndex(0) {setupBot( );}
 
-Bot::~Bot() { if (_listenBSd) close (_listenBSd); std::cout << "bot destroyed" << std::endl; }
+Bot::~Bot() { if (_listenBSd) close (_listenBSd);}
 
 /*********************************************
  * 				setup bot
  *********************************************/
 void Bot::setBotMap()
 {
-	_botMap["hello"] = "Hello, new member, how are you ?";
-	_botMap["Hello"] = "Hello, new member, how are you ?";
-	_botMap["HELLO"] = "Hello, new member, how are you ?";
-	_botMap["Time"] = "it is : " + ircTime();
-	_botMap["Thank"] = "you are welcome";
+	_botMap[0] = "You are welcome";
+	_botMap[1] = "it wont make sense but it is : " + ircTime();
+	_botMap[2] = "Hello, new member, how are you ?";
+	_botMap[3] = "There's more to learn!";
+	_botMap[4] = "Let me teach you the ways of magic!";
+	_botMap[5] = "I got quests!";
+	_botMap[6] = "Magic waits for no one, apprentice!";
+	_botMap[7] = "Still working on that quest?";
+	_botMap[8] = "Shouldn't you be murdering something about now?";
+	_botMap[9] = "No way! That's, like, my third favorite kind of magic!";
+	_botMap[10] = "Hey! You're TALKING to me! And I didn't even have an exclamation point over my head! This is the BEST day of my life!";
+	_botMap[11] = "Sooooo... how are things?";
+	_botMap[12] = "Hey, best friend!";
+	_botMap[13] = "Yessss, look into my eyes. You're getting sleepy. You're getting... zzzzzz... Zzzzzz...";
+	_botMap[14] = "Success! My spell to make you want to hang out with me worked!";
+	_botMap[15] = "Stay a while, and listen. Oh god, please -- PLEASE! -- stay a while.";
+	_botMap[16] = "Away with thee!";
+	_botMap[17] = "Hocus pocus!";
+	_botMap[18] = "Ahhh!";
+	_botMap[19] = "Alaka-ZAM!";
+	_botMap[20] = "Ha-HA!";
 }
 
-void	Bot::setupBot(){
-
+void	Bot::setupBot()
+{
 	ircMemset((void *)_buffer, 0, sizeof(_buffer));
 	setBotMap();
 	try{
@@ -53,26 +66,20 @@ void	Bot::setupBot(){
 	botExec();
 }
 
-void	Bot::connectToServer(){
-
+void	Bot::connectToServer()
+{
 	int opt = 1;
 
 	if ((_listenBSd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) == BOT_ERROR)
 		throw std::invalid_argument("Bot socket fail");
-	else
-		std::cout << "Bot socket success" << std::endl;
  	if (setsockopt(_listenBSd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt)))
 		throw std::invalid_argument("Bot setsockopt fail");
-	else
-		std::cout << "Bot socketopt success" << std::endl;
 	_addrBot.sin_family = AF_INET;
 	_addrBot.sin_addr.s_addr = inet_addr(LOCAL_HOST);
 	_addrBot.sin_port = htons(_port);
 	if (connect(_listenBSd, (sockaddr *) &_addrBot, sizeof(_addrBot)) == BOT_ERROR)
 		throw std::invalid_argument("bot connect fail");
-	else
-		std::cout << "Bot is now connected" << std::endl;
-
+	std::cout << "Bot is now connected" << std::endl;
 	_status = ON_STATUS;
 }
 
@@ -82,7 +89,6 @@ void	Bot::authentification()
 						+ std::string(BOT_CONN_PASS(std::string(_pwd)))
 						+ std::string(BOT_CONN_NICK)
 						+ std::string(BOT_CONN_USER);
-
 	// TODO :: add authentification as operator;
  	send(_listenBSd, msg.c_str(), msg.size(), 0);
 }
@@ -99,8 +105,7 @@ void	Bot::checkServerRpl()
 
 	do {
 		waitForCompleteRecv();
-		if (_strBuffer.find("You're now known as Bot") != std::string::npos)
-		{
+		if (_strBuffer.find("You're now known as Bot") != std::string::npos){
 			extractCmd(_strBuffer);
 			continue ;
 		}
@@ -114,28 +119,25 @@ void	Bot::checkServerRpl()
 	} while (_flag < 63);
 	if (_flag > 63)
 		throw std::invalid_argument("unexpected error");
-	else
-		std::cout << "Bot authentified \n" << std::endl;
+	std::cout << "Bot authentified \n" << std::endl;
 }
- 
+
 /*********************************************
  * 		make reply
  *********************************************/
 
-void	Bot::setRplBuffer(){
-
+void	Bot::setRplBuffer()
+{
 	_rplBuffer = "PRIVMSG #BotChan :";
-	botMap::iterator it = _botMap.find(_splitBuffer[0]);;
-	if (it != _botMap.end())
-		_rplBuffer += _botMap[_splitBuffer[0]];
-	else
-		_rplBuffer += "I dont get it";
+	_rplBuffer += _botMap[_rplIndex++];
+	if (_rplIndex > 20)
+		_rplIndex = 0;
 }
 
 void	Bot::sendRpl()
 {
 	std::string	str;
-	int	sendRet = 0;
+	int			sendRet = 0;
 
 	while (1){
 		str = extractCmd(_strBuffer);
@@ -164,7 +166,7 @@ void	Bot::readBuffer()
 			return ;
 		}
 	}
-	else if (recvRet == 0) // server turned of
+	else if (recvRet == 0)
 		_status = OFF_STATUS;
 }
 
@@ -172,7 +174,6 @@ void	Bot::concatRecv()
 {
 	_strBuffer += _buffer;
 	ircMemset((void *)_buffer, 0, sizeof(_buffer));
-	//std::cout << "client _strBuffer contains : " << _strBuffer << std::endl;
 }
 
 void	Bot::waitForCompleteRecv()
@@ -193,17 +194,3 @@ void	Bot::botExec()
 		sendRpl();
 	}
 }
-
-/*
-client _buffer contains : [:localhost 001 Bot :Welcome to the IRC-LCHAN-DTANIGAWcom Network, BonusBot
-]
-client _buffer contains : [:localhost 002 Bot :Your host is localhost, running version 0.0.1
-]
-client _buffer contains : [:localhost 003 Bot :This server was created Thu Dec  8 17:54:09 2022
-]
-client _buffer contains : [:localhost 004 Bot localhost 0.0.1 ovinsk ovtimnsplk ovlk
-]
-client _buffer contains : [:localhost 353 Bot = BotChan :@Bot
-]
-client _buffer contains : [:localhost 366 Bot BotChan
-*/

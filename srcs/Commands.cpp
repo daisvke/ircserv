@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/09 20:32:29 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 23:26:25 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -350,7 +350,6 @@ void Commands::join(void)
 		message = _ERR_NEEDMOREPARAMS(userNick, _params[0]);
 		return _server->sendMsg(userFd, message);
 	}
-
 	std::vector<std::string> channelKeys;
 	std::vector<std::string> channelNames = ircSplit(_params[1], ',');
 	bool isOper;

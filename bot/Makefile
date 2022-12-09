@@ -3,8 +3,8 @@ SRCS	=	Bot.cpp BotMain.cpp BotUtils.cpp
 HEADER	=	Bot.hpp BotUtils.hpp
 OBJS	=	$(SRCS:.cpp=.o)
 COMPIL	=	c++
-FLAGS	=	-g3 -fsanitize=address -std=c++98 -Wall -Wextra -Werror
-DEBUGFLAGS	= -g3 -fsanitize=address -std=c++98 -Wall -Wextra -Werror
+FLAGS	=	-g3 -std=c++98 -Wall -Wextra -Werror
+DEBUGFLAGS	= -g3 -std=c++98 -Wall -Wextra -Werror
 
 
 # $< = dependances | $@ = regles -> .o

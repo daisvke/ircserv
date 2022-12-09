@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 14:15:27 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/09 13:18:47 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 22:54:21 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,18 +109,11 @@ void	Bot::checkServerRpl()
 			if (_splitBuffer.size() < 1)
 				throw std::invalid_argument("Channel creation failed");
 			else if (rplTab[i] == _splitBuffer[1])
-			{
-				std::cout << _flag << std::endl;
-				//_flag |= 1 << i;
 				_flag |= (1<<i);
-			}
 		}
 	} while (_flag < 63);
 	if (_flag > 63)
-	{
-		std::cout << "_flag = " << _flag << std::endl;
 		throw std::invalid_argument("unexpected error");
-	}
 	else
 		std::cout << "bot is lauched \n" << std::endl;
 }
@@ -131,7 +124,7 @@ void	Bot::checkServerRpl()
 
 void	Bot::setRplBuffer(){
 
-	_rplBuffer = "PRIVMSG #BotChan";
+	_rplBuffer = "PRIVMSG #BotChan :";
 	botMap::iterator it = _botMap.find(_splitBuffer[0]);;
 	if (it != _botMap.end())
 		_rplBuffer += _botMap[_splitBuffer[0]];
@@ -142,16 +135,16 @@ void	Bot::setRplBuffer(){
 void	Bot::sendRpl()
 {
 	std::string	str;
+	int	sendRet = 0;
 
 	while (1){
 		str = extractCmd(_strBuffer);
 		if (str.empty())
 			break;
-		std::cout << "extracted = " << str << std::endl;
 		setRplBuffer();
 		if (_rplBuffer.empty() == false){
-			std::cout << "sending : " << _rplBuffer << std::endl;
-			send(_listenBSd, _rplBuffer.c_str(), _rplBuffer.size(), 0);
+			_rplBuffer += "\r\n";
+			sendRet = send(_listenBSd, _rplBuffer.c_str(), _rplBuffer.size(), 0);
 			_rplBuffer.clear();
 		}
 	}
@@ -190,11 +183,6 @@ void	Bot::waitForCompleteRecv()
 		readBuffer();
 		concatRecv();
 	}
-	std::cout << "waitforCompleteRecv : \n" << _strBuffer << std::endl;
-// 	do {
-// 		readBuffer();
-// 		concatRecv();
-// 	} while(_strBuffer.find("\r\n") == std::string::npos);
 }
 
 void	Bot::botExec()

@@ -389,7 +389,6 @@ void Commands::join(void)
 
 			if (channel->isInviteOnly())
 			{
-				std::cout << "\033[31m =====================> 2\033[0m" << std::endl;
 				message = _ERR_INVITEONLYCHAN(userNick, channelName);
 				return _server->sendMsg(userFd, message);
 			}
@@ -504,7 +503,6 @@ void Commands::mode(void)
 		message = _ERR_NEEDMOREPARAMS(userNick, _params[0]);
 		return _server->sendMsg(userFd, message);
 	}
-std::cout << "\033[31m================================== 1\033[0m" <<std::endl;
 	if (_params[1][0] == '#') // channel modes
 	{
 		Channel *channel = _server->findChannel(_params[1]);
@@ -570,8 +568,8 @@ std::cout << "\033[31m================================== 2\033[0m" <<std::endl;
 			}
 			// Apply mode mdifications
 			std::map<char, char>::iterator	it;
-			size_t	i = 0;
-			std::string	concatModes;
+			size_t							i = 0;
+			std::string						concatModes;
 
 			for (it = foundModes.begin(); it != foundModes.end(); ++it)
 			{
@@ -579,8 +577,8 @@ std::cout << "\033[31m================================== 2\033[0m" <<std::endl;
 				channel->modifyModes((*it).first, tmpParams, (*it).second);
 
 				concatModes += toString((*it).second) + (*it).first;
-				++i;
 
+				++i;
 			}
 			concatParams = params.empty() ? "" : modes + " " + concatArrayStrs(params, 0);
 			message = _RPL_CHANNELMODEIS(userNick, channel->getName(), \

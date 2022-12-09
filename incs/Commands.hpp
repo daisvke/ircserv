@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:10 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/07 11:31:01 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 15:57:33 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define _RPL_CURRENTNICK(nick)				"Your nickname is " + nick
 # define _RPL_NICKSUCCESS(nick)				"You're now known as " + nick
 # define _ERR_NONICKNAMEGIVEN(nick)			"431 " + nick
+# define _ERR_ERRONEUSNICKNAME(nick)		"432 " + nick + ":Erroneus nickname"
 # define _ERR_NICKNAMEINUSE(nick)			"433 " + nick + nick
 // user
 # define _ERR_ALREADYREGISTRED(user)		user + " already registered"

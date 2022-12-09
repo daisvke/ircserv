@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/09 12:28:56 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 15:58:01 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,6 +144,13 @@ void Commands::nick(void)
 	}
 	std::string newNick = _params[1];
 	std::remove_if(newNick.begin(), newNick.end(), isspace);
+	/****** just added, to delete if incorrect*/
+	if (newNick.size() > 9 || newNick.find("#") != std::string::npos)
+	{
+		message = _ERR_ERRONEUSNICKNAME(newNick);
+		return _server->sendMsg(_user->getFd(), message);
+	}
+	/****** just added, to delete if incorrect*/
 	if (newNick.empty())
 	{
 		message = _ERR_NONICKNAMEGIVEN(newNick);
@@ -537,7 +544,7 @@ void Commands::mode(void)
 		}
 		// Get mode parameters if found
 		std::string params;
-		if (_params.size() > 3) 
+		if (_params.size() > 3)
 			params = _params[3];
 		// Apply mode mdifications
 		std::map<char, char>::iterator	it;
@@ -552,12 +559,12 @@ void Commands::mode(void)
 		{
 			message = _ERR_NOSUCHNICK(userNick);
 			return _server->sendMsg(_user->getFd(), message);
-		}	
+		}
 		if (targetNick != userNick)
 		{
 			message = _ERR_USERSDONTMATCH(userNick);
 			return _server->sendMsg(_user->getFd(), message);
-		}	
+		}
 		// If no modestring is given, print current modes
 		if (_params.size() < 3)
 		{

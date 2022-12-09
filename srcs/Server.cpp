@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/09 12:36:57 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/09 15:56:22 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -482,4 +482,4 @@ std::vector<Channel *> *Server::getChannels(void) { return &_channels; }
  * protocol : man protocol
 */
 
-// c++ srcs/main.cpp srcs/server.cpp incs/headers.hpp incs/server.hpp
+// c++ srcs/main.cpp srcs/Server.cpp incs/headers.hpp incs/server.hpp

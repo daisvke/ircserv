@@ -14,7 +14,7 @@ DEBUG			=	-g3
 
 SRCS_DIR		=	srcs/
 SRCS_FILES		=	main.cpp \
-					server.cpp \
+					Server.cpp \
 					ServerHandle.cpp \
 					User.cpp \
 					Channel.cpp \

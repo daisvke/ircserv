@@ -23,7 +23,7 @@
 # include "Channel.hpp"
 # include "Server.hpp"
 
-enum e_isOper
+enum	e_isOper
 {
 	_ISNOTOPER,
 	_ISOPER
@@ -74,6 +74,7 @@ enum e_isOper
 #define _ERR_USERONCHANNEL(nick, chan) "443 " + nick + " Already on channel " + chan
 // mode
 #define _ERR_USERSDONTMATCH(nick) "502 " + nick + " :Cant change mode for other users"
+# define _ERR_UNKNOWNMODE(nick, modechar)	"472 " + nick + " " + modechar + " :is unknown mode char to me"
 #define _RPL_UMODEIS(nick, modes) "221 " + nick + " " + modes
 #define _RPL_CHANNELMODEIS(nick, chan, modes, args) "324 " + nick + " " + chan + " " + modes + " " + args
 // topic

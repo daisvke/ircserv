@@ -545,6 +545,8 @@ std::cout << "\033[31m================================== 2\033[0m" <<std::endl;
 				}
 				else return ;
 
+				std::string channelModes = _CHANMODES;
+
 				while (i < modes.size() && !(modes[i] == '-' || modes[i] == '+'))
 				{
 					// If the found mode needs a param that is not found, ignore it
@@ -552,7 +554,17 @@ std::cout << "\033[31m================================== 2\033[0m" <<std::endl;
 					if (paramModes.find(modes[i]) != std::string::npos)
 						if (params.empty() == false)
 							break ;
-					foundModes[modes[i]] = sign;
+					if (channelModes.find(modes[i]) == std::string::npos)
+					{
+						message = _ERR_UNKNOWNMODE(userNick, modes[i]);
+						_server->sendMsg(userFd, message);
+						++i;
+						continue;
+					}
+					// Save validated mode with its sign
+					if ((channel->getModes().find(modes[i]) == std::string::npos && sign == '+')
+					|| (channel->getModes().find(modes[i]) != std::string::npos && sign == '-'))
+						foundModes[modes[i]] = sign;
 					++i;
 				}
 			}
@@ -576,7 +588,6 @@ std::cout << "\033[31m================================== 2\033[0m" <<std::endl;
 				channel->modifyModes((*it).first, tmpParams, (*it).second);
 
 				concatModes += toString((*it).second) + (*it).first;
-
 				++i;
 			}
 			concatParams = params.empty() ? "" : modes + " " + concatArrayStrs(params, 0);

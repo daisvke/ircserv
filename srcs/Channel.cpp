@@ -90,7 +90,7 @@ bool	Channel::isModerated(void) const { return checkMode('m'); }
 bool	Channel::isInviteOnly(void) const { return checkMode('i'); }
 bool	Channel::isSecret(void) const { return checkMode('s'); }
 bool	Channel::isInternalOnly(void) const { return checkMode('n'); }
-bool	Channel::isLimited(void) const { return checkMode('l'); }	
+bool	Channel::isLimited(void) const { return checkMode('l'); }
 bool	Channel::isEmpty(void) const { return _users.size() == 0; }
 
 bool	Channel::isOper(std::string name) {
@@ -169,15 +169,14 @@ void Channel::modifyModes(char c, std::string params, char sign)
 	// User modes
 	if (c == 'o' || c == 'v')
 		modifyTargetMode(c, params, sign);
-
-	// Channel modes
-	if (channelModes.find(c) == std::string::npos)
-		return; /* ERR_UNKNOWNMODE */
-
-	if (sign == '+' && checkMode(c) == _NOT_FOUND)
-		setChannelMode(c, params);
-	else if (sign == '-' && _modes.find(c) != std::string::npos)
-		_modes.erase(c);
+	else
+	{
+		// Channel modes
+		if (sign == '+')
+			setChannelMode(c, params);
+		else if (sign == '-')
+			_modes.erase(std::remove(_modes.begin(), _modes.end(), c), _modes.end());
+	}
 }
 
 bool Channel::checkMode(char c) const

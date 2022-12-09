@@ -79,6 +79,7 @@ enum	e_isOper { _ISNOTOPER, _ISOPER };
 # define _RPL_LIST(nick, chan, clientCount, topic)	"322 " + nick + " " + chan + " " + clientCount + " :" + topic
 # define _RPL_LISTEND(nick)					"323 " + nick + " :End of LIST"
 // kick
+# define _ERR_USERNOTINCHANNEL(nick, user, chan)	"441 " + nick + " " + nick + " " + chan + "  :They aren't on that channel"
 # define _RPL_KICKSUCCESS(chan, nick, comment)	"KICK " + chan + " " + nick + " " + comment
 // kill
 # define _ERR_NOPRIVILEGES(nick)			"481 " + nick + " :Permission Denied- You're not an IRC operator"

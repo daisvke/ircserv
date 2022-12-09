@@ -725,7 +725,7 @@ void Commands::kick(void)
 {
 	std::string	userNick = _user->getNickName();
 	int			userFd = _user->getFd();
-	std::string message;
+	std::string message, targetNick = _params[2];
 
 	if (_params.size() < 3)
 	{
@@ -733,14 +733,22 @@ void Commands::kick(void)
 		return _server->sendMsg(userFd, message);
 	}
 
-	User *target = _server->findUserByNick(_params[2]);
 	Channel *channel;
-
 	if (!(channel = _server->findChannel(_params[1])))
 	{
 		message = _ERR_NOSUCHCHANNEL(userNick, channel->getName());
 		return _server->sendMsg(userFd, message);
 	}
+
+	std::string	channelName = channel->getName();
+	if (channel->isMember(targetNick) == false)
+	{
+		message = _ERR_USERNOTINCHANNEL(userNick, targetNick, channelName);
+		return _server->sendMsg(userFd, message);
+	}
+
+	User *target = _server->findUserByNick(targetNick);
+
  	// Can only use KICK if oper
 	if (channel->isOper(userNick) == false)
 	{
@@ -751,13 +759,18 @@ void Commands::kick(void)
 	std::string comment;
 	if (_params.size() > 3)
 		comment = concatArrayStrs(_params, 3);
-
-	message = _RPL_KICKSUCCESS(channel->getName(), target->getNickName(), comment);
+		
+	// Kick target out of the channel using PART message
+	message = "PART " + channelName;
+	broadcastToChannel(channel, message, _NOT_PRIV);
+	_server->sendMessage(target->getFd(), target->getId(), message);
+	// Broadcast success message to all users on channel
+	message = _RPL_KICKSUCCESS(channelName, target->getNickName(), comment);
 	broadcastToChannel(channel, message, _NOT_PRIV);
 	_server->sendMessage(_user->getFd(), _user->getId(), message);
 
+	// kick target out on the server
 	channel->part(target);
-	// handle  ERR_USERNOTINCHANNEL (441) and  ERR_NOTONCHANNEL (442) ?
 }
 
 /*************************************************************
@@ -838,7 +851,7 @@ void Commands::kill(void)
 		message = _ERR_NOSUCHNICK(userNick);
 		return _server->sendMsg(userFd, message);
 	}
-	
+
 	std::string comment = concatArrayStrs(_params, 2);
 	std::string	targetNick = target->getNickName();
 

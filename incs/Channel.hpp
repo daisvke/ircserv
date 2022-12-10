@@ -32,7 +32,6 @@ public:
 	void setTopic(std::string name);
 	bool modifyModes(char mode, std::string params, char sign);
 	void modifyUserMode(char c, std::string target, char sign);
-	void setUserLimit(std::string limit);
 	bool setChannelMode(char c, std::string params);
 
 	// getters

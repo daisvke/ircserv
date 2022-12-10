@@ -561,7 +561,7 @@ void Commands::mode(void)
 					if (paramModes.find(modes[i]) != std::string::npos)
 					{
 						needsParam = true;
-						if (params.empty() == true)
+						if ((params.empty() == true && sign != '-') || (!params.empty() && sign == '-'))
 						{
 							++i;
 							continue ;

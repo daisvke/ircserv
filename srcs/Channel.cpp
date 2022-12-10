@@ -56,9 +56,11 @@ bool Channel::setChannelMode(char c, std::string params)
 		case 'l':
 		{
 			size_t limit = atoi(params.c_str());
+
 			if (limit != _userLimit)
 			{
 				_userLimit = limit;
+				_modes += c;
 				return true;
 			}
 			else
@@ -69,6 +71,7 @@ bool Channel::setChannelMode(char c, std::string params)
 			if (_key != params)
 			{
 				_key = params;
+				_modes += c;
 				return true;
 			}
 			else
@@ -199,7 +202,11 @@ bool Channel::modifyModes(char c, std::string params, char sign)
 		if (sign == '+')
 			changed = setChannelMode(c, params);
 		else if (sign == '-')
+		{
+			if (c == 'l')
+				_userLimit = 0;
 			_modes.erase(std::remove(_modes.begin(), _modes.end(), c), _modes.end());
+		}
 	}
 	return changed;
 }

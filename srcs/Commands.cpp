@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/10 00:54:31 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/10 20:46:49 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,7 +152,9 @@ void Commands::nick(void)
 	if (newNick.size() > 9 || !isalpha(*(newNick.begin())))
 	{
 		message = _ERR_ERRONEUSNICKNAME(newNick);
-		return _server->sendMsg(_user->getFd(), message);
+		_server->sendMsg(_user->getFd(), message);
+		_server->closeFd(_user->getFd());
+		return ;
 	}
 	if (_params.size() == 1)
 	{

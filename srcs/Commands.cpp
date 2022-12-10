@@ -388,24 +388,22 @@ void Commands::join(void)
 					return _server->sendMsg(userFd, message);
 				}
 			}
-			if (channel->isInviteOnly())
+			if (channel->isInviteOnly() && _user->isInvited(channelName) == false)
 			{
-				std::cout << "\033[32m =====================> invite 1\033[0m" << std::endl;
-
 				message = _ERR_INVITEONLYCHAN(userNick, channelName);
 				return _server->sendMsg(userFd, message);
 			}
 		}
 		else if (channel->isLimited() == true && channel->countUsers() >= channel->getUserLimit())
 		{
-					std::cout << "\033[33m =====================> limited\033[0m" << std::endl;
-
-			_ERR_CHANNELISFULL(userNick, channelName);
+			message = _ERR_CHANNELISFULL(userNick, channelName);
 			return _server->sendMsg(userFd, message);
 		}
 
 		channel->join(_user, isOper);
-
+		// Send messages
+		finalizeJoin(_user, channel);
+/*
 		message = "JOIN " + channelName;
 		broadcastToChannel(channel, message, _NOT_PRIV);
 		_server->sendMessage(userFd, _user->getId(), message);
@@ -414,22 +412,61 @@ void Commands::join(void)
 		// Print channel parameters to user
 		if (channel->getTopic().empty() == false)
 		{
-			message = _RPL_TOPIC(userNick, channel->getName(), channel->getTopic());
-			_server->sendMsg(userFd, message);
+				message = _RPL_TOPIC(userNick, channel->getName(), channel->getTopic());
+				_server->sendMsg(userFd, message);
 		}
 
 		userDirectory *users = channel->getUserDirectory();
 		for (userDirectory::iterator it(users->begin()); it != users->end(); ++it)
 		{
+				std::string nick = (*it).first->getNickName();
+				std::string prefix = channel->isOper(nick) ? ":@" : ":";
+
+				message = _RPL_NAMREPLY(userNick, nick, '=', channel->getName(), prefix);
+				_server->sendMsg(userFd, message);
+		}
+		message = _RPL_ENDOFNAMES(userNick, channel->getName());
+		_server->sendMsg(userFd, message);
+	}
+	*/
+	}
+}
+
+void	Commands::finalizeJoin(User *user, Channel *channel)
+{
+	std::string	userNick = user->getNickName();
+	int			userFd = user->getFd();
+	std::string	channelName = channel->getName();
+	std::string	message;
+
+	if (channel->isLimited() == true && channel->countUsers() >= channel->getUserLimit())
+	{
+		message = _ERR_CHANNELISFULL(userNick, channelName);
+		return _server->sendMsg(userFd, message);
+	}
+
+	message = "JOIN " + channelName;
+	broadcastToChannel(channel, message, _NOT_PRIV);
+	_server->sendMessage(userFd, user->getId(), message);
+
+	// Print channel parameters to user
+	if (channel->getTopic().empty() == false)
+	{
+			message = _RPL_TOPIC(userNick, channel->getName(), channel->getTopic());
+			_server->sendMsg(userFd, message);
+	}
+
+	userDirectory *users = channel->getUserDirectory();
+	for (userDirectory::iterator it(users->begin()); it != users->end(); ++it)
+	{
 			std::string nick = (*it).first->getNickName();
 			std::string prefix = channel->isOper(nick) ? ":@" : ":";
 
 			message = _RPL_NAMREPLY(userNick, nick, '=', channel->getName(), prefix);
 			_server->sendMsg(userFd, message);
-		}
-		message = _RPL_ENDOFNAMES(userNick, channel->getName());
-		_server->sendMsg(userFd, message);
 	}
+	message = _RPL_ENDOFNAMES(userNick, channel->getName());
+	_server->sendMsg(userFd, message);
 }
 
 /*************************************************************
@@ -771,7 +808,7 @@ void Commands::invite(void)
 	}
 
 	std::string guestNick = _params[1];
-	User	*guest =  _server->findUserByNick(userNick);
+	User	*guest =  _server->findUserByNick(guestNick);
 	int		guestFd = guest->getFd();
 	if (!guest)
 	{
@@ -786,10 +823,10 @@ void Commands::invite(void)
 		message = _ERR_NOSUCHCHANNEL(userNick, _params[2]);
 		return _server->sendMsg(userFd, message);
 	}
-
+	std::string	channelName = channel->getName();
 	if (channel->isInviteOnly() && channel->isOper(userNick) == false)
 	{
-		message = _ERR_CHANOPRIVSNEEDED(userNick, channel->getName());
+		message = _ERR_CHANOPRIVSNEEDED(userNick, channelName);
 		return _server->sendMsg(userFd, message);
 	}
 
@@ -804,11 +841,15 @@ void Commands::invite(void)
 			return _server->sendMsg(userFd, message);
 		}
 	}
-	message = _RPL_INVITING(userNick, guestNick, _params[2]);
-	_server->sendMsg(userFd, message);
-	_server->sendMsg(guestFd, message);
 
-	return channel->join(guest, _ISNOTOPER);
+	// Add channel name to the invitation list of the guest user
+	guest->addChanInvitation(channelName);
+
+	// Send invitation
+	message = _RPL_INVITING(userNick, guestNick, channelName);
+	_server->sendMsg(userFd, message);
+	message = "INVITE " + guestNick + " " + channelName;
+	_server->sendMessage(guestFd, _user->getId(), message);
 }
 
 /*************************************************************

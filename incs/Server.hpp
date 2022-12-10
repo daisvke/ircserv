@@ -11,25 +11,25 @@
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
-#define SERVER_HPP
+# define SERVER_HPP
 
-#include "headers.hpp"
-#include "Commands.hpp"
+# include "headers.hpp"
+# include "Commands.hpp"
 
-#define LOCAL_HOST			"127.0.0.1"
-#define SERVER_DEFAULT_PORT	8084
-#define BUFFER_SIZE			1024
-#define MAX_PWD				100
-#define MAX_CLIENT			1000
-#define TIMEOUT				1000000
-#define SERVER_VERSION		"Ubuntu 22.04.1 LTS"
-#define SERVER_NAME			"<ircserv>"
+# define LOCAL_HOST				"127.0.0.1"
+# define SERVER_DEFAULT_PORT	8084
+# define BUFFER_SIZE			1024
+# define MAX_PWD				100
+# define MAX_CLIENT				1000
+# define TIMEOUT				1000000
+# define SERVER_VERSION			"Ubuntu 22.04.1 LTS"
+# define SERVER_NAME			"<ircserv>"
 
-#define TIMEOUT_MESS		"time out - server automatic shutdown has been requested"
-#define ACCEPTED			"the server has accepted your connection"
-#define SERVER_START_MESS	"Server lauched"
-#define POLL_ERR_MESS		"Poll() failed"
-#define _CRLF				"\r\n"
+# define TIMEOUT_MESS			"time out - server automatic shutdown has been requested"
+# define ACCEPTED				"the server has accepted your connection"
+# define SERVER_START_MESS		"Server lauched"
+# define POLL_ERR_MESS			"Poll() failed"
+# define _CRLF					"\r\n"
 
 enum e_socket
 {
@@ -144,4 +144,3 @@ class Server
 		void	PrintInfo(void);
 };
 #endif
-

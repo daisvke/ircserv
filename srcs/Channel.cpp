@@ -57,7 +57,7 @@ bool Channel::setChannelMode(char c, std::string params)
 		{
 			if (ircIsAlNum(params) == E_FALSE)
 				return false;
-			
+
 			int limit = atoi(params.c_str());
 			if (limit < 0)
 				return false;
@@ -87,7 +87,7 @@ bool Channel::setChannelMode(char c, std::string params)
 		_modes += c;
 	else
 		changed = false;
-		
+
 	return changed;
 }
 
@@ -153,6 +153,7 @@ bool Channel::isMember(std::string nick)
 void Channel::join(User *user, bool isOp)
 {
 	std::string mode;
+
 	if (isOp == true || user->isOperator())
 		mode = "o";
 	_users[user] += mode;

@@ -13,7 +13,6 @@
 #ifndef HEADER_HPP
 # define HEADER_HPP
 
-# include "Channel.hpp"
 # include "User.hpp"
 # include "Utils.hpp"
 # include <iostream>

@@ -13,6 +13,7 @@
 # ifndef USER_HPP
 # define USER_HPP
 
+# include <vector>
 # include <string>
 # include <iostream>
 
@@ -32,6 +33,7 @@ class User
 		void	setHostName(std::string host);
 		void	setRealName(std::string real);
 		void	setAsOperator(void);
+		void	addChanInvitation(std::string channelName);
 
 		// getters
 		int			getFd(void) const;
@@ -43,18 +45,20 @@ class User
 
 		bool		isOperator(void) const;
 		bool		isPwdVerified(void) const;
+		bool		isInvited(std::string channelName) const;
 
 
 	private:
 
-		int			_fd;
-		bool		_isPwdVerified;
-		bool		_isOper;
-		std::string	_id;
-		std::string	_nickName;
-		std::string	_userName;
-		std::string	_hostName;
-		std::string	_realName;
+		int							_fd;
+		bool						_isPwdVerified;
+		bool						_isOper;
+		std::string					_id;
+		std::string					_nickName;
+		std::string					_userName;
+		std::string					_hostName;
+		std::string					_realName;
+		std::vector<std::string>	_channelInvitations;
 };
 
 /* debug overload to delete*/

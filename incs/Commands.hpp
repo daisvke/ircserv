@@ -16,7 +16,7 @@
 # include <vector>
 # include <algorithm>
 # include <map>
- 
+
 # include "main.hpp"
 # include "Utils.hpp"
 # include "User.hpp"
@@ -56,9 +56,6 @@ enum	e_isOper
 #define _ERR_INVITEONLYCHAN(nick, chan) "473 " + nick + " " + chan + " :Cannot join channel (+i)"
 #define _ERR_BADCHANNELKEY(nick, chan) "475 " + nick + " " + chan + " :Cannot join channel (+k)"
 #define _ERR_CHANNELISFULL(nick, chan) "471 " + nick + " " + chan + " :Cannot join channel (+l)"
-#define _RPL_TOPIC(nick, chan, topic) "332 " + nick + " " + chan + " :" + topic
-#define _RPL_NAMREPLY(nick, name, symbol, chan, prefix) "353 " + nick + " " + symbol + " " + chan + " " + prefix + name
-#define _RPL_ENDOFNAMES(nick, chan) "366 " + nick + " " + chan + " :End of /NAMES list"
 // part
 #define _ERR_NOSUCHCHANNEL(nick, chan) "403 " + nick + " " + chan
 #define _ERR_NOSUCHCHANIMIT(nick, chan) "403 " + nick + " " + chan
@@ -71,7 +68,7 @@ enum	e_isOper
 #define _ERR_CHANOPRIVSNEEDED(nick, chan) "482 " + nick + " " + chan + " :You're not channel operator"
 // invite
 #define _ERR_USERONCHANNEL(nick, chan) "443 " + nick + " Already on channel " + chan
-#define _RPL_INVITING(nick, guest, client) "341 " + nick + " " + guest + " " + client
+#define _RPL_INVITING(nick, guest, chan) "341 " + nick + " " + guest + " " + chan
 // mode
 #define _ERR_USERSDONTMATCH(nick) "502 " + nick + " :Cant change mode for other users"
 # define _ERR_UNKNOWNMODE(nick, modechar)	"472 " + nick + " " + modechar + " :is unknown mode char to me"
@@ -110,6 +107,7 @@ private:
 	void oper(void);
 	void quit(void);
 	void join(void);
+	void finalizeJoin(User *user, Channel *channel);
 	void part(void);
 	void mode(void);
 	void topic(void);

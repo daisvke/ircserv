@@ -1,14 +1,14 @@
 #ifndef CHANNEL_HPP
-#define CHANNEL_HPP
+# define CHANNEL_HPP
 
-#include <map>
-#include <iostream>
-#include <algorithm>
-#include <cstring>
+# include <map>
+# include <iostream>
+# include <algorithm>
+# include <cstring>
 
-#include "main.hpp"
-#include "User.hpp"
-#include "Utils.hpp"
+# include "main.hpp"
+# include "User.hpp"
+# include "Utils.hpp"
 
 enum e_chanReturn
 {
@@ -20,8 +20,15 @@ enum e_chanReturn
 /*************************************************************
  * A map including a pointer to the users and indicating
  * whether the user is an operator or a regular user on this channel
- *************************************************************/
-typedef std::map<User *, std::string> userDirectory;
+**************************************************************/
+ typedef std::map<User *, std::string> userDirectory;
+
+/*************************************************************
+ * Messages returned whenever a user joins a channel
+**************************************************************/
+#define _RPL_TOPIC(nick, chan, topic) "332 " + nick + " " + chan + " :" + topic
+#define _RPL_NAMREPLY(nick, name, symbol, chan, prefix) "353 " + nick + " " + symbol + " " + chan + " " + prefix + name
+#define _RPL_ENDOFNAMES(nick, chan) "366 " + nick + " " + chan + " :End of /NAMES list"
 
 class Channel
 {
@@ -65,12 +72,12 @@ public:
 	bool checkMode(char c) const;
 
 private:
-	std::string _name;
-	std::string _topic;
-	std::string _modes;
-	std::string _key;
-	userDirectory _users;
-	size_t _userLimit;
+	std::string		_name;
+	std::string		_topic;
+	std::string		_modes;
+	std::string		_key;
+	userDirectory 	_users;
+	size_t 			_userLimit;
 };
 
 #endif

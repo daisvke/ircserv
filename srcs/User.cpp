@@ -27,6 +27,12 @@ void	User::setHostName(std::string host) { _hostName = host; }
 void	User::setRealName(std::string real) { _realName = real; }
 void	User::setAsOperator(void) { _isOper = true; }
 
+void	User::addChanInvitation(std::string channelName)
+{
+	_channelInvitations.push_back(channelName);
+}
+
+
 /*************************************************************
 * Getters
 *************************************************************/
@@ -39,6 +45,14 @@ std::string	User::getRealName(void) const { return _realName; }
 
 bool		User::isOperator(void) const { return _isOper; }
 bool		User::isPwdVerified(void) const { return _isPwdVerified; }
+
+bool		User::isInvited(std::string channelName) const
+{
+	for (size_t i(0); i < _channelInvitations.size(); ++i)
+		if (channelName == _channelInvitations[i])
+			return true;
+	return false;
+}
 
 /* debug overload to delete*/
 std::ostream & operator<<(std::ostream & o, User * const &rhs){

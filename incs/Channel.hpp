@@ -8,6 +8,7 @@
 
 #include "main.hpp"
 #include "User.hpp"
+#include "Utils.hpp"
 
 enum e_chanReturn
 {

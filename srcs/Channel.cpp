@@ -55,11 +55,16 @@ bool Channel::setChannelMode(char c, std::string params)
 	{
 		case 'l':
 		{
-			size_t limit = atoi(params.c_str());
+			if (ircIsAlNum(params) == E_FALSE)
+				return false;
+			
+			int limit = atoi(params.c_str());
+			if (limit < 0)
+				return false;
 
-			if (limit != _userLimit)
+			if ((size_t)limit != _userLimit)
 			{
-				_userLimit = limit;
+				_userLimit = (size_t)limit;
 				_modes += c;
 				return true;
 			}

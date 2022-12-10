@@ -510,9 +510,6 @@ void Commands::mode(void)
 	}
 	if (_params[1][0] == '#') // channel modes
 	{
-
-
-
 		Channel *channel = _server->findChannel(_params[1]);
 		if (!channel)
 		{
@@ -596,6 +593,7 @@ void Commands::mode(void)
 			size_t							i = 0;
 			std::string						concatModes;
 			bool							changed;
+			bool							changedAtLeastOnce = false;
 			char							oldSign;
 
 			for (it = foundModes.begin(); it != foundModes.end(); ++it)
@@ -603,6 +601,7 @@ void Commands::mode(void)
 				std::string	tmpParams = i < params.size() ? params[i++] : "";
 				changed = channel->modifyModes((*it).first, tmpParams, (*it).second);
 				if (changed == true) {
+					changedAtLeastOnce = true;
 					if (it == foundModes.begin() || (*it).second != oldSign)
 						concatModes += toString((*it).second) + (*it).first;
 					else
@@ -611,11 +610,14 @@ void Commands::mode(void)
 					concatParams += tmpParams;
 				}
 			}
-			// Broadcast mode update to all members
-			message = _RPL_CHANNELMODEIS(userNick, channel->getName(), \
-										concatModes, concatParams);
-			broadcastToChannel(channel, message, _NOT_PRIV);
-			return _server->sendMsg(userFd, message);
+			if (changedAtLeastOnce)
+			{
+				// Broadcast mode update to all members
+				message = _RPL_CHANNELMODEIS(userNick, channel->getName(), \
+											concatModes, concatParams);
+				broadcastToChannel(channel, message, _NOT_PRIV);
+				return _server->sendMsg(userFd, message);
+			}
 		}
 
 	}

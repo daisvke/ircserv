@@ -264,18 +264,10 @@ void Commands::whois(void)
 
 void Commands::who(void)
 {
+	if (_params.size() < 2) return ;
 	std::string nick = _params[1], message;
 
-	if (_params.size() < 2)
-	{
-		std::string message = _ERR_NONICKNAMEGIVEN;
-		return _server->sendMsg(_user->getFd(), message);
-	}
-	if (!_server->findUserByNick(nick))
-	{
-		message = _ERR_NOSUCHNICK(nick);
-		return _server->sendMsg(_user->getFd(), message);
-	}
+	if (!_server->findUserByNick(nick)) return ;
 
 	message = _RPL_WHOISREGNICK(nick);
 	_server->sendMsg(_user->getFd(), message);

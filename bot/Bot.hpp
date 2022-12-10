@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 13:53:21 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/10 01:03:51 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/10 18:58:24 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@
 # define BOT_CONN_PASS(pwd)		"PASS " + pwd + " \r\n"
 # define BOT_CONN_NICK			"NICK ClapTrap \r\n"
 # define BOT_CONN_USER			"USER BonusBot BonusBot localhost :LBot \r\n"
-# define BOT_JOIN_CHAN(chan)	"JOIN " + chan + "\r\n"
+# define BOT_JOIN_CHAN(chan, pass)	"JOIN " + chan + pass + "\r\n"
 
 enum e_bot_error {BOT_ERROR = -1, BOT_SUCESS};
 enum e_bot_status{OFF_STATUS, ON_STATUS};

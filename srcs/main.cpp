@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 15:55:19 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/10 00:46:09 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/10 19:08:56 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ int main(int ac, char **av)
 
 // irssi -w pass -n irssiLuc -p 6667 -c localhost
 //nc -C localhost 6667
+//CONNECT localhost 6667 pass mike
 
 
 /*************** to do list */
@@ -71,11 +72,8 @@ int main(int ac, char **av)
 //TODO : channel name are case insensitive
 
 
-// join avec mdp and join sans mdp --> error de message
-
 //dcc send irssiLuc2 "/Documents/coucou.txt"
 //dcc get irssiLuc "coucou.txt"
-
 
 
 /*************** Done */

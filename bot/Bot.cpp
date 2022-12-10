@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 14:15:27 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/10 01:10:51 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/10 18:58:58 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,13 +90,13 @@ void	Bot::authentification()
 						+ std::string(BOT_CONN_NICK)
 						+ std::string(BOT_CONN_USER);
 	// TODO :: add authentification as operator;
- 	send(_listenBSd, msg.c_str(), msg.size(), 0);
+ 	send(_listenBSd, msg.c_str(), msg.size(), MSG_NOSIGNAL);
 }
 
 void	Bot::creatChannel()
 {
-	std::string msg =	std::string(BOT_JOIN_CHAN(std::string(_chanName)));
-	send(_listenBSd, msg.c_str(), msg.size(), 0);
+	std::string msg =	std::string(BOT_JOIN_CHAN(_chanName, " botpass\r\n"));
+	send(_listenBSd, msg.c_str(), msg.size(), MSG_NOSIGNAL);
 }
 
 void	Bot::checkServerRpl()
@@ -116,6 +116,8 @@ void	Bot::checkServerRpl()
 			else if (rplTab[i] == _splitBuffer[1])
 				_flag |= (1<<i);
 		}
+		if (_splitBuffer[1] == "475")
+			throw std::invalid_argument("Channel seems pwd protected");
 	} while (_flag < 63);
 	if (_flag > 63)
 		throw std::invalid_argument("unexpected error");
@@ -147,7 +149,12 @@ void	Bot::sendRpl()
 		setRplBuffer();
 		if (_rplBuffer.empty() == false){
 			_rplBuffer += "\r\n";
-			sendRet = send(_listenBSd, _rplBuffer.c_str(), _rplBuffer.size(), 0);
+			sendRet = send(_listenBSd, _rplBuffer.c_str(), _rplBuffer.size(), MSG_NOSIGNAL);
+			if (sendRet < 0)
+			{
+				std::cout << "bot error send() failed" << std::endl;
+				_status = OFF_STATUS;
+			}
 			_rplBuffer.clear();
 		}
 	}

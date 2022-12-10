@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/09 23:19:28 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/10 20:26:43 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ class Server
 		int					_listenSd;
 		bool				_status;
 		bool				_condenceArrayFlag;
-		char				_buffer[BUFFER_SIZE];
+		char				_buffer[BUFFER_SIZE + 1];
 		int					_opt;
 		int					_nfds;
 		int					_newSd;

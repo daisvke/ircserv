@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/09 18:54:16 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/10 18:24:37 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -244,7 +244,7 @@ void Server::sendMsg(int fd, std::string &msg)
 	msg = ":" + _name + " " + msg + _CRLF;
 
 	std::cout << "\033[31m]==================== sendMsg 1: \033[0m" << msg << std::endl;
-	sendRet = send(fd, msg.c_str(), msg.length(), 0);
+	sendRet = send(fd, msg.c_str(), msg.length(), MSG_NOSIGNAL);
 	if (sendRet < 0)
 	{
 		serverPrint("send() failed");
@@ -259,7 +259,7 @@ void Server::sendMessage(int fd, std::string id, std::string &msg)
 	int sendRet;
 
 	msg = ":" + id + " " + msg + _CRLF;
-	sendRet = send(fd, msg.c_str(), msg.length(), 0);
+	sendRet = send(fd, msg.c_str(), msg.length(), MSG_NOSIGNAL);
 	std::cout << "\033[31m]==================== sendMessage 1: \033[0m" << msg << std::endl;
 	if (sendRet < 0)
 	{

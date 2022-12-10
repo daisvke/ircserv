@@ -71,6 +71,7 @@ enum	e_isOper
 #define _ERR_CHANOPRIVSNEEDED(nick, chan) "482 " + nick + " " + chan + " :You're not channel operator"
 // invite
 #define _ERR_USERONCHANNEL(nick, chan) "443 " + nick + " Already on channel " + chan
+#define _RPL_INVITING(nick, guest, client) "341 " + nick + " " + guest + " " + client
 // mode
 #define _ERR_USERSDONTMATCH(nick) "502 " + nick + " :Cant change mode for other users"
 # define _ERR_UNKNOWNMODE(nick, modechar)	"472 " + nick + " " + modechar + " :is unknown mode char to me"

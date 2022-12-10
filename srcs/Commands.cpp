@@ -760,39 +760,55 @@ void Commands::list(void)
 
 void Commands::invite(void)
 {
+	std::string	userNick = _user->getNickName();
+	int			userFd = _user->getFd();
 	std::string message;
 
-	if (_params.size() < 4)
+	if (_params.size() < 3)
 	{
-		message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
-		return _server->sendMsg(_user->getFd(), message);
+		message = _ERR_NEEDMOREPARAMS(userNick, _params[0]);
+		return _server->sendMsg(userFd, message);
 	}
 
-	std::string nick = _params[1];
-	if (!_server->findUserByNick(nick))
+	std::string guestNick = _params[1];
+	User	*guest =  _server->findUserByNick(userNick);
+	int		guestFd = guest->getFd();
+	if (!guest)
 	{
-		message = _ERR_NOSUCHNICK(nick);
-		return _server->sendMsg(_user->getFd(), message);
-	}
-	Channel *channel = _server->findChannel(_params[2]);
-
-	if (channel->isInviteOnly() && channel->isOper(nick) == false)
-	{
-		message = _ERR_CHANOPRIVSNEEDED(_user->getNickName(), channel->getName());
-		return _server->sendMsg(_user->getFd(), message);
+		message = _ERR_NOSUCHNICK(userNick);
+		return _server->sendMsg(userFd, message);
 	}
 
-	User *user = _server->findUserByNick(nick);
+	std::string	chanName = _params[2];
+	Channel *channel = _server->findChannel(chanName);
+	if (!channel)
+	{
+		message = _ERR_NOSUCHCHANNEL(userNick, _params[2]);
+		return _server->sendMsg(userFd, message);
+	}
+
+	if (channel->isInviteOnly() && channel->isOper(userNick) == false)
+	{
+		message = _ERR_CHANOPRIVSNEEDED(userNick, channel->getName());
+		return _server->sendMsg(userFd, message);
+	}
+
 	userDirectory *users = channel->getUserDirectory();
 	userDirectory::iterator it = users->begin();
 
 	for (; it != users->end(); ++it)
-		if ((*it).first->getNickName() == nick)
+	{
+		if ((*it).first->getNickName() == guestNick)
 		{
-			std::string message = _ERR_USERONCHANNEL(nick, _params[2]);
-			return _server->sendMsg(_user->getFd(), message);
+			std::string message = _ERR_USERONCHANNEL(guestNick, chanName);
+			return _server->sendMsg(userFd, message);
 		}
-	return channel->join(user, _ISNOTOPER);
+	}
+	message = _RPL_INVITING(userNick, guestNick, _params[2]);
+	_server->sendMsg(userFd, message);
+	_server->sendMsg(guestFd, message);
+
+	return channel->join(guest, _ISNOTOPER);
 }
 
 /*************************************************************
@@ -813,7 +829,7 @@ void Commands::kick(void)
 	Channel *channel;
 	if (!(channel = _server->findChannel(_params[1])))
 	{
-		message = _ERR_NOSUCHCHANNEL(userNick, channel->getName());
+		message = _ERR_NOSUCHCHANNEL(userNick, _params[1]);
 		return _server->sendMsg(userFd, message);
 	}
 

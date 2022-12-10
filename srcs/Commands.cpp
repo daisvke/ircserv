@@ -308,7 +308,7 @@ void Commands::oper(void)
  *************************************************************/
 void Commands::quit(void)
 {
-	std::string lastWords = _params[1].erase(0, 1);
+	std::string lastWords = _params[1].empty() ? "" : _params[1].erase(0, 1);
 	std::vector<Channel *> *channels = _server->getChannels();
 
 	for (size_t i(0); i < channels->size(); ++i)
@@ -323,9 +323,11 @@ void Commands::quit(void)
 				(*channels)[i]->part((*it).first);
 				if (lastWords.empty() == false)
 					broadcastToChannel((*channels)[i], lastWords, _PRIV);
-				return ;
+				break ;
 			}
 		}
+		if ((*channels)[i]->isEmpty())
+			_server->deleteChannel((*channels)[i]->getName());
 	}
 }
 
@@ -894,6 +896,9 @@ void Commands::kick(void)
 
 	// kick target out on the server
 	channel->part(target);
+
+	if (channel->isEmpty())
+		_server->deleteChannel(channel->getName());
 }
 
 /*************************************************************
@@ -985,10 +990,12 @@ void Commands::kill(void)
 	message = "KILL " + targetNick + " " + comment;
 	int	targetFd = target->getFd();
 	_server->sendMessage(targetFd, _user->getId(), message);
-	_server->closeFd(targetFd);
 	// KILL success notice
 	message = _RPL_KILLSUCCESS(targetNick);
 	_server->sendMessage(userFd, _user->getId(), message);
+
+	quit();
+	_server->closeFd(targetFd);
 }
 
 void Commands::ping(void)

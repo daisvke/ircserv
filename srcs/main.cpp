@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 15:55:19 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/09 23:21:51 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/10 00:46:09 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ int main(int ac, char **av)
 		std::cout << "invalid_argument : " << e.what() << std::endl;
 		return (0);
 	}
+
 	Server	Server(ircStoi(av[1]), av[2]);
 
 	Server.startServer();
@@ -64,21 +65,23 @@ int main(int ac, char **av)
 // irssi -w pass -n irssiLuc -p 6667 -c localhost
 //nc -C localhost 6667
 
+
+/*************** to do list */
 //TODO : max size of message = 210;
+//TODO : channel name are case insensitive
 
-// join chann name with #
-// channel name are case insensitive
-// channel name are 50 size
-// channel begin with #
 
-// join avec ,
 // join avec mdp and join sans mdp --> error de message
-
-// segfault a chaque fois que des utilisateurs ne sont pas connu
-
-// quand /part --> name is still in user list
-// quand notice coucou coucou, segfault
-
 
 //dcc send irssiLuc2 "/Documents/coucou.txt"
 //dcc get irssiLuc "coucou.txt"
+
+
+
+/*************** Done */
+// channel name are 50 size
+// channel begin with #
+// NOT TO DO quand /part --> name is still in user list
+// DONE segfault a chaque fois que des utilisateurs ne sont pas connu ?
+// DONE join avec ,
+// DONE quand notice coucou coucou, segfault

@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 13:53:21 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/09 23:52:29 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/10 01:03:51 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,11 @@
 
 # define LOCAL_HOST				"127.0.0.1"
 # define MAX_PWD				100
-# define CHAN_NAME				"#BotChan"
+# define BOTNAME				"ClapTrap"
+# define CHAN_NAME				"#botchan"
 # define BOT_CONN_CAP			"CAP LS \r\n"
 # define BOT_CONN_PASS(pwd)		"PASS " + pwd + " \r\n"
-# define BOT_CONN_NICK			"NICK Bot \r\n"
+# define BOT_CONN_NICK			"NICK ClapTrap \r\n"
 # define BOT_CONN_USER			"USER BonusBot BonusBot localhost :LBot \r\n"
 # define BOT_JOIN_CHAN(chan)	"JOIN " + chan + "\r\n"
 

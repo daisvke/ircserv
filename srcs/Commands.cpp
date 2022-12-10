@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/10 00:15:08 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/10 00:54:31 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -362,6 +362,9 @@ void Commands::join(void)
 			channelNames[i] = "#" + channelNames[i];
 		if (channelNames[i].size() > 50)
 			channelNames[i].erase(channelNames[i].begin() + 50, channelNames[i].end());
+		// std::string::iterator it = channelNames[i].begin();
+		// for (; it < channelNames[i].end(); ++it)
+    	// 	*it = std::tolower(*it);
 	}
 	/*just added, delete if not useful*/
 

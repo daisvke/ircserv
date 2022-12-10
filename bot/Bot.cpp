@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/12/07 14:15:27 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/09 23:46:32 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/10 01:10:51 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ Bot::~Bot() { if (_listenBSd) close (_listenBSd);}
 void Bot::setBotMap()
 {
 	_botMap[0] = "You are welcome";
-	_botMap[1] = "it wont make sense but it is : " + ircTime();
+	_botMap[1] = "I was created at " + ircTime();
 	_botMap[2] = "Hello, new member, how are you ?";
 	_botMap[3] = "There's more to learn!";
 	_botMap[4] = "Let me teach you the ways of magic!";
@@ -128,7 +128,8 @@ void	Bot::checkServerRpl()
 
 void	Bot::setRplBuffer()
 {
-	_rplBuffer = "PRIVMSG #BotChan :";
+	//_rplBuffer = "PRIVMSG #BotChan :";
+	_rplBuffer = "PRIVMSG " + std::string(CHAN_NAME) + " :";
 	_rplBuffer += _botMap[_rplIndex++];
 	if (_rplIndex > 20)
 		_rplIndex = 0;
@@ -184,6 +185,7 @@ void	Bot::waitForCompleteRecv()
 		readBuffer();
 		concatRecv();
 	}
+	std::cout << "received = " << _strBuffer << std::endl;
 }
 
 void	Bot::botExec()
@@ -191,6 +193,9 @@ void	Bot::botExec()
 	while (_status == ON_STATUS)
 	{
 		waitForCompleteRecv();
-		sendRpl();
+		if (_strBuffer.find("403 " + std::string(BOTNAME)) != std::string::npos)
+			_status = OFF_STATUS;
+		else
+			sendRpl();
 	}
 }

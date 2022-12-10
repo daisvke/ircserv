@@ -15,7 +15,10 @@
 Channel::Channel(std::string name, std::string key)
 	: _name(name), _topic(), _modes("+"), _key(key), _userLimit()
 {
-		if (key.empty() == false) { _modes += "k"; }
+	if (key.empty() == false)
+	{
+		_modes += "k";
+	}
 }
 
 Channel::~Channel() {}
@@ -26,7 +29,7 @@ Channel::~Channel() {}
 
 void Channel::setTopic(std::string name) { _topic = name; }
 
-void Channel::modifyTargetMode(char c, std::string target, char sign)
+void Channel::modifyUserMode(char c, std::string target, char sign)
 {
 	userDirectory::iterator it = _users.begin();
 
@@ -44,30 +47,47 @@ void Channel::modifyTargetMode(char c, std::string target, char sign)
 	}
 }
 
-void Channel::setChannelMode(char c, std::string params)
+bool Channel::setChannelMode(char c, std::string params)
 {
+	bool	changed = true;
+
 	switch (c)
 	{
 		case 'l':
-			_userLimit = atoi(params.c_str());
+		{
+			size_t limit = atoi(params.c_str());
+			if (limit != _userLimit)
+				_userLimit = limit;
+			else
+				changed = false;;
 			break;
+		}
 		case 'k':
-			_key = params;
+			if (_key != params)
+				_key = params;
+			else
+				changed = false;
 	}
-	_modes += c;
+
+	if (checkMode(c) == _NOT_FOUND)
+		_modes += c;
+	else
+		changed = false;
+		
+	return changed;
 }
 
 /*************************************************************
  * Getters
  *************************************************************/
 
-std::string		Channel::getName(void) const { return _name; }
-std::string 	Channel::getTopic(void) const { return _topic; }
-std::string 	Channel::getModes(void) const { return _modes; }
-userDirectory	*Channel::getUserDirectory(void) { return &_users; }
-std::string		Channel::getKey(void) const { return _key; }
-size_t			Channel::countUsers(void) const { return _users.size(); }
-size_t			Channel::getUserLimit(void) const { return _userLimit; }
+std::string Channel::getName(void) const { return _name; }
+std::string Channel::getTopic(void) const { return _topic; }
+std::string Channel::getModes(void) const { return _modes; }
+userDirectory *Channel::getUserDirectory(void) { return &_users; }
+std::string Channel::getKey(void) const { return _key; }
+size_t Channel::countUsers(void) const { return _users.size(); }
+size_t Channel::getUserLimit(void) const { return _userLimit; }
 
 std::string *Channel::getUserMode(std::string name)
 {
@@ -79,23 +99,26 @@ std::string *Channel::getUserMode(std::string name)
 	return 0;
 }
 
-bool	Channel::isKeyProtected(void) const { return checkMode('k'); }
-bool	Channel::isTopicProtected(void) const { return checkMode('t'); }
-bool	Channel::isModerated(void) const { return checkMode('m'); }
-bool	Channel::isInviteOnly(void) const { return checkMode('i'); }
-bool	Channel::isSecret(void) const { return checkMode('s'); }
-bool	Channel::isInternalOnly(void) const { return checkMode('n'); }
-bool	Channel::isLimited(void) const { return checkMode('l'); }
-bool	Channel::isEmpty(void) const { return _users.size() == 0; }
+bool Channel::isKeyProtected(void) const { return checkMode('k'); }
+bool Channel::isTopicProtected(void) const { return checkMode('t'); }
+bool Channel::isModerated(void) const { return checkMode('m'); }
+bool Channel::isInviteOnly(void) const { return checkMode('i'); }
+bool Channel::isSecret(void) const { return checkMode('s'); }
+bool Channel::isInternalOnly(void) const { return checkMode('n'); }
+bool Channel::isLimited(void) const { return checkMode('l'); }
+bool Channel::isEmpty(void) const { return _users.size() == 0; }
 
-bool	Channel::isOper(std::string name) {
+bool Channel::isOper(std::string name)
+{
 	return getUserMode(name)->find('o') == std::string::npos ? false : true;
 }
-bool	Channel::hasVoice(std::string name) {
+bool Channel::hasVoice(std::string name)
+{
 	return getUserMode(name)->find('v') == std::string::npos ? false : true;
 }
 
-bool	Channel::isMember(std::string nick) {
+bool Channel::isMember(std::string nick)
+{
 	for (userDirectory::iterator it = _users.begin(); it != _users.end(); ++it)
 	{
 		if (((*it).first->getNickName() == nick))
@@ -103,8 +126,6 @@ bool	Channel::isMember(std::string nick) {
 	}
 	return false;
 }
-
-
 
 /*************************************************************
  * Commands
@@ -117,8 +138,9 @@ bool	Channel::isMember(std::string nick) {
  *************************************************************/
 void Channel::join(User *user, bool isOp)
 {
-	std::string	mode;
-	if (isOp == true || user->isOperator()) mode = "o";
+	std::string mode;
+	if (isOp == true || user->isOperator())
+		mode = "o";
 	_users[user] += mode;
 }
 
@@ -133,7 +155,7 @@ void Channel::part(User *user)
 		{
 			_users.erase(it);
 			std::cout << user->getNickName() << " has parted channel " << getName() << std::endl;
-			return ;
+			return;
 		}
 	}
 }
@@ -156,22 +178,24 @@ void Channel::names(void)
  * If the mode is already set, and remove is true,
  *	then the mode is removed.
  *************************************************************/
-void Channel::modifyModes(char c, std::string params, char sign)
+bool Channel::modifyModes(char c, std::string params, char sign)
 {
-//	std::string channelModes = "lktmnspib";
+	//	std::string channelModes = "lktmnspib";
 	std::string channelModes = _CHANMODES;
+	bool		changed = true;
 
 	// User modes
 	if (c == 'o' || c == 'v')
-		modifyTargetMode(c, params, sign);
+		modifyUserMode(c, params, sign);
 	else
 	{
 		// Channel modes
 		if (sign == '+')
-			setChannelMode(c, params);
+			changed = setChannelMode(c, params);
 		else if (sign == '-')
 			_modes.erase(std::remove(_modes.begin(), _modes.end(), c), _modes.end());
 	}
+	return changed;
 }
 
 bool Channel::checkMode(char c) const

@@ -140,18 +140,18 @@ void Commands::nick(void)
 		_server->sendMsg(_user->getFd(), message);
 		_server->closeFd(_user->getFd());
 	}
+
 	std::string newNick = _params[1];
 	std::remove_if(newNick.begin(), newNick.end(), isspace);
-	/****** just added, to delete if incorrect*/
-	if (newNick.size() > 9 || !isalpha(*(newNick.begin())) /*!= std::string::npos*/)
-	{
-		message = _ERR_ERRONEUSNICKNAME(newNick);
-		return _server->sendMsg(_user->getFd(), message);
-	}
-	/****** just added, to delete if incorrect*/
+
 	if (newNick.empty())
 	{
-		message = _ERR_NONICKNAMEGIVEN(newNick);
+		message = _ERR_NONICKNAMEGIVEN;
+		return _server->sendMsg(_user->getFd(), message);
+	}
+	if (newNick.size() > 9 || !isalpha(*(newNick.begin())))
+	{
+		message = _ERR_ERRONEUSNICKNAME(newNick);
 		return _server->sendMsg(_user->getFd(), message);
 	}
 	if (_params.size() == 1)
@@ -159,18 +159,15 @@ void Commands::nick(void)
 		message = _RPL_CURRENTNICK(_user->getNickName());
 		return _server->sendMsg(_user->getFd(), message);
 	}
-	if (_server->findUserByNick(newNick) == false)
-	{
-		_user->setNickName(newNick);
-		message = _RPL_NICKSUCCESS(newNick);
-		_server->sendMsg(_user->getFd(), message);
-	}
-	else
+	if (_server->findUserByNick(newNick) != 0)
 	{
 		message = _ERR_NICKNAMEINUSE(newNick);
 		_server->sendMsg(_user->getFd(), message);
-		_server->closeFd(_user->getFd());
+		return _server->closeFd(_user->getFd());
 	}
+	_user->setNickName(newNick);
+	message = _RPL_NICKSUCCESS(newNick);
+	_server->sendMsg(_user->getFd(), message);
 }
 
 /*************************************************************
@@ -182,9 +179,10 @@ void Commands::nick(void)
  *************************************************************/
 void Commands::user(void)
 {
+	std::string message;
 	if (_params.size() < 5)
 	{
-		std::string message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
+		message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
@@ -202,7 +200,7 @@ void Commands::user(void)
 	if (_user->getNickName().empty() == true)
 	{
 		_server->closeFd(_user->getFd());
-		std::string message = _ERR_NONICK;
+		message = _ERR_NONICKNAMEGIVEN;
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
@@ -244,7 +242,7 @@ void Commands::whois(void)
 
 	if (_params.size() < 2)
 	{
-		message = _ERR_NONICKNAMEGIVEN(nick);
+		message = _ERR_NONICKNAMEGIVEN;
 		return _server->sendMsg(_user->getFd(), message);
 	}
 	if (!(user = _server->findUserByNick(nick)))
@@ -270,7 +268,7 @@ void Commands::who(void)
 
 	if (_params.size() < 2)
 	{
-		std::string message = _ERR_NONICKNAMEGIVEN(nick);
+		std::string message = _ERR_NONICKNAMEGIVEN;
 		return _server->sendMsg(_user->getFd(), message);
 	}
 	if (!_server->findUserByNick(nick))
@@ -290,9 +288,11 @@ void Commands::who(void)
  *************************************************************/
 void Commands::oper(void)
 {
+	std::string	userNick = _user->getNickName();
+
 	if (_params.size() < 3)
 	{
-		std::string message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
+		std::string message = _ERR_NEEDMOREPARAMS(userNick, _params[0]);
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
@@ -301,11 +301,11 @@ void Commands::oper(void)
 		return;
 	if (_server->getPassword() != _params[2])
 	{
-		std::string message = _ERR_PASSWDMISMATCH(_user->getNickName());
+		std::string message = _ERR_PASSWDMISMATCH(userNick);
 		return _server->sendMsg(_user->getFd(), message);
 	}
 	user->setAsOperator();
-	std::string message = _RPL_YOUREOPER;
+	std::string message = _RPL_YOUREOPER(userNick);
 	_server->sendMsg(user->getFd(), message);
 }
 
@@ -392,22 +392,24 @@ void Commands::join(void)
 			{
 				if (channelKeys[i] != channel->getKey())
 				{
-					message = _ERR_BADCHANNELKEY(channelName);
+					message = _ERR_BADCHANNELKEY(userNick, channelName);
 					return _server->sendMsg(userFd, message);
 				}
 			}
-				std::cout << "\033[31m =====================> 1\033[0m" << std::endl;
-
 			if (channel->isInviteOnly())
 			{
+				std::cout << "\033[32m =====================> invite 1\033[0m" << std::endl;
+
 				message = _ERR_INVITEONLYCHAN(userNick, channelName);
 				return _server->sendMsg(userFd, message);
 			}
 		}
 		else if (channel->isLimited() == true && channel->countUsers() >= channel->getUserLimit())
 		{
-			_ERR_CHANNELISFULL(channelName);
-			return;
+					std::cout << "\033[33m =====================> limited\033[0m" << std::endl;
+
+			_ERR_CHANNELISFULL(userNick, channelName);
+			return _server->sendMsg(userFd, message);
 		}
 
 		channel->join(_user, isOper);
@@ -428,10 +430,10 @@ void Commands::join(void)
 		for (userDirectory::iterator it(users->begin()); it != users->end(); ++it)
 		{
 			std::string nick = (*it).first->getNickName();
-			std::string prefix = channel->isOper(nick) ? " :@" : " :";
+			std::string prefix = channel->isOper(nick) ? ":@" : ":";
 
 			message = _RPL_NAMREPLY(userNick, nick, '=', channel->getName(), prefix);
-			_server->sendMsg(_user->getFd(), message);
+			_server->sendMsg(userFd, message);
 		}
 		message = _RPL_ENDOFNAMES(userNick, channel->getName());
 		_server->sendMsg(userFd, message);
@@ -516,6 +518,9 @@ void Commands::mode(void)
 	}
 	if (_params[1][0] == '#') // channel modes
 	{
+
+
+
 		Channel *channel = _server->findChannel(_params[1]);
 		if (!channel)
 		{
@@ -533,8 +538,9 @@ void Commands::mode(void)
 		}
 
 		modes = _params[2];
-		// Get mode parameters if found
 		std::vector<std::string> params;
+
+		// Get mode parameters if found
 		if (_params.size() > 3)
 			for (size_t i(3); i < _params.size(); ++i)
 				params.push_back(_params[i]);
@@ -554,12 +560,12 @@ void Commands::mode(void)
 				else return ;
 
 				std::string channelModes = _CHANMODES;
+				std::string	paramModes = _CHAN_PARAM_MODES;
 				bool		needsParam;
 
 				while (i < modes.size() && !(modes[i] == '-' || modes[i] == '+'))
 				{
 					// If the found mode needs a param that is not found, ignore it
-					std::string	paramModes = _CHAN_PARAM_MODES;
 					if (paramModes.find(modes[i]) != std::string::npos)
 					{
 						needsParam = true;
@@ -569,7 +575,7 @@ void Commands::mode(void)
 							continue ;
 						}
 					}
-					if (channelModes.find(modes[i]) == std::string::npos)
+					else if (channelModes.find(modes[i]) == std::string::npos)
 					{
 						message = _ERR_UNKNOWNMODE(userNick, modes[i]);
 						_server->sendMsg(userFd, message);
@@ -590,25 +596,28 @@ void Commands::mode(void)
 			bool isChanOper = channel->isOper(userNick);
 			if (isChanOper == false)
 			{
-				message = _ERR_CHANOPRIVSNEEDED(userNick);
+				message = _ERR_CHANOPRIVSNEEDED(userNick, channel->getName());
 				return _server->sendMsg(userFd, message);
 			}
 			// Apply mode modifications
 			std::map<char, char>::iterator	it;
 			size_t							i = 0;
 			std::string						concatModes;
+			bool							changed;
 
 			for (it = foundModes.begin(); it != foundModes.end(); ++it)
 			{
 				std::string	tmpParams = i < params.size() ? params[i++] : "";
-				channel->modifyModes((*it).first, tmpParams, (*it).second);
-
-				concatModes += toString((*it).second) + (*it).first;
+				changed = channel->modifyModes((*it).first, tmpParams, (*it).second);
+				if (changed == true) {
+					concatModes += toString((*it).second) + (*it).first;
+					concatParams += tmpParams;
+				}
 			}
-			concatParams = params.empty() ? "" : modes + " " + concatArrayStrs(params, 0);
+			// Broadcast mode update to all members
 			message = _RPL_CHANNELMODEIS(userNick, channel->getName(), \
 										concatModes, concatParams);
-
+			broadcastToChannel(channel, message, _NOT_PRIV);
 			return _server->sendMsg(userFd, message);
 		}
 
@@ -674,7 +683,7 @@ void Commands::topic(void)
 		broadcastToChannel(channel, message, _NOT_PRIV);
 		_server->sendMessage(userFd, _user->getId(), message);
 	}
-	message = _ERR_CHANOPRIVSNEEDED(userNick);
+	message = _ERR_CHANOPRIVSNEEDED(userNick, channelName);
 	_server->sendMsg(userFd, message);
 }
 
@@ -770,7 +779,7 @@ void Commands::invite(void)
 
 	if (channel->isInviteOnly() && channel->isOper(nick) == false)
 	{
-		message = _ERR_CHANOPRIVSNEEDED(_user->getNickName());
+		message = _ERR_CHANOPRIVSNEEDED(_user->getNickName(), channel->getName());
 		return _server->sendMsg(_user->getFd(), message);
 	}
 
@@ -826,7 +835,7 @@ void Commands::kick(void)
  	// Can only use KICK if oper
 	if (channel->isOper(userNick) == false)
 	{
-		std::string message = _ERR_CHANOPRIVSNEEDED(userNick);
+		std::string message = _ERR_CHANOPRIVSNEEDED(userNick, channelName);
 		return _server->sendMsg(userFd, message);
 	}
 	// Use the comment if it is given
@@ -970,5 +979,3 @@ void printMap(std::map<std::string, T> &mymap)
 				  << "val : " << it->second << std::endl;
 	}
 }
-
-

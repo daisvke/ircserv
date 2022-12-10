@@ -373,6 +373,7 @@ void Commands::join(void)
 		if (!(channel = _server->findChannel(channelName)))
 		{
 			channel = _server->addChannel(channelName, channelKeys[i]);
+			_user->setAsOperator();
 			isOper = true;
 		}
 		else isOper = false;
@@ -699,8 +700,11 @@ void Commands::topic(void)
 		broadcastToChannel(channel, message, _NOT_PRIV);
 		_server->sendMessage(userFd, _user->getId(), message);
 	}
-	message = _ERR_CHANOPRIVSNEEDED(userNick, channelName);
-	_server->sendMsg(userFd, message);
+	else
+	{
+		message = _ERR_CHANOPRIVSNEEDED(userNick, channelName);
+		_server->sendMsg(userFd, message);
+	}
 }
 
 /*************************************************************
@@ -899,14 +903,15 @@ void Commands::privmsg(bool isNoticeCmd)
 {
 	std::vector<std::string> names = ircSplit(_params[1], ',');
 	std::string errMessage;
-	std::string nickName = _user->getNickName();
+	std::string userNick = _user->getNickName();
+	int			userFd = _user->getFd();
 
 	if (_params.size() < 3)
 	{
 		if (isNoticeCmd == false)
 		{
-			errMessage = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
-			return _server->sendMsg(_user->getFd(), errMessage);
+			errMessage = _ERR_NEEDMOREPARAMS(userNick, _params[0]);
+			return _server->sendMsg(userFd, errMessage);
 		}
 	}
 
@@ -920,13 +925,14 @@ void Commands::privmsg(bool isNoticeCmd)
 			Channel *channel = _server->findChannel(name);
 			if (!channel)
 			{
-				errMessage = _ERR_NOSUCHCHANNEL(nickName, name);
-				return _server->sendMsg(_user->getFd(), errMessage);
+				errMessage = _ERR_NOSUCHCHANNEL(userNick, name);
+				return _server->sendMsg(userFd, errMessage);
 			}
-			if (channel->isModerated() && !(_user->isOperator() || channel->hasVoice(nickName)))
+			if ((channel->isModerated() && !(_user->isOperator() || channel->hasVoice(userNick)))
+				|| (channel->isInternalOnly() && channel->isMember(userNick) == false))
 			{
-				errMessage = _ERR_CANNOTSENDTOCHAN(nickName, name);
-				return _server->sendMsg(_user->getFd(), errMessage);
+				errMessage = _ERR_CANNOTSENDTOCHAN(userNick, name);
+				return _server->sendMsg(userFd, errMessage);
 			}
 
 			broadcastToChannel(channel, message, _PRIV);
@@ -939,7 +945,7 @@ void Commands::privmsg(bool isNoticeCmd)
 				if (isNoticeCmd == false)
 				{
 					errMessage = _ERR_NOSUCHNICK(names[i]);
-					return _server->sendMsg(_user->getFd(), errMessage);
+					return _server->sendMsg(userFd, errMessage);
 				}
 			}
 			else

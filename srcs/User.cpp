@@ -54,6 +54,19 @@ bool		User::isInvited(std::string channelName) const
 	return false;
 }
 
+
+void		User::useInvitation(std::string channelName)
+{
+	std::vector<std::string>::iterator	it;
+	for (it = _channelInvitations.begin(); it != _channelInvitations.end(); ++it)
+		if (channelName == (*it))
+		{
+			_channelInvitations.erase(it);
+			return ;
+		}
+}
+
+
 /* debug overload to delete*/
 std::ostream & operator<<(std::ostream & o, User * const &rhs){
 

@@ -390,10 +390,14 @@ void Commands::join(void)
 					return _server->sendMsg(userFd, message);
 				}
 			}
-			if (channel->isInviteOnly() && _user->isInvited(channelName) == false)
+			if (channel->isInviteOnly())
 			{
-				message = _ERR_INVITEONLYCHAN(userNick, channelName);
-				return _server->sendMsg(userFd, message);
+				if (_user->isInvited(channelName) == false)
+				{
+					message = _ERR_INVITEONLYCHAN(userNick, channelName);
+					return _server->sendMsg(userFd, message);
+				}
+				else _user->useInvitation(channelName);
 			}
 		}
 		else if (channel->isLimited() == true && channel->countUsers() >= channel->getUserLimit())
@@ -405,32 +409,6 @@ void Commands::join(void)
 		channel->join(_user, isOper);
 		// Send messages
 		finalizeJoin(_user, channel);
-/*
-		message = "JOIN " + channelName;
-		broadcastToChannel(channel, message, _NOT_PRIV);
-		_server->sendMessage(userFd, _user->getId(), message);
-
-
-		// Print channel parameters to user
-		if (channel->getTopic().empty() == false)
-		{
-				message = _RPL_TOPIC(userNick, channel->getName(), channel->getTopic());
-				_server->sendMsg(userFd, message);
-		}
-
-		userDirectory *users = channel->getUserDirectory();
-		for (userDirectory::iterator it(users->begin()); it != users->end(); ++it)
-		{
-				std::string nick = (*it).first->getNickName();
-				std::string prefix = channel->isOper(nick) ? ":@" : ":";
-
-				message = _RPL_NAMREPLY(userNick, nick, '=', channel->getName(), prefix);
-				_server->sendMsg(userFd, message);
-		}
-		message = _RPL_ENDOFNAMES(userNick, channel->getName());
-		_server->sendMsg(userFd, message);
-	}
-	*/
 	}
 }
 

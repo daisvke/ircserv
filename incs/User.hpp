@@ -47,6 +47,8 @@ class User
 		bool		isPwdVerified(void) const;
 		bool		isInvited(std::string channelName) const;
 
+		
+		void		useInvitation(std::string channelName);
 
 	private:
 

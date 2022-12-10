@@ -729,7 +729,7 @@ void Commands::names(void)
 	for (size_t i(0); i < channels.size(); ++i)
 	{
 
-		if (channels[i]->isTopicProtected() == false)
+		if (channels[i]->isTopicProtected() == false && channels[i]->isSecret() == false)
 		{
 			std::cout << channels[i]->getName() << std::endl; // replace print fct
 			channels[i]->names();
@@ -764,7 +764,7 @@ void Commands::list(void)
 
 	for (size_t i(0); i < channels.size(); ++i)
 	{
-		if (channels[i]->isTopicProtected() == false)
+		if (channels[i]->isTopicProtected() == false && channels[i]->isSecret() == false)
 		{
 			std::string	userCount = toString(channels[i]->countUsers());
 			message = _RPL_LIST(userNick, channels[i]->getName(), userCount, channels[i]->getTopic());

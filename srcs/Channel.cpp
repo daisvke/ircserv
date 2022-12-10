@@ -57,14 +57,20 @@ bool Channel::setChannelMode(char c, std::string params)
 		{
 			size_t limit = atoi(params.c_str());
 			if (limit != _userLimit)
+			{
 				_userLimit = limit;
+				return true;
+			}
 			else
 				changed = false;;
 			break;
 		}
 		case 'k':
 			if (_key != params)
+			{
 				_key = params;
+				return true;
+			}
 			else
 				changed = false;
 	}

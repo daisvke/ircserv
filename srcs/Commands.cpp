@@ -596,13 +596,18 @@ void Commands::mode(void)
 			size_t							i = 0;
 			std::string						concatModes;
 			bool							changed;
+			char							oldSign;
 
 			for (it = foundModes.begin(); it != foundModes.end(); ++it)
 			{
 				std::string	tmpParams = i < params.size() ? params[i++] : "";
 				changed = channel->modifyModes((*it).first, tmpParams, (*it).second);
 				if (changed == true) {
-					concatModes += toString((*it).second) + (*it).first;
+					if (it == foundModes.begin() || (*it).second != oldSign)
+						concatModes += toString((*it).second) + (*it).first;
+					else
+						concatModes += (*it).first;
+					oldSign = (*it).second;
 					concatParams += tmpParams;
 				}
 			}

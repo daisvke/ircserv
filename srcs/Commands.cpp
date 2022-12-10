@@ -954,7 +954,7 @@ void Commands::ping(void)
 
 	if (servername != _server->getName())
 	{
-		message = _ERR_NOSUCHSERVER(_server->getName());
+		message = _ERR_NOSUCHSERVER(_user->getNickName(), _server->getName());
 		return _server->sendMsg(_user->getFd(), message);
 	}
 	_server->sendMsg(_user->getFd(), message);

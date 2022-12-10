@@ -64,7 +64,7 @@ enum	e_isOper
 #define _ERR_NOSUCHCHANIMIT(nick, chan) "403 " + nick + " " + chan
 #define _ERR_NOTONCHANNEL(nick, chan) "442 " + nick + " " + nick + " is not on channel " + chan
 // ping
-#define _ERR_NOSUCHSERVER(server) server + " :No such server"
+#define _ERR_NOSUCHSERVER(nick, server) "402 " + nick + " " + server + " :No such server"
 // privmsg
 #define _ERR_NOSUCHNICK(nick) "401 " + nick + " " + nick + " :No such nick/channel"
 #define _ERR_CANNOTSENDTOCHAN(nick, chan) "404 " + nick + " " + chan + " :Cannot send to channel"

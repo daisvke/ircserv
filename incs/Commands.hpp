@@ -51,7 +51,7 @@ enum	e_isOper
 #define _RPL_ENDOFWHOIS(nick) "318 " + nick + " :End of /WHOIS list"
 // oper
 #define _RPL_YOUREOPER(nick) "381 " + nick + " :You are now an IRC operator"
-#define _ERR_PASSWDMISMATCH(nick) "464 " + nick
+#define _ERR_PASSWDMISMATCH(nick) "464 " + nick + " :Password incorrect"
 // join
 #define _ERR_INVITEONLYCHAN(nick, chan) "473 " + nick + " " + chan + " :Cannot join channel (+i)"
 #define _ERR_BADCHANNELKEY(nick, chan) "475 " + nick + " " + chan + " :Cannot join channel (+k)"

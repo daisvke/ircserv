@@ -1007,6 +1007,8 @@ void Commands::squit(void)
 	std::string	server = _server->getName();
 	std::string	userNick = _user->getNickName();
 	std::string	message;
+	std::string	comment = concatArrayStrs(_params, 2);
+	comment =  comment[0] == ':' ? comment.erase(0, 1) : comment;
 	bool		error =false;
 
 	if (_params[1] != server && setToTrue(&error))
@@ -1014,9 +1016,10 @@ void Commands::squit(void)
 	if (_user->isOperator() == false && setToTrue(&error))
 		message = _ERR_NOPRIVILEGES(userNick);
 	if (error == true)
-		_server->sendMessage(_user->getFd(), server, message);
+		return _server->sendMessage(_user->getFd(), server, message);
+	std::cout << "\033[33mSQUIT: Disconnecting server... <"
+			  << comment << ">\033[0m" << std::endl;
 	_server->setServerStatus(OFF_STATUS);
-
 }
 
 bool Commands::checkParamNbr(size_t nbr)

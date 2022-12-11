@@ -1,10 +1,10 @@
 #ifndef MAIN_HPP
 # define MAIN_HPP
 
-// Used with commands
 # define _NETWORKNAME		"IRC-LCHAN-DTANIGAWcom"
-# define _SERVERVERSION		"0.0.1"
-//# define _USERMODES			"ovinsk"
+# define _SERVERVERSION		"1.0.2"
+# define _SERVER_INFO		"ircserv, by dtanigaw & lchan, Paris, France"
+
 # define _USERMODES			"o"
 # define _CHANMODES			"timnslk"
 # define _CHAN_PARAM_MODES	"lk"

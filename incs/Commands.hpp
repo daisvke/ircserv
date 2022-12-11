@@ -41,9 +41,15 @@
 // user
 #define _ERR_ALREADYREGISTRED(user) user + " already registered"
 // whois
-#define _RPL_WHOISREGNICK(nick) "307 " + nick + " " + nick + " :has identified for this nick"
+#define _RPL_WHOISREGNICK(nick) "307 " + nick + " " + nick
+#define _RPL_WHOISUSER(nick, user, host, real) "311 " + nick + " " + user + " " + host + " * :" + real
+#define _RPL_WHOISSERVER(nick, server) "312 " + nick + " " + nick + " " + server + " :" + _SERVER_INFO 
 #define _RPL_WHOISOPERATOR(nick) "313 " + nick + " " + nick + " :is an IRC operator"
 #define _RPL_ENDOFWHOIS(nick) "318 " + nick + " :End of /WHOIS list"
+// who
+#define _RPL_WHOREPLY(nick, chan, user, host, server, flags, hopcount, real) \
+	"352 " + nick + " " + chan + " " + user + " " + host + " " + server + " " + nick + " " + flags + " :" + hopcount + " " + real
+#define _RPL_ENDOFWHO(nick) "315 " + nick + " :End of /WHO list"
 // oper
 #define _RPL_YOUREOPER(nick) "381 " + nick + " :You are now an IRC operator"
 #define _ERR_PASSWDMISMATCH(nick) "464 " + nick + " :Password incorrect"

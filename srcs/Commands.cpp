@@ -65,8 +65,11 @@ void Commands::setupMap() // define it and call once in Server ?
 void Commands::routeCmd()
 {
 	cmdMap::iterator it;
-	std::string cmd = _params[0];
 
+	if (_params.size() < 1)
+		return ;
+
+	std::string cmd = _params[0];
 	if (cmd == "PRIVMSG")
 		privmsg(false);
 	else if (cmd == "NOTICE")
@@ -109,9 +112,9 @@ void	Commands::broadcastToChannel(Channel *channel, std::string msg, bool isPriv
  *************************************************************/
 void Commands::pass(void)
 {
-	int	userFd = _user->getFd();
 	if (checkParamNbr(2) == _ERROR) return ;
 
+	int	userFd = _user->getFd();
 	if (_params[1] != _server->getPassword())
 	{
 		std::string message = _ERR_PASSWDMISMATCH(_user->getNickName());
@@ -174,17 +177,6 @@ void Commands::user(void)
 	std::string message;
 	if (checkParamNbr(5) == _ERROR) return ;
 
-//	std::string userName = _params[1];
-	/*	if (_server->findUserByName(userName) == false)
-			_user->setUserName(userName);
-		else
-		{
-			std::string	message = _ERR_ALREADYREGISTRED(userName);
-			return _server->sendMessage(_user->getFd(), _server->getName(), message);
-		}
-	*/
-	//_user->setUserName(userName);
-
 	if (_user->getNickName().empty() == true)
 	{
 		_server->closeFd(_user->getFd());
@@ -195,6 +187,7 @@ void Commands::user(void)
 	_user->setUserName(_params[1]);
 	_user->setHostName(_params[2]);
 	_server->setName(_params[3]);
+
 	std::string realName;
 	if (_params[4][0] == ':')
 		_params[4].erase(0, 1);
@@ -228,41 +221,63 @@ void Commands::registerClient(void)
 
 void Commands::whois(void)
 {
-	std::string nick = _params[1], message;
-	User		*user;
+	std::string	server = _server->getName();
+	std::string	message;
 
 	if (_params.size() < 2)
 	{
 		message = _ERR_NONICKNAMEGIVEN;
-		return _server->sendMessage(_user->getFd(), _server->getName(), message);
+		return _server->sendMessage(_user->getFd(), server, message);
 	}
+
+	std::string nick = _params[1];
+	User		*user;
 	if (!(user = _server->findUserByNick(nick)))
 	{
 		message = _ERR_NOSUCHNICK(nick);
-		return _server->sendMessage(_user->getFd(), _server->getName(), message);
+		return _server->sendMessage(_user->getFd(), server, message);
 	}
 
-	message = _RPL_WHOISREGNICK(nick);
-	_server->sendMessage(_user->getFd(), _server->getName(), message);
+	std::string	userName = user->getUserName();
+	std::string	host = user->getHostName();
+	std::string	realName = user->getRealName();
+
+	std::string	whoisReplies[] = {
+		_RPL_WHOISUSER(nick, userName, host, realName),
+		_RPL_WHOISSERVER(nick, server),
+		_RPL_WHOISREGNICK(nick),
+		_RPL_WHOISOPERATOR(nick),
+		_RPL_ENDOFWHOIS(nick)
+	};
+	for (size_t i(0); i < 3; ++i)
+		_server->sendMessage(_user->getFd(), server, whoisReplies[i]);
 	if (user->isOperator())
-	{
-		message = _RPL_WHOISOPERATOR(nick);
-		_server->sendMessage(_user->getFd(), _server->getName(), message);
-	}
-	message = _RPL_ENDOFWHOIS(nick);
-	return _server->sendMessage(_user->getFd(), _server->getName(), message);
+		_server->sendMessage(_user->getFd(), server, whoisReplies[3]);
+	return _server->sendMessage(_user->getFd(), server, whoisReplies[4]);
 }
 
 void Commands::who(void)
 {
 	if (_params.size() < 2) return ;
+
 	std::string nick = _params[1], message;
+	User		*user;
+	if (!(user = _server->findUserByNick(nick))) return ;
 
-	if (!_server->findUserByNick(nick)) return ;
+	char		chan = '*'; // No channel is joined to automatically;
+	char		hopcount = '0'; // Nbr of intermediate servers between the client
+							    // issuing the WHO command and the client <nick>
+	std::string	userName = user->getUserName();
+	std::string	host = user->getHostName();
+	std::string	server = _server->getName();
+	std::string	flags = "";
+	std::string	realName = user->getRealName();
 
-	message = _RPL_WHOISREGNICK(nick);
+	message = _RPL_WHOREPLY(
+		nick, chan, userName, host, server, flags, hopcount, realName
+	);
 	_server->sendMessage(_user->getFd(), _server->getName(), message);
-	message = _RPL_ENDOFWHOIS(nick);
+	message = _RPL_ENDOFWHO(nick);
 	return _server->sendMessage(_user->getFd(), _server->getName(), message);
 }
 
@@ -271,18 +286,12 @@ void Commands::who(void)
  *************************************************************/
 void Commands::oper(void)
 {
+	if (checkParamNbr(3) == _ERROR) return ;
+
 	std::string	userNick = _user->getNickName();
-
-	if (_params.size() < 3)
-	{
-		std::string message = _ERR_NEEDMOREPARAMS(userNick, _params[0]);
-		return _server->sendMessage(_user->getFd(), _server->getName(), message);
-	}
-
 	User *user = _server->findUserByNick(_params[1]);
-	if (!user)
-		return;
-	if (_server->getPassword() != _params[2])
+	if (!user) return;
+	if (_params[2] != _server->getPassword())
 	{
 		std::string message = _ERR_PASSWDMISMATCH(userNick);
 		return _server->sendMessage(_user->getFd(), _server->getName(), message);
@@ -876,14 +885,13 @@ void Commands::kick(void)
  *************************************************************/
 void Commands::privmsg(bool isNoticeCmd)
 {
+	if (isNoticeCmd == false && checkParamNbr(3) == _ERROR)
+		return ;
+
 	std::vector<std::string> names = ircSplit(_params[1], ',');
 	std::string errMessage;
 	std::string userNick = _user->getNickName();
 	int			userFd = _user->getFd();
-
-	if (isNoticeCmd == false && checkParamNbr(3) == _ERROR)
-		return ;
-
 	std::string message = concatArrayStrs(_params, 2);
 
 	for (size_t i(0); i < names.size(); ++i)

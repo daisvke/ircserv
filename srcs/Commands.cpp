@@ -72,8 +72,7 @@ void Commands::routeCmd()
 {
 	cmdMap::iterator it;
 
-	if (_params.size() < 1)
-		return;
+	if (_params.size() < 1) return;
 
 	std::string cmd = _params[0];
 	if (cmd == "PRIVMSG")
@@ -787,8 +786,7 @@ void Commands::invite(void)
 	int userFd = _user->getFd();
 	std::string message;
 
-	if (checkParamNbr(3) == _ERROR)
-		return;
+	if (checkParamNbr(3) == _ERROR) return;
 
 	std::string guestNick = _params[1];
 	User *guest = _server->findUserByNick(guestNick);
@@ -838,12 +836,11 @@ void Commands::invite(void)
  *************************************************************/
 void Commands::kick(void)
 {
+	if (checkParamNbr(3) == _ERROR) return;
+
 	std::string userNick = _user->getNickName();
 	int userFd = _user->getFd();
 	std::string message, targetNick = _params[2];
-
-	if (checkParamNbr(3) == _ERROR)
-		return;
 
 	Channel *channel;
 	if (!(channel = _server->findChannel(_params[1])))
@@ -900,8 +897,7 @@ void Commands::kick(void)
  *************************************************************/
 void Commands::privmsg(bool isNoticeCmd)
 {
-	if (isNoticeCmd == false && checkParamNbr(3) == _ERROR)
-		return;
+	if (isNoticeCmd == false && checkParamNbr(3) == _ERROR) return;
 
 	std::vector<std::string> names = ircSplit(_params[1], ',');
 	std::string errMessage;
@@ -920,7 +916,9 @@ void Commands::privmsg(bool isNoticeCmd)
 				errMessage = _ERR_NOSUCHCHANNEL(userNick, name);
 				return _server->sendMessage(userFd, _server->getName(), errMessage);
 			}
-			if ((channel->isModerated() && !(_user->isOperator() || channel->hasVoice(userNick))) || (channel->isInternalOnly() && channel->isMember(userNick) == false))
+			if (isNoticeCmd == false
+				&& ((channel->isModerated() && !(_user->isOperator() || channel->hasVoice(userNick)))
+				|| (channel->isInternalOnly() && channel->isMember(userNick) == false)))
 			{
 				errMessage = _ERR_CANNOTSENDTOCHAN(userNick, name);
 				return _server->sendMessage(userFd, _server->getName(), errMessage);
@@ -981,18 +979,16 @@ void Commands::kill(void)
 
 void Commands::ping(void)
 {
-	std::string message = "PING", servername = _params[1];
+	if (checkParamNbr(2) == _ERROR) return;
 
-	if (servername != _server->getName())
-	{
-		message = _ERR_NOSUCHSERVER(_user->getNickName(), _server->getName());
-		return _server->sendMessage(_user->getFd(), _server->getName(), message);
-	}
-	_server->sendMessage(_user->getFd(), _server->getName(), message);
+	std::string message = "PING ", token = _params[1];
+	_server->sendMessage(_user->getFd(), _server->getName(), message + token);
 }
 
 void Commands::pong(void)
 {
+	if (checkParamNbr(2) == _ERROR) return;
+	
 	std::string message = "PONG";
 	_server->sendMessage(_user->getFd(), _server->getName(), message);
 }

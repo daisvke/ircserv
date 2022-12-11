@@ -87,10 +87,6 @@
 #define _RPL_KILLSUCCESS(target) target + " has been killed"
 
 
-enum e_isPriv { _NOT_PRIV, _PRIV };
-enum e_isOper { _ISNOTOPER, _ISOPER };
-
-
 class Server;
 
 class Commands
@@ -98,6 +94,10 @@ class Commands
 	typedef std::map<std::string, void (Commands::*)(void)> cmdMap;
 
 public:
+
+	enum e_isPriv { _NOT_PRIV, _PRIV };
+	enum e_isOper { _ISNOTOPER, _ISOPER };
+	enum e_return { _OK, _ERROR };
 
 	Commands(Server *server, User *user, std::string &str);
 	~Commands();
@@ -127,6 +127,7 @@ private:
 	void	ping(void);
 	void	pong(void);
 
+	bool	checkParamNbr(size_t nbr);
 	void	killServ(void);	
 	void	setupMap(void);
 	void	routeCmd(void);

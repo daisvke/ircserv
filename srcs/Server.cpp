@@ -285,7 +285,6 @@ void Server::sendToAllUser(std::string &msg)
  ****************************************************************************/
 void Server::reactToEvent(int index)
 {
-
 	if (index == POLL_FAILURE)
 		return;
 	else if (_fds[index].fd == _listenSd)
@@ -303,7 +302,6 @@ void Server::reactToEvent(int index)
 ********************************************/
 void Server::waitForConn()
 {
-
 	do
 	{
 		if (checkPollRet(poll(_fds, _nfds, TIMEOUT)) == POLL_FAILURE)

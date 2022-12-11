@@ -62,7 +62,7 @@
 // part
 #define _ERR_NOSUCHCHANNEL(nick, chan) "403 " + nick + " " + chan
 #define _ERR_NOSUCHCHANIMIT(nick, chan) "403 " + nick + " " + chan
-#define _ERR_NOTONCHANNEL(nick, chan) "442 " + nick + " " + nick + " is not on channel " + chan
+#define _ERR_NOTONCHANNEL(nick, chan) "442 " + nick + " " + chan + " :You're not on that channel"
 // ping
 #define _ERR_NOSUCHSERVER(nick, server) "402 " + nick + " " + server + " :No such server"
 // privmsg

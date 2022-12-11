@@ -12,7 +12,9 @@
 
 #include "User.hpp"
 
-User::User(): _isPwdVerified(false), _isRegistered(false), _isOper(false) {}
+User::User(): _fd(),
+	_isPwdVerified(false), _isRegistered(false), _isOper(false),
+	_channelInvitations() {}
 User::~User() {}
 
 /*************************************************************

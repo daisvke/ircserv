@@ -351,7 +351,7 @@ void Commands::join(void)
 
 	std::vector<std::string> channelKeys;
 	std::vector<std::string> channelNames = ircSplit(_params[1], ',');
-	bool isOper;
+	bool isOper = false;
 
 	if (_params.size() > 2)
 		channelKeys = ircSplit(_params[2], ',');
@@ -381,8 +381,6 @@ void Commands::join(void)
 			_user->setAsOperator();
 			isOper = true;
 		}
-		else
-			isOper = false;
 
 		if (channel->getUserDirectory()->count(_user))
 			return;
@@ -838,42 +836,36 @@ void Commands::kick(void)
 {
 	if (checkParamNbr(3) == _ERROR) return;
 
-	std::string userNick = _user->getNickName();
-	int userFd = _user->getFd();
+	std::string	userNick = _user->getNickName();
+	int			userFd = _user->getFd();
 	std::string message, targetNick = _params[2];
+	User 		*target;
+	bool		error = false;
 
 	Channel *channel;
-	if (!(channel = _server->findChannel(_params[1])))
+	if (!(channel = _server->findChannel(_params[1])) && setToTrue(&error))
 	{
 		message = _ERR_NOSUCHCHANNEL(userNick, _params[1]);
 		return _server->sendMessage(userFd, _server->getName(), message);
 	}
-
+	
 	std::string channelName = channel->getName();
-	if (channel->isMember(targetNick) == false)
-	{
+	if (channel->isMember(userNick) == false && setToTrue(&error))
+		message = _ERR_NOTONCHANNEL(userNick, channelName);
+	else if (channel->isMember(targetNick) == false && setToTrue(&error))
 		message = _ERR_USERNOTINCHANNEL(userNick, targetNick, channelName);
-		return _server->sendMessage(userFd, _server->getName(), message);
-	}
-
-	User *target = _server->findUserByNick(targetNick);
-	if (!target)
-	{
+	else if (!(target = _server->findUserByNick(targetNick)) && setToTrue(&error))
 		message = _ERR_NOSUCHNICK(targetNick);
-		return _server->sendMessage(_user->getFd(), _server->getName(), message);
-	}
+	else if (channel->isOper(userNick) == false && setToTrue(&error))
+		message = _ERR_CHANOPRIVSNEEDED(userNick, channelName);
 
-	// Can only use KICK if oper
-	if (channel->isOper(userNick) == false)
-	{
-		std::string message = _ERR_CHANOPRIVSNEEDED(userNick, channelName);
+	if (error == true)
 		return _server->sendMessage(userFd, _server->getName(), message);
-	}
+
 	// Use the comment if it is given
 	std::string comment;
 	if (_params.size() > 3)
 		comment = concatArrayStrs(_params, 3);
-
 	// Kick target out of the channel using PART message
 	message = "PART " + channelName;
 	broadcastToChannel(channel, message, _NOT_PRIV);
@@ -882,7 +874,6 @@ void Commands::kick(void)
 	message = _RPL_KICKSUCCESS(channelName, target->getNickName(), comment);
 	broadcastToChannel(channel, message, _NOT_PRIV);
 	_server->sendMessage(_user->getFd(), _user->getId(), message);
-
 	// kick target out from the server
 	channel->part(target);
 	// Delete channel if empty

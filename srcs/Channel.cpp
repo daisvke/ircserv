@@ -13,7 +13,7 @@
 #include "Channel.hpp"
 
 Channel::Channel(std::string name, std::string key)
-	: _name(name), _topic(), _modes("+"), _key(key), _userLimit()
+	: _name(name), _topic(), _modes("+"), _key(key), _users(), _userLimit()
 {
 	if (key.empty() == false)
 	{
@@ -105,9 +105,7 @@ size_t Channel::getUserLimit(void) const { return _userLimit; }
 
 std::string *Channel::getUserMode(std::string name)
 {
-	userDirectory::iterator it = _users.begin();
-
-	for (; it != _users.end(); ++it)
+	for (userDirectory::iterator it = _users.begin(); it != _users.end(); ++it)
 		if ((*it).first->getNickName() == name)
 			return &(*it).second;
 	return 0;
@@ -176,7 +174,7 @@ void Channel::part(User *user)
 }
 
 /*************************************************************
- * Prints all members of the channel
+ * Print all members of the channel
  *************************************************************/
 void Channel::names(void)
 {
@@ -187,10 +185,10 @@ void Channel::names(void)
 }
 
 /*************************************************************
- * Modifies user/channel modes.
- * If the mode is not already set, and remove is false,
+ * Modify user/channel modes.
+ * If the mode is not already set, and sign is '+',
  * 	then the new mode is added.
- * If the mode is already set, and remove is true,
+ * If the mode is already set, and sign is '-',
  *	then the mode is removed.
  *************************************************************/
 bool Channel::modifyModes(char c, std::string params, char sign)

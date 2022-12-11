@@ -34,28 +34,33 @@ Commands::Commands(Server *server, User *user, std::string &str)
 
 Commands::~Commands() {}
 
-void Commands::setupMap() // define it and call once in Server ?
+void Commands::setupMap()
 {
 	_cmdMap["PASS"] = &Commands::pass;
 	_cmdMap["NICK"] = &Commands::nick;
 	_cmdMap["USER"] = &Commands::user;
-	_cmdMap["WHOIS"] = &Commands::whois;
-	_cmdMap["WHO"] = &Commands::who;
-	_cmdMap["OPER"] = &Commands::oper;
-	_cmdMap["QUIT"] = &Commands::quit;
-	_cmdMap["JOIN"] = &Commands::join;
-	_cmdMap["PART"] = &Commands::part;
-	_cmdMap["MODE"] = &Commands::mode;
-	_cmdMap["TOPIC"] = &Commands::topic;
-	_cmdMap["NAMES"] = &Commands::names;
-	_cmdMap["LIST"] = &Commands::list;
-	_cmdMap["INVITE"] = &Commands::invite;
-	_cmdMap["KICK"] = &Commands::kick;
-	_cmdMap["KILL"] = &Commands::kill;
-	_cmdMap["kill"] = &Commands::kill;
-	_cmdMap["PING"] = &Commands::ping;
-	_cmdMap["PONG"] = &Commands::pong;
-	_cmdMap["KILLSERV"] = &Commands::killServ;
+	// These commands are forbidden to clients that didn't
+	//	complete the registration process
+	if (_user->isPwdVerified() && _user->isRegistered())
+	{
+		_cmdMap["WHOIS"] = &Commands::whois;
+		_cmdMap["WHO"] = &Commands::who;
+		_cmdMap["OPER"] = &Commands::oper;
+		_cmdMap["QUIT"] = &Commands::quit;
+		_cmdMap["JOIN"] = &Commands::join;
+		_cmdMap["PART"] = &Commands::part;
+		_cmdMap["MODE"] = &Commands::mode;
+		_cmdMap["TOPIC"] = &Commands::topic;
+		_cmdMap["NAMES"] = &Commands::names;
+		_cmdMap["LIST"] = &Commands::list;
+		_cmdMap["INVITE"] = &Commands::invite;
+		_cmdMap["KICK"] = &Commands::kick;
+		_cmdMap["KILL"] = &Commands::kill;
+		_cmdMap["kill"] = &Commands::kill;
+		_cmdMap["PING"] = &Commands::ping;
+		_cmdMap["PONG"] = &Commands::pong;
+		_cmdMap["KILLSERV"] = &Commands::killServ;
+	}
 }
 
 /*************************************************************
@@ -179,9 +184,9 @@ void Commands::user(void)
 
 	if (_user->getNickName().empty() == true)
 	{
-		_server->closeFd(_user->getFd());
 		message = _ERR_NONICKNAMEGIVEN;
-		return _server->sendMessage(_user->getFd(), _server->getName(), message);
+		_server->sendMessage(_user->getFd(), _server->getName(), message);
+		return _server->closeFd(_user->getFd());
 	}
 
 	_user->setUserName(_params[1]);
@@ -207,14 +212,14 @@ void Commands::registerClient(void)
 	std::string serverName = _server->getName();
 
 	// Messages to send to the client to give info needed to finalize registeration
-	std::string message = _RPL_WELCOME(nickName, _user->getUserName());
-	_server->sendMessage(_user->getFd(), _server->getName(), message);
-	message = _RPL_YOURHOST(nickName, serverName);
-	_server->sendMessage(_user->getFd(), _server->getName(), message);
-	message = _RPL_CREATED(nickName, getTimeStr());
-	_server->sendMessage(_user->getFd(), _server->getName(), message);
-	message = _RPL_MYINFO(nickName, serverName);
-	_server->sendMessage(_user->getFd(), _server->getName(), message);
+	std::string	replies[] = {
+		_RPL_WELCOME(nickName, _user->getUserName()),
+		_RPL_YOURHOST(nickName, serverName),
+		_RPL_MYINFO(nickName, serverName),
+		_RPL_CREATED(nickName, getTimeStr())
+	};
+	for (size_t i(0); i < 4; ++i)
+		_server->sendMessage(_user->getFd(), _server->getName(), replies[i]);
 	// Set client as registerated on our server
 	_user->setAsRegistered();
 }

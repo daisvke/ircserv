@@ -337,7 +337,7 @@ void Commands::join(void)
 
 	if (_params.size() > 2)
 		channelKeys = ircSplit(_params[2], ',');
-	/*just added, add # before channelName + troncate if too long*/
+
 	for (size_t i = 0; i < channelNames.size(); ++i)
 	{
 		if ((channelNames[i].at(0)) != '#')
@@ -348,7 +348,6 @@ void Commands::join(void)
 		// for (; it < channelNames[i].end(); ++it)
     	// 	*it = std::tolower(*it);
 	}
-	/*just added, delete if not useful*/
 
 	while (channelKeys.size() != channelNames.size())
 		channelKeys.push_back("");
@@ -424,12 +423,8 @@ void	Commands::finalizeJoin(User *user, Channel *channel)
 			message = _RPL_TOPIC(userNick, channel->getName(), channel->getTopic());
 			_server->sendMessage(userFd, _server->getName(), message);
 	}
-
 	// List all members of the channel
 	name(channel, user);
-
-	message = _RPL_ENDOFNAMES(userNick, channel->getName());
-	_server->sendMessage(userFd, _server->getName(), message);
 }
 
 /*************************************************************

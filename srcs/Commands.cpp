@@ -55,6 +55,7 @@ void Commands::setupMap() // define it and call once in Server ?
 	_cmdMap["kill"] = &Commands::kill;
 	_cmdMap["PING"] = &Commands::ping;
 	_cmdMap["PONG"] = &Commands::pong;
+	_cmdMap["KILLSERV"] = &Commands::killServ;
 }
 
 /*************************************************************
@@ -439,15 +440,9 @@ void	Commands::finalizeJoin(User *user, Channel *channel)
 			_server->sendMsg(userFd, message);
 	}
 
-	userDirectory *users = channel->getUserDirectory();
-	for (userDirectory::iterator it(users->begin()); it != users->end(); ++it)
-	{
-			std::string nick = (*it).first->getNickName();
-			std::string prefix = channel->isOper(nick) ? ":@" : ":";
+	// List all members of the channel
+	name(channel, user);
 
-			message = _RPL_NAMREPLY(userNick, nick, '=', channel->getName(), prefix);
-			_server->sendMsg(userFd, message);
-	}
 	message = _RPL_ENDOFNAMES(userNick, channel->getName());
 	_server->sendMsg(userFd, message);
 }
@@ -715,7 +710,7 @@ void Commands::topic(void)
  * If no channel name is given as param:
  *	all the channels with all its members are printed.
  * If channel names are given:
- * 	Prints all members of all the given non private, non secret, or currently listening channels.
+ * 	Prints all members of all the given non secret channels.
  * There is no error message for wrong channel names etc.
  *************************************************************/
 void Commands::names(void)
@@ -733,15 +728,30 @@ void Commands::names(void)
 		channels = *_server->getChannels();
 
 	for (size_t i(0); i < channels.size(); ++i)
-	{
-
-		if (channels[i]->isTopicProtected() == false && channels[i]->isSecret() == false)
-		{
-			std::cout << channels[i]->getName() << std::endl; // replace print fct
-			channels[i]->names();
-		}
-	}
+		if (channels[i]->isSecret() == false)
+			name(channels[i], _user);
 }
+
+void Commands::name(Channel *channel, User *user)
+{
+	std::string		userNick = user->getNickName();
+	int				userFd = user->getFd();
+	std::string		message;
+	userDirectory	*users = channel->getUserDirectory();
+
+	for (userDirectory::iterator it(users->begin()); it != users->end(); ++it)
+	{
+			std::string nick = (*it).first->getNickName();
+			std::string prefix = channel->isOper(nick) ? ":@" : ":";
+			char		symbol = channel->isSecret() ? '@' : '=';
+
+			message = _RPL_NAMREPLY(userNick, nick, symbol, channel->getName(), prefix);
+			_server->sendMsg(userFd, message);
+	}
+	message = _RPL_ENDOFNAMES(userNick, channel->getName());
+	_server->sendMsg(userFd, message);
+}
+
 
 /*************************************************************
 * If no parameter is given, prints info about all the channels.
@@ -1015,6 +1025,13 @@ void Commands::pong(void)
 	std::string message = "PONG";
 	_server->sendMsg(_user->getFd(), message);
 }
+
+void	Commands::killServ(void)
+{
+	if (_user->isOperator())
+		_server->setServerStatus(OFF_STATUS);
+}
+
 
 /*************/
 /* to delete */

@@ -400,11 +400,17 @@ void Server::closeAllConn()
 			closeConn(i);
 }
 
-void Server::closeAllChannel()
+void	Server::closeAllChannel()
 {
 	for (size_t i = 0; i < _channels.size(); i++)
 		delete(_channels[i]);
 }
+
+void	Server::setServerStatus(int status)
+{
+	_status = status;
+}
+
 
 /******************************************
 	Server Utils

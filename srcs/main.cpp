@@ -73,6 +73,8 @@ int main(int ac, char **av)
 
 
 //dcc send irssiLuc2 "/Documents/coucou.txt"
+//dcc send u2 "/home/mint/Documents/42/ircserv/coucou.txt"
+
 //dcc get irssiLuc "coucou.txt"
 
 

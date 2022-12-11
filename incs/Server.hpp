@@ -21,7 +21,7 @@
 # define BUFFER_SIZE			1024
 # define MAX_PWD				100
 # define MAX_CLIENT				1000
-# define TIMEOUT				10000
+# define TIMEOUT				1000000
 # define SERVER_VERSION			"Ubuntu 22.04.1 LTS"
 # define SERVER_NAME			"<ircserv>"
 
@@ -90,6 +90,8 @@ class Server
 		void	closeFd(int targetFd);
 		void	closeAllConn(void);
 		void	closeAllChannel(void);
+		void	setServerStatus(int status);
+
 
 	private:
 		int			_port;

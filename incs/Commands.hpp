@@ -23,11 +23,6 @@
 # include "Channel.hpp"
 # include "Server.hpp"
 
-enum	e_isOper
-{
-	_ISNOTOPER,
-	_ISOPER
-};
 
 // authentification
 #define _RPL_WELCOME(nick, user) "001 " + nick + " :Welcome to the " + _NETWORKNAME + " Network, " + user
@@ -56,6 +51,9 @@ enum	e_isOper
 #define _ERR_INVITEONLYCHAN(nick, chan) "473 " + nick + " " + chan + " :Cannot join channel (+i)"
 #define _ERR_BADCHANNELKEY(nick, chan) "475 " + nick + " " + chan + " :Cannot join channel (+k)"
 #define _ERR_CHANNELISFULL(nick, chan) "471 " + nick + " " + chan + " :Cannot join channel (+l)"
+#define _RPL_TOPIC(nick, chan, topic) "332 " + nick + " " + chan + " :" + topic
+#define _RPL_NAMREPLY(nick, name, symbol, chan, prefix) "353 " + nick + " " + symbol + " " + chan + " " + prefix + name
+#define _RPL_ENDOFNAMES(nick, chan) "366 " + nick + " " + chan
 // part
 #define _ERR_NOSUCHCHANNEL(nick, chan) "403 " + nick + " " + chan
 #define _ERR_NOSUCHCHANIMIT(nick, chan) "403 " + nick + " " + chan
@@ -88,6 +86,11 @@ enum	e_isOper
 #define _ERR_NOPRIVILEGES(nick) "481 " + nick + " :Permission Denied- You're not an IRC operator"
 #define _RPL_KILLSUCCESS(target) target + " has been killed"
 
+
+enum e_isPriv { _NOT_PRIV, _PRIV };
+enum e_isOper { _ISNOTOPER, _ISOPER };
+
+
 class Server;
 
 class Commands
@@ -95,46 +98,45 @@ class Commands
 	typedef std::map<std::string, void (Commands::*)(void)> cmdMap;
 
 public:
+
 	Commands(Server *server, User *user, std::string &str);
 	~Commands();
 
+
 private:
-	void pass(void);
-	void nick(void);
-	void user(void);
-	void whois(void);
-	void who(void);
-	void oper(void);
-	void quit(void);
-	void join(void);
-	void finalizeJoin(User *user, Channel *channel);
-	void part(void);
-	void mode(void);
-	void topic(void);
-	void names(void);
-	void list(void);
-	void invite(void);
-	void kick(void);
-	void privmsg(bool isNoticeCmd);
-	void kill(void);
-	void ping(void);
-	void pong(void);
 
-	void setupMap(void);
-	void routeCmd(void);
-	void registerClient(void);
-
-	enum e_isPriv
-	{
-		_NOT_PRIV,
-		_PRIV
-	};
+	void	pass(void);
+	void	nick(void);
+	void	user(void);
+	void	whois(void);
+	void	who(void);
+	void	oper(void);
+	void	quit(void);
+	void	join(void);
+	void	finalizeJoin(User *user, Channel *channel);
+	void	part(void);
+	void	mode(void);
+	void	topic(void);
+	void	names(void);
+	void	name(Channel *channel, User *user);
+	void	list(void);
+	void	invite(void);
+	void	kick(void);
+	void	privmsg(bool isNoticeCmd);
+	void	kill(void);
+	void	ping(void);
+	void	pong(void);
+	void	killServ(void);	
+	void	setupMap(void);
+	void	routeCmd(void);
+	void	registerClient(void);
+	
 	void broadcastToChannel(Channel *channel, std::string msg, bool isPriv);
 
-	Server *_server;
-	User *_user;
-	std::vector<std::string> _params;
-	cmdMap _cmdMap;
+	Server						*_server;
+	User						*_user;
+	std::vector<std::string>	_params;
+	cmdMap						_cmdMap;
 };
 
 #endif

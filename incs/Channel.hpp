@@ -23,13 +23,6 @@ enum e_chanReturn
 **************************************************************/
  typedef std::map<User *, std::string> userDirectory;
 
-/*************************************************************
- * Messages returned whenever a user joins a channel
-**************************************************************/
-#define _RPL_TOPIC(nick, chan, topic) "332 " + nick + " " + chan + " :" + topic
-#define _RPL_NAMREPLY(nick, name, symbol, chan, prefix) "353 " + nick + " " + symbol + " " + chan + " " + prefix + name
-#define _RPL_ENDOFNAMES(nick, chan) "366 " + nick + " " + chan + " :End of /NAMES list"
-
 class Channel
 {
 public:

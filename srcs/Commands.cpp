@@ -664,7 +664,6 @@ void Commands::topic(void)
 	if (checkParamNbr(2) == _ERROR)
 		return;
 
-	std::string fullTopicName = concatArrayStrs(_params, 2);
 	std::string channelName = _params[1];
 
 	Channel *channel = _server->findChannel(channelName);
@@ -675,9 +674,11 @@ void Commands::topic(void)
 	}
 	if (_params.size() == 2)
 	{
-		message = _RPL_TOPIC(userNick, channelName, fullTopicName);
+		message = _RPL_TOPIC(userNick, channelName, channel->getTopic());
 		return _server->sendMessage(userFd, _server->getName(), message);
 	}
+
+	std::string fullTopicName = concatArrayStrs(_params, 2);
 	if (channel->isTopicProtected() == false || _user->isOperator() == true)
 	{
 		channel->setTopic(fullTopicName);

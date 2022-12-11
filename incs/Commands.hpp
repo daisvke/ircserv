@@ -11,18 +11,17 @@
 /* ************************************************************************** */
 
 #ifndef COMMANDS_HPP
-# define COMMANDS_HPP
+#define COMMANDS_HPP
 
-# include <vector>
-# include <algorithm>
-# include <map>
+#include <vector>
+#include <algorithm>
+#include <map>
 
-# include "main.hpp"
-# include "Utils.hpp"
-# include "User.hpp"
-# include "Channel.hpp"
-# include "Server.hpp"
-
+#include "main.hpp"
+#include "Utils.hpp"
+#include "User.hpp"
+#include "Channel.hpp"
+#include "Server.hpp"
 
 // authentification
 #define _RPL_WELCOME(nick, user) "001 " + nick + " :Welcome to the " + _NETWORKNAME + " Network, " + user
@@ -43,7 +42,7 @@
 // whois
 #define _RPL_WHOISREGNICK(nick) "307 " + nick + " " + nick
 #define _RPL_WHOISUSER(nick, user, host, real) "311 " + nick + " " + user + " " + host + " * :" + real
-#define _RPL_WHOISSERVER(nick, server) "312 " + nick + " " + nick + " " + server + " :" + _SERVER_INFO 
+#define _RPL_WHOISSERVER(nick, server) "312 " + nick + " " + nick + " " + server + " :" + _SERVER_INFO
 #define _RPL_WHOISOPERATOR(nick) "313 " + nick + " " + nick + " :is an IRC operator"
 #define _RPL_ENDOFWHOIS(nick) "318 " + nick + " :End of /WHOIS list"
 // who
@@ -75,7 +74,7 @@
 #define _RPL_INVITING(nick, guest, chan) "341 " + nick + " " + guest + " " + chan
 // mode
 #define _ERR_USERSDONTMATCH(nick) "502 " + nick + " :Cant change mode for other users"
-# define _ERR_UNKNOWNMODE(nick, modechar)	"472 " + nick + " " + modechar + " :is unknown mode char to me"
+#define _ERR_UNKNOWNMODE(nick, modechar) "472 " + nick + " " + modechar + " :is unknown mode char to me"
 #define _RPL_UMODEIS(nick, modes) "221 " + nick + " " + modes
 #define _RPL_CHANNELMODEIS(nick, chan, modes, args) "324 " + nick + " " + chan + " " + modes + " " + args
 // topic
@@ -92,7 +91,6 @@
 #define _ERR_NOPRIVILEGES(nick) "481 " + nick + " :Permission Denied- You're not an IRC operator"
 #define _RPL_KILLSUCCESS(target) target + " has been killed"
 
-
 class Server;
 
 class Commands
@@ -100,51 +98,60 @@ class Commands
 	typedef std::map<std::string, void (Commands::*)(void)> cmdMap;
 
 public:
-
-	enum e_isPriv { _NOT_PRIV, _PRIV };
-	enum e_isOper { _ISNOTOPER, _ISOPER };
-	enum e_return { _OK, _ERROR };
+	enum e_isPriv
+	{
+		_NOT_PRIV,
+		_PRIV
+	};
+	enum e_isOper
+	{
+		_ISNOTOPER,
+		_ISOPER
+	};
+	enum e_return
+	{
+		_OK,
+		_ERROR
+	};
 
 	Commands(Server *server, User *user, std::string &str);
 	~Commands();
 
-
 private:
+	void pass(void);
+	void nick(void);
+	void user(void);
+	void whois(void);
+	void who(void);
+	void oper(void);
+	void quit(void);
+	void join(void);
+	void finalizeJoin(User *user, Channel *channel);
+	void part(void);
+	void mode(void);
+	void topic(void);
+	void names(void);
+	void name(Channel *channel, User *user);
+	void list(void);
+	void invite(void);
+	void kick(void);
+	void privmsg(bool isNoticeCmd);
+	void kill(void);
+	void ping(void);
+	void pong(void);
+	void squit(void);
 
-	void	pass(void);
-	void	nick(void);
-	void	user(void);
-	void	whois(void);
-	void	who(void);
-	void	oper(void);
-	void	quit(void);
-	void	join(void);
-	void	finalizeJoin(User *user, Channel *channel);
-	void	part(void);
-	void	mode(void);
-	void	topic(void);
-	void	names(void);
-	void	name(Channel *channel, User *user);
-	void	list(void);
-	void	invite(void);
-	void	kick(void);
-	void	privmsg(bool isNoticeCmd);
-	void	kill(void);
-	void	ping(void);
-	void	pong(void);
+	bool checkParamNbr(size_t nbr);
+	void setupMap(void);
+	void routeCmd(void);
+	void registerClient(void);
 
-	bool	checkParamNbr(size_t nbr);
-	void	killServ(void);	
-	void	setupMap(void);
-	void	routeCmd(void);
-	void	registerClient(void);
-	
 	void broadcastToChannel(Channel *channel, std::string msg, bool isPriv);
 
-	Server						*_server;
-	User						*_user;
-	std::vector<std::string>	_params;
-	cmdMap						_cmdMap;
+	Server *_server;
+	User *_user;
+	std::vector<std::string> _params;
+	cmdMap _cmdMap;
 };
 
 #endif

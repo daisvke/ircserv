@@ -59,7 +59,8 @@ void Commands::setupMap()
 		_cmdMap["kill"] = &Commands::kill;
 		_cmdMap["PING"] = &Commands::ping;
 		_cmdMap["PONG"] = &Commands::pong;
-		_cmdMap["KILLSERV"] = &Commands::killServ;
+		_cmdMap["SQUIT"] = &Commands::squit;
+		_cmdMap["squit"] = &Commands::squit;
 	}
 }
 
@@ -72,7 +73,7 @@ void Commands::routeCmd()
 	cmdMap::iterator it;
 
 	if (_params.size() < 1)
-		return ;
+		return;
 
 	std::string cmd = _params[0];
 	if (cmd == "PRIVMSG")
@@ -95,17 +96,18 @@ void Commands::routeCmd()
 /*************************************************************
  * Sends channel message to one or more members of the channel
  *************************************************************/
-void	Commands::broadcastToChannel(Channel *channel, std::string msg, bool isPriv)
+void Commands::broadcastToChannel(Channel *channel, std::string msg, bool isPriv)
 {
-	userDirectory	*users = channel->getUserDirectory();
+	userDirectory *users = channel->getUserDirectory();
 
 	for (userDirectory::iterator it = users->begin(); it != users->end(); ++it)
 	{
 		if ((*it).first != _user)
 		{
 			msg = isPriv ? "PRIVMSG " + channel->getName() + " " + msg : msg;
-			int			userFd = (*it).first->getFd();
-			std::string userId  = _user->getId();
+			int userFd = (*it).first->getFd();
+			std::string userId = _user->getId();
+
 			_server->sendMessage(userFd, userId, msg);
 		}
 	}
@@ -117,9 +119,10 @@ void	Commands::broadcastToChannel(Channel *channel, std::string msg, bool isPriv
  *************************************************************/
 void Commands::pass(void)
 {
-	if (checkParamNbr(2) == _ERROR) return ;
+	if (checkParamNbr(2) == _ERROR)
+		return;
 
-	int	userFd = _user->getFd();
+	int userFd = _user->getFd();
 	if (_params[1] != _server->getPassword())
 	{
 		std::string message = _ERR_PASSWDMISMATCH(_user->getNickName());
@@ -137,13 +140,13 @@ void Commands::pass(void)
 void Commands::nick(void)
 {
 	std::string message;
-	bool		error = false;
+	bool error = false;
 
 	// If no param is given, and user is registered, print the current nick
 	if (_params.size() == 1 && _user->isRegistered())
 	{
-			message = _RPL_CURRENTNICK(_user->getNickName());
-			return _server->sendMessage(_user->getFd(), _server->getName(), message);
+		message = _RPL_CURRENTNICK(_user->getNickName());
+		return _server->sendMessage(_user->getFd(), _server->getName(), message);
 	}
 	if (_params.size() < 2 && setToTrue(&error))
 		message = _ERR_NONICKNAMEGIVEN;
@@ -169,7 +172,6 @@ void Commands::nick(void)
 	_server->sendMessage(_user->getFd(), _server->getName(), message);
 }
 
-
 /*************************************************************
  * Used at the begining of a connection between client and server.
  * The string sent by the client contains:
@@ -180,7 +182,8 @@ void Commands::nick(void)
 void Commands::user(void)
 {
 	std::string message;
-	if (checkParamNbr(5) == _ERROR) return ;
+	if (checkParamNbr(5) == _ERROR)
+		return;
 
 	if (_user->getNickName().empty() == true)
 	{
@@ -200,7 +203,7 @@ void Commands::user(void)
 		realName += ' ' + _params[i];
 	_user->setRealName(realName);
 
-	std::string	newId = _user->getNickName() + "!" + _user->getUserName() + "@" + _server->getName();
+	std::string newId = _user->getNickName() + "!" + _user->getUserName() + "@" + _server->getName();
 	_user->setId(newId);
 
 	registerClient();
@@ -212,12 +215,11 @@ void Commands::registerClient(void)
 	std::string serverName = _server->getName();
 
 	// Messages to send to the client to give info needed to finalize registeration
-	std::string	replies[] = {
+	std::string replies[] = {
 		_RPL_WELCOME(nickName, _user->getUserName()),
 		_RPL_YOURHOST(nickName, serverName),
 		_RPL_MYINFO(nickName, serverName),
-		_RPL_CREATED(nickName, getTimeStr())
-	};
+		_RPL_CREATED(nickName, getTimeStr())};
 	for (size_t i(0); i < 4; ++i)
 		_server->sendMessage(_user->getFd(), _server->getName(), replies[i]);
 	// Set client as registerated on our server
@@ -226,8 +228,8 @@ void Commands::registerClient(void)
 
 void Commands::whois(void)
 {
-	std::string	server = _server->getName();
-	std::string	message;
+	std::string server = _server->getName();
+	std::string message;
 
 	if (_params.size() < 2)
 	{
@@ -236,24 +238,23 @@ void Commands::whois(void)
 	}
 
 	std::string nick = _params[1];
-	User		*user;
+	User *user;
 	if (!(user = _server->findUserByNick(nick)))
 	{
 		message = _ERR_NOSUCHNICK(nick);
 		return _server->sendMessage(_user->getFd(), server, message);
 	}
 
-	std::string	userName = user->getUserName();
-	std::string	host = user->getHostName();
-	std::string	realName = user->getRealName();
+	std::string userName = user->getUserName();
+	std::string host = user->getHostName();
+	std::string realName = user->getRealName();
 
-	std::string	whoisReplies[] = {
+	std::string whoisReplies[] = {
 		_RPL_WHOISUSER(nick, userName, host, realName),
 		_RPL_WHOISSERVER(nick, server),
 		_RPL_WHOISREGNICK(nick),
 		_RPL_WHOISOPERATOR(nick),
-		_RPL_ENDOFWHOIS(nick)
-	};
+		_RPL_ENDOFWHOIS(nick)};
 	for (size_t i(0); i < 3; ++i)
 		_server->sendMessage(_user->getFd(), server, whoisReplies[i]);
 	if (user->isOperator())
@@ -263,24 +264,25 @@ void Commands::whois(void)
 
 void Commands::who(void)
 {
-	if (_params.size() < 2) return ;
+	if (_params.size() < 2)
+		return;
 
 	std::string nick = _params[1], message;
-	User		*user;
-	if (!(user = _server->findUserByNick(nick))) return ;
+	User *user;
+	if (!(user = _server->findUserByNick(nick)))
+		return;
 
-	char		chan = '*'; // No channel is joined to automatically;
-	char		hopcount = '0'; // Nbr of intermediate servers between the client
-							    // issuing the WHO command and the client <nick>
-	std::string	userName = user->getUserName();
-	std::string	host = user->getHostName();
-	std::string	server = _server->getName();
-	std::string	flags = "";
-	std::string	realName = user->getRealName();
+	char chan = '*';	 // No channel is joined to automatically;
+	char hopcount = '0'; // Nbr of intermediate servers between the client
+						 // issuing the WHO command and the client <nick>
+	std::string userName = user->getUserName();
+	std::string host = user->getHostName();
+	std::string server = _server->getName();
+	std::string flags = "";
+	std::string realName = user->getRealName();
 
 	message = _RPL_WHOREPLY(
-		nick, chan, userName, host, server, flags, hopcount, realName
-	);
+		nick, chan, userName, host, server, flags, hopcount, realName);
 	_server->sendMessage(_user->getFd(), _server->getName(), message);
 	message = _RPL_ENDOFWHO(nick);
 	return _server->sendMessage(_user->getFd(), _server->getName(), message);
@@ -291,11 +293,13 @@ void Commands::who(void)
  *************************************************************/
 void Commands::oper(void)
 {
-	if (checkParamNbr(3) == _ERROR) return ;
+	if (checkParamNbr(3) == _ERROR)
+		return;
 
-	std::string	userNick = _user->getNickName();
+	std::string userNick = _user->getNickName();
 	User *user = _server->findUserByNick(_params[1]);
-	if (!user) return;
+	if (!user)
+		return;
 	if (_params[2] != _server->getPassword())
 	{
 		std::string message = _ERR_PASSWDMISMATCH(userNick);
@@ -326,7 +330,7 @@ void Commands::quit(void)
 				(*channels)[i]->part((*it).first);
 				if (lastWords.empty() == false)
 					broadcastToChannel((*channels)[i], lastWords, _PRIV);
-				break ;
+				break;
 			}
 		}
 		if ((*channels)[i]->isEmpty())
@@ -340,10 +344,11 @@ void Commands::quit(void)
 void Commands::join(void)
 {
 	std::string message;
-	std::string	userNick = _user->getNickName();
-	int			userFd = _user->getFd();
+	std::string userNick = _user->getNickName();
+	int userFd = _user->getFd();
 
-	if (checkParamNbr(2) == _ERROR) return ;
+	if (checkParamNbr(2) == _ERROR)
+		return;
 
 	std::vector<std::string> channelKeys;
 	std::vector<std::string> channelNames = ircSplit(_params[1], ',');
@@ -360,7 +365,7 @@ void Commands::join(void)
 			channelNames[i].erase(channelNames[i].begin() + 50, channelNames[i].end());
 		// std::string::iterator it = channelNames[i].begin();
 		// for (; it < channelNames[i].end(); ++it)
-    	// 	*it = std::tolower(*it);
+		// 	*it = std::tolower(*it);
 	}
 
 	while (channelKeys.size() != channelNames.size())
@@ -377,12 +382,12 @@ void Commands::join(void)
 			_user->setAsOperator();
 			isOper = true;
 		}
-		else isOper = false;
+		else
+			isOper = false;
 
 		if (channel->getUserDirectory()->count(_user))
 			return;
-		if (channel->isLimited() == false
-			|| (channel->isLimited() == true && channel->countUsers() < channel->getUserLimit()))
+		if (channel->isLimited() == false || (channel->isLimited() == true && channel->countUsers() < channel->getUserLimit()))
 		{
 			if (channel->isKeyProtected())
 			{
@@ -399,7 +404,8 @@ void Commands::join(void)
 					message = _ERR_INVITEONLYCHAN(userNick, channelName);
 					return _server->sendMessage(userFd, _server->getName(), message);
 				}
-				else _user->useInvitation(channelName);
+				else
+					_user->useInvitation(channelName);
 			}
 		}
 		else if (channel->isLimited() == true && channel->countUsers() >= channel->getUserLimit())
@@ -414,12 +420,12 @@ void Commands::join(void)
 	}
 }
 
-void	Commands::finalizeJoin(User *user, Channel *channel)
+void Commands::finalizeJoin(User *user, Channel *channel)
 {
-	std::string	userNick = user->getNickName();
-	int			userFd = user->getFd();
-	std::string	channelName = channel->getName();
-	std::string	message;
+	std::string userNick = user->getNickName();
+	int userFd = user->getFd();
+	std::string channelName = channel->getName();
+	std::string message;
 
 	if (channel->isLimited() == true && channel->countUsers() >= channel->getUserLimit())
 	{
@@ -434,8 +440,8 @@ void	Commands::finalizeJoin(User *user, Channel *channel)
 	// Print channel parameters to user
 	if (channel->getTopic().empty() == false)
 	{
-			message = _RPL_TOPIC(userNick, channel->getName(), channel->getTopic());
-			_server->sendMessage(userFd, _server->getName(), message);
+		message = _RPL_TOPIC(userNick, channel->getName(), channel->getTopic());
+		_server->sendMessage(userFd, _server->getName(), message);
 	}
 	// List all members of the channel
 	name(channel, user);
@@ -447,9 +453,10 @@ void	Commands::finalizeJoin(User *user, Channel *channel)
  *************************************************************/
 void Commands::part(void)
 {
-	if (checkParamNbr(2) == _ERROR) return ;
+	if (checkParamNbr(2) == _ERROR)
+		return;
 
-	std::string	message;
+	std::string message;
 	std::vector<std::string> channelNames = ircSplit(_params[1], ',');
 	std::string reason;
 	if (_params.size() > 2)
@@ -458,7 +465,7 @@ void Commands::part(void)
 	for (size_t i(0); i < channelNames.size(); ++i)
 	{
 		std::string channelName = channelNames[i];
-		Channel		*channel;
+		Channel *channel;
 
 		if (!(channel = _server->findChannel(channelName)))
 		{
@@ -482,7 +489,7 @@ void Commands::part(void)
 
 				if (channel->isEmpty())
 					_server->deleteChannel(channel->getName());
-				break ;
+				break;
 			}
 			++it;
 		}
@@ -502,13 +509,14 @@ void Commands::part(void)
  *************************************************************/
 void Commands::mode(void)
 {
-	std::string 			concatParams, message, mode, modes;
-	std::string				userNick = _user->getNickName();
-	int						userFd = _user->getFd();
-	char					sign;
-	std::map<char, char>	foundModes;
+	std::string concatParams, message, mode, modes;
+	std::string userNick = _user->getNickName();
+	int userFd = _user->getFd();
+	char sign;
+	std::map<char, char> foundModes;
 
-	if (checkParamNbr(2) == _ERROR) return ;
+	if (checkParamNbr(2) == _ERROR)
+		return;
 	if (_params[1][0] == '#') // channel modes
 	{
 		Channel *channel = _server->findChannel(_params[1]);
@@ -520,10 +528,10 @@ void Commands::mode(void)
 		// If no modestring is given, only prints the current channel modes
 		if (_params.size() < 3)
 		{
-			int	userLimit = channel->getUserLimit();
+			int userLimit = channel->getUserLimit();
 			concatParams = userLimit > 0 ? toString(userLimit) : "";
-			message = _RPL_CHANNELMODEIS(userNick, channel->getName(), \
-										channel->getModes(), concatParams);
+			message = _RPL_CHANNELMODEIS(userNick, channel->getName(),
+										 channel->getModes(), concatParams);
 			return _server->sendMessage(userFd, _server->getName(), message);
 		}
 
@@ -537,21 +545,23 @@ void Commands::mode(void)
 
 		if (_params.size() > 2) // modestring present: parse
 		{
-			size_t	i = 0;
+			size_t i = 0;
 			while (i < modes.size())
 			{
 				if (modes[i] == '-' || modes[i] == '+')
 				{
-					while (i < modes.size() && (modes[i] == '-' || modes[i] == '+')) {
+					while (i < modes.size() && (modes[i] == '-' || modes[i] == '+'))
+					{
 						sign = modes[i];
 						++i;
 					}
 				}
-				else return ;
+				else
+					return;
 
 				std::string channelModes = _CHANMODES;
-				std::string	paramModes = _CHAN_PARAM_MODES;
-				bool		needsParam;
+				std::string paramModes = _CHAN_PARAM_MODES;
+				bool needsParam;
 
 				while (i < modes.size() && !(modes[i] == '-' || modes[i] == '+'))
 				{
@@ -562,7 +572,7 @@ void Commands::mode(void)
 						if ((params.empty() == true && sign != '-') || (!params.empty() && sign == '-'))
 						{
 							++i;
-							continue ;
+							continue;
 						}
 					}
 					else if (channelModes.find(modes[i]) == std::string::npos)
@@ -573,9 +583,7 @@ void Commands::mode(void)
 						continue;
 					}
 					// Save validated mode with its sign
-					if ((channel->getModes().find(modes[i]) == std::string::npos && sign == '+')
-					|| (channel->getModes().find(modes[i]) != std::string::npos && sign == '-')
-					|| (channel->getModes().find(modes[i]) != std::string::npos && needsParam == true))
+					if ((channel->getModes().find(modes[i]) == std::string::npos && sign == '+') || (channel->getModes().find(modes[i]) != std::string::npos && sign == '-') || (channel->getModes().find(modes[i]) != std::string::npos && needsParam == true))
 						foundModes[modes[i]] = sign;
 					++i;
 				}
@@ -590,18 +598,19 @@ void Commands::mode(void)
 				return _server->sendMessage(userFd, _server->getName(), message);
 			}
 			// Apply mode modifications
-			std::map<char, char>::iterator	it;
-			size_t							i = 0;
-			std::string						concatModes;
-			bool							changed;
-			bool							changedAtLeastOnce = false;
-			char							oldSign;
+			std::map<char, char>::iterator it;
+			size_t i = 0;
+			std::string concatModes;
+			bool changed;
+			bool changedAtLeastOnce = false;
+			char oldSign;
 
 			for (it = foundModes.begin(); it != foundModes.end(); ++it)
 			{
-				std::string	tmpParams = i < params.size() ? params[i++] : "";
+				std::string tmpParams = i < params.size() ? params[i++] : "";
 				changed = channel->modifyModes((*it).first, tmpParams, (*it).second);
-				if (changed == true) {
+				if (changed == true)
+				{
 					changedAtLeastOnce = true;
 					if (it == foundModes.begin() || (*it).second != oldSign)
 						concatModes += toString((*it).second) + (*it).first;
@@ -614,18 +623,17 @@ void Commands::mode(void)
 			if (changedAtLeastOnce)
 			{
 				// Broadcast mode update to all members
-				message = _RPL_CHANNELMODEIS(userNick, channel->getName(), \
-											concatModes, concatParams);
+				message = _RPL_CHANNELMODEIS(userNick, channel->getName(),
+											 concatModes, concatParams);
 				broadcastToChannel(channel, message, _NOT_PRIV);
 				return _server->sendMessage(userFd, _server->getName(), message);
 			}
 		}
-
 	}
 	else // user modes
 	{
 		std::string targetNick = _params[1];
-		User		*user = _server->findUserByNick(userNick);
+		User *user = _server->findUserByNick(userNick);
 		if (!user)
 		{
 			message = _ERR_NOSUCHNICK(userNick);
@@ -654,12 +662,13 @@ void Commands::mode(void)
 void Commands::topic(void)
 {
 	std::string userNick = _user->getNickName(), message;
-	int			userFd = _user->getFd();
+	int userFd = _user->getFd();
 
-	if (checkParamNbr(2) == _ERROR) return ;
+	if (checkParamNbr(2) == _ERROR)
+		return;
 
-	std::string	fullTopicName = concatArrayStrs(_params, 2);
-	std::string	channelName = _params[1];
+	std::string fullTopicName = concatArrayStrs(_params, 2);
+	std::string channelName = _params[1];
 
 	Channel *channel = _server->findChannel(channelName);
 	if (!channel)
@@ -716,28 +725,27 @@ void Commands::names(void)
 
 void Commands::name(Channel *channel, User *user)
 {
-	std::string		userNick = user->getNickName();
-	int				userFd = user->getFd();
-	std::string		message;
-	userDirectory	*users = channel->getUserDirectory();
+	std::string userNick = user->getNickName();
+	int userFd = user->getFd();
+	std::string message;
+	userDirectory *users = channel->getUserDirectory();
 
 	for (userDirectory::iterator it(users->begin()); it != users->end(); ++it)
 	{
-			std::string nick = (*it).first->getNickName();
-			std::string prefix = channel->isOper(nick) ? ":@" : ":";
-			char		symbol = channel->isSecret() ? '@' : '=';
+		std::string nick = (*it).first->getNickName();
+		std::string prefix = channel->isOper(nick) ? ":@" : ":";
+		char symbol = channel->isSecret() ? '@' : '=';
 
-			message = _RPL_NAMREPLY(userNick, nick, symbol, channel->getName(), prefix);
-			_server->sendMessage(userFd, _server->getName(), message);
+		message = _RPL_NAMREPLY(userNick, nick, symbol, channel->getName(), prefix);
+		_server->sendMessage(userFd, _server->getName(), message);
 	}
 	message = _RPL_ENDOFNAMES(userNick, channel->getName());
 	_server->sendMessage(userFd, _server->getName(), message);
 }
 
-
 /*************************************************************
-* If no parameter is given, prints info about all the channels.
-* If channel names are given, they are the only onces to be handled.
+ * If no parameter is given, prints info about all the channels.
+ * If channel names are given, they are the only onces to be handled.
  *************************************************************/
 void Commands::list(void)
 {
@@ -754,8 +762,8 @@ void Commands::list(void)
 	else
 		channels = *_server->getChannels();
 
-	int 		userFd = _user->getFd();
-	std::string	userNick = _user->getNickName();
+	int userFd = _user->getFd();
+	std::string userNick = _user->getNickName();
 
 	message = _RPL_LISTSTART(userNick);
 	_server->sendMessage(userFd, _server->getName(), message);
@@ -764,7 +772,7 @@ void Commands::list(void)
 	{
 		if (channels[i]->isTopicProtected() == false && channels[i]->isSecret() == false)
 		{
-			std::string	userCount = toString(channels[i]->countUsers());
+			std::string userCount = toString(channels[i]->countUsers());
 			message = _RPL_LIST(userNick, channels[i]->getName(), userCount, channels[i]->getTopic());
 			_server->sendMessage(userFd, _server->getName(), message);
 		}
@@ -775,37 +783,38 @@ void Commands::list(void)
 
 void Commands::invite(void)
 {
-	std::string	userNick = _user->getNickName();
-	int			userFd = _user->getFd();
+	std::string userNick = _user->getNickName();
+	int userFd = _user->getFd();
 	std::string message;
 
-	if (checkParamNbr(3) == _ERROR) return ;
+	if (checkParamNbr(3) == _ERROR)
+		return;
 
 	std::string guestNick = _params[1];
-	User	*guest =  _server->findUserByNick(guestNick);
+	User *guest = _server->findUserByNick(guestNick);
 	if (!guest)
 	{
 		message = _ERR_NOSUCHNICK(userNick);
 		return _server->sendMessage(userFd, _server->getName(), message);
 	}
 
-	int			guestFd = guest->getFd();
-	std::string	chanName = _params[2];
-	Channel 	*channel = _server->findChannel(chanName);
+	int guestFd = guest->getFd();
+	std::string chanName = _params[2];
+	Channel *channel = _server->findChannel(chanName);
 	if (!channel)
 	{
 		message = _ERR_NOSUCHCHANNEL(userNick, _params[2]);
 		return _server->sendMessage(userFd, _server->getName(), message);
 	}
-	std::string	channelName = channel->getName();
+	std::string channelName = channel->getName();
 	if (channel->isInviteOnly() && channel->isOper(userNick) == false)
 	{
 		message = _ERR_CHANOPRIVSNEEDED(userNick, channelName);
 		return _server->sendMessage(userFd, _server->getName(), message);
 	}
 
-	userDirectory			*users = channel->getUserDirectory();
-	userDirectory::iterator	it = users->begin();
+	userDirectory *users = channel->getUserDirectory();
+	userDirectory::iterator it = users->begin();
 	for (; it != users->end(); ++it)
 	{
 		if ((*it).first->getNickName() == guestNick)
@@ -829,11 +838,12 @@ void Commands::invite(void)
  *************************************************************/
 void Commands::kick(void)
 {
-	std::string	userNick = _user->getNickName();
-	int			userFd = _user->getFd();
+	std::string userNick = _user->getNickName();
+	int userFd = _user->getFd();
 	std::string message, targetNick = _params[2];
 
-	if (checkParamNbr(3) == _ERROR) return ;
+	if (checkParamNbr(3) == _ERROR)
+		return;
 
 	Channel *channel;
 	if (!(channel = _server->findChannel(_params[1])))
@@ -842,7 +852,7 @@ void Commands::kick(void)
 		return _server->sendMessage(userFd, _server->getName(), message);
 	}
 
-	std::string	channelName = channel->getName();
+	std::string channelName = channel->getName();
 	if (channel->isMember(targetNick) == false)
 	{
 		message = _ERR_USERNOTINCHANNEL(userNick, targetNick, channelName);
@@ -856,7 +866,7 @@ void Commands::kick(void)
 		return _server->sendMessage(_user->getFd(), _server->getName(), message);
 	}
 
- 	// Can only use KICK if oper
+	// Can only use KICK if oper
 	if (channel->isOper(userNick) == false)
 	{
 		std::string message = _ERR_CHANOPRIVSNEEDED(userNick, channelName);
@@ -891,27 +901,26 @@ void Commands::kick(void)
 void Commands::privmsg(bool isNoticeCmd)
 {
 	if (isNoticeCmd == false && checkParamNbr(3) == _ERROR)
-		return ;
+		return;
 
 	std::vector<std::string> names = ircSplit(_params[1], ',');
 	std::string errMessage;
 	std::string userNick = _user->getNickName();
-	int			userFd = _user->getFd();
+	int userFd = _user->getFd();
 	std::string message = concatArrayStrs(_params, 2);
 
 	for (size_t i(0); i < names.size(); ++i)
 	{
 		if (names[i][0] == '#')
 		{
-			std::string	name = names[i];
+			std::string name = names[i];
 			Channel *channel = _server->findChannel(name);
 			if (!channel)
 			{
 				errMessage = _ERR_NOSUCHCHANNEL(userNick, name);
 				return _server->sendMessage(userFd, _server->getName(), errMessage);
 			}
-			if ((channel->isModerated() && !(_user->isOperator() || channel->hasVoice(userNick)))
-				|| (channel->isInternalOnly() && channel->isMember(userNick) == false))
+			if ((channel->isModerated() && !(_user->isOperator() || channel->hasVoice(userNick))) || (channel->isInternalOnly() && channel->isMember(userNick) == false))
 			{
 				errMessage = _ERR_CANNOTSENDTOCHAN(userNick, name);
 				return _server->sendMessage(userFd, _server->getName(), errMessage);
@@ -937,18 +946,18 @@ void Commands::privmsg(bool isNoticeCmd)
 
 void Commands::kill(void)
 {
-	std::string	userNick = _user->getNickName();
-	std::string message;
-	int			userFd = _user->getFd();
+	if (checkParamNbr(3) == _ERROR) return;
 
-	if (checkParamNbr(3) == _ERROR) return ;
+	std::string userNick = _user->getNickName();
+	std::string message;
+	int userFd = _user->getFd();
 	if (_user->isOperator() == false)
 	{
 		message = _ERR_NOPRIVILEGES(userNick);
 		return _server->sendMessage(userFd, _server->getName(), message);
 	}
 
-	User 		*target = _server->findUserByNick(_params[1]);
+	User *target = _server->findUserByNick(_params[1]);
 	if (!target)
 	{
 		message = _ERR_NOSUCHNICK(userNick);
@@ -956,11 +965,11 @@ void Commands::kill(void)
 	}
 
 	std::string comment = concatArrayStrs(_params, 2);
-	std::string	targetNick = target->getNickName();
+	std::string targetNick = target->getNickName();
 
 	// Killing target
 	message = "KILL " + targetNick + " " + comment;
-	int	targetFd = target->getFd();
+	int targetFd = target->getFd();
 	_server->sendMessage(targetFd, _user->getId(), message);
 	// KILL success notice
 	message = _RPL_KILLSUCCESS(targetNick);
@@ -988,23 +997,38 @@ void Commands::pong(void)
 	_server->sendMessage(_user->getFd(), _server->getName(), message);
 }
 
-void	Commands::killServ(void)
+/*************************************************************
+ * This command disconnects a server from the network.
+*************************************************************/
+void Commands::squit(void)
 {
-	if (_user->isOperator())
-		_server->setServerStatus(OFF_STATUS);
+	if (checkParamNbr(3) == _ERROR) return;
+
+	std::string	server = _server->getName();
+	std::string	userNick = _user->getNickName();
+	std::string	message;
+	bool		error =false;
+
+	if (_params[1] != server && setToTrue(&error))
+		message = _ERR_NOSUCHSERVER(userNick, server);
+	if (_user->isOperator() == false && setToTrue(&error))
+		message = _ERR_NOPRIVILEGES(userNick);
+	if (error == true)
+		_server->sendMessage(_user->getFd(), server, message);
+	_server->setServerStatus(OFF_STATUS);
+
 }
 
-bool	Commands::checkParamNbr(size_t nbr)
+bool Commands::checkParamNbr(size_t nbr)
 {
 	if (_params.size() < nbr)
 	{
-		std::string	message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
+		std::string message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
 		_server->sendMessage(_user->getFd(), _server->getName(), message);
 		return _ERROR;
 	}
 	return _OK;
 }
-
 
 /*************/
 /* to delete */

@@ -79,7 +79,7 @@ void Commands::routeCmd()
 		else
 		{
 			std::string message = _ERR_UNKNOWNCOMMAND(_user->getNickName(), cmd);
-			return _server->sendMsg(_user->getFd(), message);
+			return _server->sendMessage(_user->getFd(), _server->getName(), message);
 		}
 	}
 }
@@ -115,7 +115,7 @@ void Commands::pass(void)
 	if (_params[1] != _server->getPassword())
 	{
 		std::string message = _ERR_PASSWDMISMATCH(_user->getNickName());
-		_server->sendMsg(userFd, message);
+		_server->sendMessage(userFd, _server->getName(), message);
 		_server->closeFd(userFd);
 	}
 	else
@@ -135,7 +135,7 @@ void Commands::nick(void)
 	if (_params.size() == 1 && _user->isRegistered())
 	{
 			message = _RPL_CURRENTNICK(_user->getNickName());
-			return _server->sendMsg(_user->getFd(), message);
+			return _server->sendMessage(_user->getFd(), _server->getName(), message);
 	}
 	if (_params.size() < 2 && setToTrue(&error))
 		message = _ERR_NONICKNAMEGIVEN;
@@ -152,13 +152,13 @@ void Commands::nick(void)
 	}
 	if (error == true)
 	{
-		_server->sendMsg(_user->getFd(), message);
+		_server->sendMessage(_user->getFd(), _server->getName(), message);
 		return _server->closeFd(_user->getFd());
 	}
 	// Set nickname if no error occured
 	_user->setNickName(_params[1]);
 	message = _RPL_NICKSUCCESS(_params[1]);
-	_server->sendMsg(_user->getFd(), message);
+	_server->sendMessage(_user->getFd(), _server->getName(), message);
 }
 
 
@@ -180,7 +180,7 @@ void Commands::user(void)
 		else
 		{
 			std::string	message = _ERR_ALREADYREGISTRED(userName);
-			return _server->sendMsg(_user->getFd(), message);
+			return _server->sendMessage(_user->getFd(), _server->getName(), message);
 		}
 	*/
 	//_user->setUserName(userName);
@@ -189,7 +189,7 @@ void Commands::user(void)
 	{
 		_server->closeFd(_user->getFd());
 		message = _ERR_NONICKNAMEGIVEN;
-		return _server->sendMsg(_user->getFd(), message);
+		return _server->sendMessage(_user->getFd(), _server->getName(), message);
 	}
 
 	_user->setUserName(_params[1]);
@@ -215,13 +215,13 @@ void Commands::registerClient(void)
 
 	// Messages to send to the client to give info needed to finalize registeration
 	std::string message = _RPL_WELCOME(nickName, _user->getUserName());
-	_server->sendMsg(_user->getFd(), message);
+	_server->sendMessage(_user->getFd(), _server->getName(), message);
 	message = _RPL_YOURHOST(nickName, serverName);
-	_server->sendMsg(_user->getFd(), message);
+	_server->sendMessage(_user->getFd(), _server->getName(), message);
 	message = _RPL_CREATED(nickName, getTimeStr());
-	_server->sendMsg(_user->getFd(), message);
+	_server->sendMessage(_user->getFd(), _server->getName(), message);
 	message = _RPL_MYINFO(nickName, serverName);
-	_server->sendMsg(_user->getFd(), message);
+	_server->sendMessage(_user->getFd(), _server->getName(), message);
 	// Set client as registerated on our server
 	_user->setAsRegistered();
 }
@@ -234,23 +234,23 @@ void Commands::whois(void)
 	if (_params.size() < 2)
 	{
 		message = _ERR_NONICKNAMEGIVEN;
-		return _server->sendMsg(_user->getFd(), message);
+		return _server->sendMessage(_user->getFd(), _server->getName(), message);
 	}
 	if (!(user = _server->findUserByNick(nick)))
 	{
 		message = _ERR_NOSUCHNICK(nick);
-		return _server->sendMsg(_user->getFd(), message);
+		return _server->sendMessage(_user->getFd(), _server->getName(), message);
 	}
 
 	message = _RPL_WHOISREGNICK(nick);
-	_server->sendMsg(_user->getFd(), message);
+	_server->sendMessage(_user->getFd(), _server->getName(), message);
 	if (user->isOperator())
 	{
 		message = _RPL_WHOISOPERATOR(nick);
-		_server->sendMsg(_user->getFd(), message);
+		_server->sendMessage(_user->getFd(), _server->getName(), message);
 	}
 	message = _RPL_ENDOFWHOIS(nick);
-	return _server->sendMsg(_user->getFd(), message);
+	return _server->sendMessage(_user->getFd(), _server->getName(), message);
 }
 
 void Commands::who(void)
@@ -261,9 +261,9 @@ void Commands::who(void)
 	if (!_server->findUserByNick(nick)) return ;
 
 	message = _RPL_WHOISREGNICK(nick);
-	_server->sendMsg(_user->getFd(), message);
+	_server->sendMessage(_user->getFd(), _server->getName(), message);
 	message = _RPL_ENDOFWHOIS(nick);
-	return _server->sendMsg(_user->getFd(), message);
+	return _server->sendMessage(_user->getFd(), _server->getName(), message);
 }
 
 /*************************************************************
@@ -276,7 +276,7 @@ void Commands::oper(void)
 	if (_params.size() < 3)
 	{
 		std::string message = _ERR_NEEDMOREPARAMS(userNick, _params[0]);
-		return _server->sendMsg(_user->getFd(), message);
+		return _server->sendMessage(_user->getFd(), _server->getName(), message);
 	}
 
 	User *user = _server->findUserByNick(_params[1]);
@@ -285,11 +285,11 @@ void Commands::oper(void)
 	if (_server->getPassword() != _params[2])
 	{
 		std::string message = _ERR_PASSWDMISMATCH(userNick);
-		return _server->sendMsg(_user->getFd(), message);
+		return _server->sendMessage(_user->getFd(), _server->getName(), message);
 	}
 	user->setAsOperator();
 	std::string message = _RPL_YOUREOPER(userNick);
-	_server->sendMsg(user->getFd(), message);
+	_server->sendMessage(user->getFd(), _server->getName(), message);
 }
 
 /*************************************************************
@@ -376,7 +376,7 @@ void Commands::join(void)
 				if (channelKeys[i] != channel->getKey())
 				{
 					message = _ERR_BADCHANNELKEY(userNick, channelName);
-					return _server->sendMsg(userFd, message);
+					return _server->sendMessage(userFd, _server->getName(), message);
 				}
 			}
 			if (channel->isInviteOnly())
@@ -384,7 +384,7 @@ void Commands::join(void)
 				if (_user->isInvited(channelName) == false)
 				{
 					message = _ERR_INVITEONLYCHAN(userNick, channelName);
-					return _server->sendMsg(userFd, message);
+					return _server->sendMessage(userFd, _server->getName(), message);
 				}
 				else _user->useInvitation(channelName);
 			}
@@ -392,7 +392,7 @@ void Commands::join(void)
 		else if (channel->isLimited() == true && channel->countUsers() >= channel->getUserLimit())
 		{
 			message = _ERR_CHANNELISFULL(userNick, channelName);
-			return _server->sendMsg(userFd, message);
+			return _server->sendMessage(userFd, _server->getName(), message);
 		}
 
 		channel->join(_user, isOper);
@@ -411,7 +411,7 @@ void	Commands::finalizeJoin(User *user, Channel *channel)
 	if (channel->isLimited() == true && channel->countUsers() >= channel->getUserLimit())
 	{
 		message = _ERR_CHANNELISFULL(userNick, channelName);
-		return _server->sendMsg(userFd, message);
+		return _server->sendMessage(userFd, _server->getName(), message);
 	}
 
 	message = "JOIN " + channelName;
@@ -422,14 +422,14 @@ void	Commands::finalizeJoin(User *user, Channel *channel)
 	if (channel->getTopic().empty() == false)
 	{
 			message = _RPL_TOPIC(userNick, channel->getName(), channel->getTopic());
-			_server->sendMsg(userFd, message);
+			_server->sendMessage(userFd, _server->getName(), message);
 	}
 
 	// List all members of the channel
 	name(channel, user);
 
 	message = _RPL_ENDOFNAMES(userNick, channel->getName());
-	_server->sendMsg(userFd, message);
+	_server->sendMessage(userFd, _server->getName(), message);
 }
 
 /*************************************************************
@@ -454,7 +454,7 @@ void Commands::part(void)
 		if (!(channel = _server->findChannel(channelName)))
 		{
 			message = _ERR_NOSUCHCHANNEL(_user->getNickName(), channelName);
-			_server->sendMsg(_user->getFd(), message);
+			_server->sendMessage(_user->getFd(), _server->getName(), message);
 			continue;
 		}
 
@@ -480,7 +480,7 @@ void Commands::part(void)
 		if (it == users->end())
 		{
 			std::string message = _ERR_NOTONCHANNEL(_user->getNickName(), channel->getName());
-			return _server->sendMsg(_user->getFd(), message);
+			return _server->sendMessage(_user->getFd(), _server->getName(), message);
 		}
 	}
 }
@@ -506,7 +506,7 @@ void Commands::mode(void)
 		if (!channel)
 		{
 			message = _ERR_NOSUCHCHANNEL(userNick, _params[1]);
-			return _server->sendMsg(userFd, message);
+			return _server->sendMessage(userFd, _server->getName(), message);
 		}
 		// If no modestring is given, only prints the current channel modes
 		if (_params.size() < 3)
@@ -515,7 +515,7 @@ void Commands::mode(void)
 			concatParams = userLimit > 0 ? toString(userLimit) : "";
 			message = _RPL_CHANNELMODEIS(userNick, channel->getName(), \
 										channel->getModes(), concatParams);
-			return _server->sendMsg(userFd, message);
+			return _server->sendMessage(userFd, _server->getName(), message);
 		}
 
 		modes = _params[2];
@@ -559,7 +559,7 @@ void Commands::mode(void)
 					else if (channelModes.find(modes[i]) == std::string::npos)
 					{
 						message = _ERR_UNKNOWNMODE(userNick, modes[i]);
-						_server->sendMsg(userFd, message);
+						_server->sendMessage(userFd, _server->getName(), message);
 						++i;
 						continue;
 					}
@@ -578,7 +578,7 @@ void Commands::mode(void)
 			if (isChanOper == false)
 			{
 				message = _ERR_CHANOPRIVSNEEDED(userNick, channel->getName());
-				return _server->sendMsg(userFd, message);
+				return _server->sendMessage(userFd, _server->getName(), message);
 			}
 			// Apply mode modifications
 			std::map<char, char>::iterator	it;
@@ -608,7 +608,7 @@ void Commands::mode(void)
 				message = _RPL_CHANNELMODEIS(userNick, channel->getName(), \
 											concatModes, concatParams);
 				broadcastToChannel(channel, message, _NOT_PRIV);
-				return _server->sendMsg(userFd, message);
+				return _server->sendMessage(userFd, _server->getName(), message);
 			}
 		}
 
@@ -620,19 +620,19 @@ void Commands::mode(void)
 		if (!user)
 		{
 			message = _ERR_NOSUCHNICK(userNick);
-			return _server->sendMsg(_user->getFd(), message);
+			return _server->sendMessage(_user->getFd(), _server->getName(), message);
 		}
 		if (targetNick != userNick)
 		{
 			message = _ERR_USERSDONTMATCH(userNick);
-			return _server->sendMsg(_user->getFd(), message);
+			return _server->sendMessage(_user->getFd(), _server->getName(), message);
 		}
 		// If no modestring is given, print current modes
 		if (_params.size() < 3)
 		{
 			mode = _user->isOperator() ? "o" : "";
 			message = _RPL_UMODEIS(userNick, mode);
-			return _server->sendMsg(userFd, message);
+			return _server->sendMessage(userFd, _server->getName(), message);
 		}
 	}
 }
@@ -656,12 +656,12 @@ void Commands::topic(void)
 	if (!channel)
 	{
 		message = _ERR_NOSUCHCHANNEL(userNick, channelName);
-		return _server->sendMsg(userFd, message);
+		return _server->sendMessage(userFd, _server->getName(), message);
 	}
 	if (_params.size() == 2)
 	{
 		message = _RPL_TOPIC(userNick, channelName, fullTopicName);
-		return _server->sendMsg(userFd, message);
+		return _server->sendMessage(userFd, _server->getName(), message);
 	}
 	if (channel->isTopicProtected() == false || _user->isOperator() == true)
 	{
@@ -673,7 +673,7 @@ void Commands::topic(void)
 	else
 	{
 		message = _ERR_CHANOPRIVSNEEDED(userNick, channelName);
-		_server->sendMsg(userFd, message);
+		_server->sendMessage(userFd, _server->getName(), message);
 	}
 }
 
@@ -719,10 +719,10 @@ void Commands::name(Channel *channel, User *user)
 			char		symbol = channel->isSecret() ? '@' : '=';
 
 			message = _RPL_NAMREPLY(userNick, nick, symbol, channel->getName(), prefix);
-			_server->sendMsg(userFd, message);
+			_server->sendMessage(userFd, _server->getName(), message);
 	}
 	message = _RPL_ENDOFNAMES(userNick, channel->getName());
-	_server->sendMsg(userFd, message);
+	_server->sendMessage(userFd, _server->getName(), message);
 }
 
 
@@ -749,7 +749,7 @@ void Commands::list(void)
 	std::string	userNick = _user->getNickName();
 
 	message = _RPL_LISTSTART(userNick);
-	_server->sendMsg(userFd, message);
+	_server->sendMessage(userFd, _server->getName(), message);
 
 	for (size_t i(0); i < channels.size(); ++i)
 	{
@@ -757,11 +757,11 @@ void Commands::list(void)
 		{
 			std::string	userCount = toString(channels[i]->countUsers());
 			message = _RPL_LIST(userNick, channels[i]->getName(), userCount, channels[i]->getTopic());
-			_server->sendMsg(userFd, message);
+			_server->sendMessage(userFd, _server->getName(), message);
 		}
 	}
 	message = _RPL_LISTEND(userNick);
-	_server->sendMsg(userFd, message);
+	_server->sendMessage(userFd, _server->getName(), message);
 }
 
 void Commands::invite(void)
@@ -777,7 +777,7 @@ void Commands::invite(void)
 	if (!guest)
 	{
 		message = _ERR_NOSUCHNICK(userNick);
-		return _server->sendMsg(userFd, message);
+		return _server->sendMessage(userFd, _server->getName(), message);
 	}
 
 	int			guestFd = guest->getFd();
@@ -786,13 +786,13 @@ void Commands::invite(void)
 	if (!channel)
 	{
 		message = _ERR_NOSUCHCHANNEL(userNick, _params[2]);
-		return _server->sendMsg(userFd, message);
+		return _server->sendMessage(userFd, _server->getName(), message);
 	}
 	std::string	channelName = channel->getName();
 	if (channel->isInviteOnly() && channel->isOper(userNick) == false)
 	{
 		message = _ERR_CHANOPRIVSNEEDED(userNick, channelName);
-		return _server->sendMsg(userFd, message);
+		return _server->sendMessage(userFd, _server->getName(), message);
 	}
 
 	userDirectory			*users = channel->getUserDirectory();
@@ -802,7 +802,7 @@ void Commands::invite(void)
 		if ((*it).first->getNickName() == guestNick)
 		{
 			std::string message = _ERR_USERONCHANNEL(guestNick, chanName);
-			return _server->sendMsg(userFd, message);
+			return _server->sendMessage(userFd, _server->getName(), message);
 		}
 	}
 
@@ -830,28 +830,28 @@ void Commands::kick(void)
 	if (!(channel = _server->findChannel(_params[1])))
 	{
 		message = _ERR_NOSUCHCHANNEL(userNick, _params[1]);
-		return _server->sendMsg(userFd, message);
+		return _server->sendMessage(userFd, _server->getName(), message);
 	}
 
 	std::string	channelName = channel->getName();
 	if (channel->isMember(targetNick) == false)
 	{
 		message = _ERR_USERNOTINCHANNEL(userNick, targetNick, channelName);
-		return _server->sendMsg(userFd, message);
+		return _server->sendMessage(userFd, _server->getName(), message);
 	}
 
 	User *target = _server->findUserByNick(targetNick);
 	if (!target)
 	{
 		message = _ERR_NOSUCHNICK(targetNick);
-		return _server->sendMsg(_user->getFd(), message);
+		return _server->sendMessage(_user->getFd(), _server->getName(), message);
 	}
 
  	// Can only use KICK if oper
 	if (channel->isOper(userNick) == false)
 	{
 		std::string message = _ERR_CHANOPRIVSNEEDED(userNick, channelName);
-		return _server->sendMsg(userFd, message);
+		return _server->sendMessage(userFd, _server->getName(), message);
 	}
 	// Use the comment if it is given
 	std::string comment;
@@ -875,6 +875,8 @@ void Commands::kick(void)
 }
 
 /*************************************************************
+ * This command is used by the server and its users to communicate
+ * 	with each other.
  * Unlike privmsg, notice does not send error messages
  *************************************************************/
 void Commands::privmsg(bool isNoticeCmd)
@@ -898,13 +900,13 @@ void Commands::privmsg(bool isNoticeCmd)
 			if (!channel)
 			{
 				errMessage = _ERR_NOSUCHCHANNEL(userNick, name);
-				return _server->sendMsg(userFd, errMessage);
+				return _server->sendMessage(userFd, _server->getName(), errMessage);
 			}
 			if ((channel->isModerated() && !(_user->isOperator() || channel->hasVoice(userNick)))
 				|| (channel->isInternalOnly() && channel->isMember(userNick) == false))
 			{
 				errMessage = _ERR_CANNOTSENDTOCHAN(userNick, name);
-				return _server->sendMsg(userFd, errMessage);
+				return _server->sendMessage(userFd, _server->getName(), errMessage);
 			}
 			broadcastToChannel(channel, message, _PRIV);
 		}
@@ -916,11 +918,11 @@ void Commands::privmsg(bool isNoticeCmd)
 				if (isNoticeCmd == false)
 				{
 					errMessage = _ERR_NOSUCHNICK(names[i]);
-					return _server->sendMsg(userFd, errMessage);
+					return _server->sendMessage(userFd, _server->getName(), errMessage);
 				}
 			}
 			else
-				_server->sendMsg(target->getFd(), message);
+				_server->sendMessage(target->getFd(), _user->getId(), message);
 		}
 	}
 }
@@ -935,14 +937,14 @@ void Commands::kill(void)
 	if (_user->isOperator() == false)
 	{
 		message = _ERR_NOPRIVILEGES(userNick);
-		return _server->sendMsg(userFd, message);
+		return _server->sendMessage(userFd, _server->getName(), message);
 	}
 
 	User 		*target = _server->findUserByNick(_params[1]);
 	if (!target)
 	{
 		message = _ERR_NOSUCHNICK(userNick);
-		return _server->sendMsg(userFd, message);
+		return _server->sendMessage(userFd, _server->getName(), message);
 	}
 
 	std::string comment = concatArrayStrs(_params, 2);
@@ -967,15 +969,15 @@ void Commands::ping(void)
 	if (servername != _server->getName())
 	{
 		message = _ERR_NOSUCHSERVER(_user->getNickName(), _server->getName());
-		return _server->sendMsg(_user->getFd(), message);
+		return _server->sendMessage(_user->getFd(), _server->getName(), message);
 	}
-	_server->sendMsg(_user->getFd(), message);
+	_server->sendMessage(_user->getFd(), _server->getName(), message);
 }
 
 void Commands::pong(void)
 {
 	std::string message = "PONG";
-	_server->sendMsg(_user->getFd(), message);
+	_server->sendMessage(_user->getFd(), _server->getName(), message);
 }
 
 void	Commands::killServ(void)
@@ -989,7 +991,7 @@ bool	Commands::checkParamNbr(size_t nbr)
 	if (_params.size() < nbr)
 	{
 		std::string	message = _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]);
-		_server->sendMsg(_user->getFd(), message);
+		_server->sendMessage(_user->getFd(), _server->getName(), message);
 		return _ERROR;
 	}
 	return _OK;

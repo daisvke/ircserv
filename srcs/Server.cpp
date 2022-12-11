@@ -237,24 +237,7 @@ void Server::readExistingFds(int index)
 	ircMemset((void *)_buffer, 0, sizeof(_buffer));
 }
 
-void Server::sendMsg(int fd, std::string &msg)
-{
-	int sendRet;
-
-	msg = ":" + _name + " " + msg + _CRLF;
-
-	std::cout << "\033[31m]==================== sendMsg 1: \033[0m" << msg << std::endl;
-	sendRet = send(fd, msg.c_str(), msg.length(), MSG_NOSIGNAL);
-	if (sendRet < 0)
-	{
-		serverPrint("send() failed");
-		for (int i = 0; i < _nfds; i++)
-			if (_fds[i].fd == fd)
-				closeConn(i);
-	}
-}
-
-void Server::sendMessage(int fd, std::string id, std::string &msg)
+void Server::sendMessage(int fd, std::string id, std::string msg)
 {
 	int sendRet;
 
@@ -275,7 +258,7 @@ void Server::sendToAllUser(std::string &msg)
 	userMap::iterator it = _userMap.begin();
 
 	for (; it != _userMap.end(); ++it)
-		sendMsg((*it).first, msg);
+		sendMessage((*it).first, (*it).second->getId(), msg);
 }
 
 /****************************************************************************

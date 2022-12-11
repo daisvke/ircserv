@@ -83,8 +83,7 @@ class Server
 		Channel					*addChannel(std::string name, std::string key);
 		void					deleteChannel(std::string name);
 		//send
-		void	sendMsg(int fd, std::string &msg);
-		void	sendMessage(int fd, std::string id, std::string &msg);
+		void	sendMessage(int fd, std::string id, std::string msg);
 		void	sendToAllUser(std::string &msg);
 		//close
 		void	closeFd(int targetFd);

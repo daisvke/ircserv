@@ -26,6 +26,7 @@ enum e_return{
 	E_FALSE = 1
 };
 
+int	                    	setToTrue(bool	*res);
 int							ircStoi(std::string input);
 bool						ircIsAlNum(std::string &s);
 bool						ircIsAllPrintable(std::string &s);

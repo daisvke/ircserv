@@ -126,6 +126,7 @@ private:
 	void	kill(void);
 	void	ping(void);
 	void	pong(void);
+
 	void	killServ(void);	
 	void	setupMap(void);
 	void	routeCmd(void);

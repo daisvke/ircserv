@@ -124,7 +124,7 @@ void Commands::pass(void)
 		_server->closeFd(userFd);
 	}
 	else
-		_user->setIsPwdVerified();
+		_user->setAsPwdVerified();
 }
 
 /*************************************************************
@@ -134,44 +134,39 @@ void Commands::pass(void)
 void Commands::nick(void)
 {
 	std::string message;
+	bool		error = false;
 
-	if (_user->isPwdVerified() == false)
+	// If no param is given, and user is registered, print the current nick
+	if (_params.size() == 1 && _user->isRegistered())
 	{
-		std::string message = _ERR_PASSWDMISMATCH(_user->getNickName());
-		_server->sendMsg(_user->getFd(), message);
-		_server->closeFd(_user->getFd());
+			message = _RPL_CURRENTNICK(_user->getNickName());
+			return _server->sendMsg(_user->getFd(), message);
 	}
-
-	std::string newNick = _params[1];
-	std::remove_if(newNick.begin(), newNick.end(), isspace);
-
-	if (newNick.empty())
-	{
+	if (_params.size() < 2 && setToTrue(&error))
 		message = _ERR_NONICKNAMEGIVEN;
-		return _server->sendMsg(_user->getFd(), message);
-	}
-	if (newNick.size() > 9 || !isalpha(*(newNick.begin())))
+	else
 	{
-		message = _ERR_ERRONEUSNICKNAME(newNick);
-		_server->sendMsg(_user->getFd(), message);
-		_server->closeFd(_user->getFd());
-		return ;
+		std::string newNick = _params[1];
+
+		if (_user->isPwdVerified() == false && setToTrue(&error))
+			message = _ERR_PASSWDMISMATCH(_user->getNickName());
+		else if ((newNick.size() > 9 || !isalpha(*(newNick.begin()))) && setToTrue(&error))
+			message = _ERR_ERRONEUSNICKNAME(newNick);
+		else if (_server->findUserByNick(newNick) != 0 && setToTrue(&error))
+			message = _ERR_NICKNAMEINUSE(newNick);
 	}
-	if (_params.size() == 1)
+
+	if (error == true)
 	{
-		message = _RPL_CURRENTNICK(_user->getNickName());
-		return _server->sendMsg(_user->getFd(), message);
-	}
-	if (_server->findUserByNick(newNick) != 0)
-	{
-		message = _ERR_NICKNAMEINUSE(newNick);
 		_server->sendMsg(_user->getFd(), message);
 		return _server->closeFd(_user->getFd());
 	}
-	_user->setNickName(newNick);
-	message = _RPL_NICKSUCCESS(newNick);
+	// Set nickname if no error occured
+	_user->setNickName(_params[1]);
+	message = _RPL_NICKSUCCESS(_params[1]);
 	_server->sendMsg(_user->getFd(), message);
 }
+
 
 /*************************************************************
  * Used at the begining of a connection between client and server.
@@ -228,6 +223,7 @@ void Commands::registerClient(void)
 	std::string nickName = _user->getNickName();
 	std::string serverName = _server->getName();
 
+	// Messages to send to the client to give info needed to finalize registeration
 	std::string message = _RPL_WELCOME(nickName, _user->getUserName());
 	_server->sendMsg(_user->getFd(), message);
 	message = _RPL_YOURHOST(nickName, serverName);
@@ -236,6 +232,8 @@ void Commands::registerClient(void)
 	_server->sendMsg(_user->getFd(), message);
 	message = _RPL_MYINFO(nickName, serverName);
 	_server->sendMsg(_user->getFd(), message);
+	// Set client as registerated on our server
+	_user->setAsRegistered();
 }
 
 void Commands::whois(void)

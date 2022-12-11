@@ -115,3 +115,5 @@ std::string	concatArrayStrs(std::vector<std::string> array, size_t index)
 			concatenatedStr += " " + array[i];
 	return concatenatedStr;
 }
+
+int	setToTrue(bool	*res) { *res = true; return 1; }

@@ -27,7 +27,8 @@ class User
 		// setters
 		void	setFd(int fd);
 		void	setId(std::string id);
-		void	setIsPwdVerified(void);
+		void	setAsPwdVerified(void);
+		void	setAsRegistered(void);
 		void	setNickName(std::string nick);
 		void	setUserName(std::string user);
 		void	setHostName(std::string host);
@@ -45,15 +46,16 @@ class User
 
 		bool		isOperator(void) const;
 		bool		isPwdVerified(void) const;
+		bool		isRegistered(void) const;
 		bool		isInvited(std::string channelName) const;
 
-		
 		void		useInvitation(std::string channelName);
 
 	private:
 
 		int							_fd;
 		bool						_isPwdVerified;
+		bool						_isRegistered;
 		bool						_isOper;
 		std::string					_id;
 		std::string					_nickName;

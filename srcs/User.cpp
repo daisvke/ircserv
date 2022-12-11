@@ -12,7 +12,7 @@
 
 #include "User.hpp"
 
-User::User(): _isPwdVerified(false), _isOper(false) {}
+User::User(): _isPwdVerified(false), _isRegistered(false), _isOper(false) {}
 User::~User() {}
 
 /*************************************************************
@@ -20,7 +20,8 @@ User::~User() {}
 *************************************************************/
 void	User::setFd(int fd) { _fd = fd; }
 void	User::setId(std::string id) { _id = id; }
-void	User::setIsPwdVerified(void) { _isPwdVerified = true; }
+void	User::setAsPwdVerified(void) { _isPwdVerified = true; }
+void	User::setAsRegistered(void) { _isRegistered = true; }
 void	User::setNickName(std::string nick) { _nickName = nick; }
 void	User::setUserName(std::string user) { _userName = user; }
 void	User::setHostName(std::string host) { _hostName = host; }
@@ -45,6 +46,7 @@ std::string	User::getRealName(void) const { return _realName; }
 
 bool		User::isOperator(void) const { return _isOper; }
 bool		User::isPwdVerified(void) const { return _isPwdVerified; }
+bool		User::isRegistered(void) const { return _isRegistered; }
 
 bool		User::isInvited(std::string channelName) const
 {

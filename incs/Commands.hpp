@@ -59,6 +59,7 @@
 #define _RPL_TOPIC(nick, chan, topic) "332 " + nick + " " + chan + " :" + topic
 #define _RPL_NAMREPLY(nick, name, symbol, chan, prefix) "353 " + nick + " " + symbol + " " + chan + " " + prefix + name
 #define _RPL_ENDOFNAMES(nick, chan) "366 " + nick + " " + chan
+#define _ERR_BANNEDFROMCHAN(nick, chan) "474 " + nick + " " + chan + " :Cannot join channel (+b)"
 // part
 #define _ERR_NOSUCHCHANNEL(nick, chan) "403 " + nick + " " + chan
 #define _ERR_NOSUCHCHANIMIT(nick, chan) "403 " + nick + " " + chan
@@ -148,10 +149,10 @@ private:
 
 	void broadcastToChannel(Channel *channel, std::string msg, bool isPriv);
 
-	Server *_server;
-	User *_user;
-	std::vector<std::string> _params;
-	cmdMap _cmdMap;
+	Server						*_server;
+	User						*_user;
+	std::vector<std::string>	_params;
+	cmdMap						_cmdMap;
 };
 
 #endif

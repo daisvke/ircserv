@@ -13,12 +13,10 @@
 #include "Channel.hpp"
 
 Channel::Channel(std::string name, std::string key)
-	: _name(name), _topic(), _modes("+"), _key(key), _users(), _userLimit()
+	: _name(name), _topic(), _modes("+"), _key(key), _userLimit()
 {
 	if (key.empty() == false)
-	{
 		_modes += "k";
-	}
 }
 
 Channel::~Channel() {}
@@ -53,6 +51,12 @@ bool Channel::setChannelMode(char c, std::string params)
 
 	switch (c)
 	{
+		case 'b':
+			if (isBanned(params) == true)
+				return false;
+			else
+				banUser(params);
+			break ;
 		case 'l':
 		{
 			if (ircIsAlNum(params) == E_FALSE)
@@ -70,10 +74,10 @@ bool Channel::setChannelMode(char c, std::string params)
 			}
 			else
 				changed = false;;
-			break;
+			break ;
 		}
 		case 'k':
-			if (_key != params)
+			if (params != _key)
 			{
 				_key = params;
 				_modes += c;
@@ -90,6 +94,12 @@ bool Channel::setChannelMode(char c, std::string params)
 
 	return changed;
 }
+
+void Channel::banUser(std::string user)
+{
+	_banList.push_back(user);
+}
+
 
 /*************************************************************
  * Getters
@@ -119,6 +129,7 @@ bool Channel::isSecret(void) const { return checkMode('s'); }
 bool Channel::isInternalOnly(void) const { return checkMode('n'); }
 bool Channel::isLimited(void) const { return checkMode('l'); }
 bool Channel::isEmpty(void) const { return _users.size() == 0; }
+bool Channel::isBanMode(void) const { return checkMode('b'); }
 
 bool Channel::isOper(std::string name)
 {
@@ -136,6 +147,14 @@ bool Channel::isMember(std::string nick)
 		if (((*it).first->getNickName() == nick))
 			return true;
 	}
+	return false;
+}
+
+bool Channel::isBanned(std::string user)
+{
+	for (size_t i(0); i < _banList; ++i)
+		if (user == _banList[i])
+			return true;
 	return false;
 }
 

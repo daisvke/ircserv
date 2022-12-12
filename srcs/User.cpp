@@ -27,7 +27,6 @@ void User::setUserName(std::string user) { _userName = user; }
 void User::setHostName(std::string host) { _hostName = host; }
 void User::setRealName(std::string real) { _realName = real; }
 void User::setAsOperator(void) { modifyMode('o', '+'); }
-void User::unSetAsOperator(void) { modifyMode('o', '-'); }
 
 void User::modifyMode(char c, char sign)
 {

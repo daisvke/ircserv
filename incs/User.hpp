@@ -37,7 +37,6 @@ public:
 	void setHostName(std::string host);
 	void setRealName(std::string real);
 	void setAsOperator(void);
-	void unSetAsOperator(void);
 	void addChanInvitation(std::string channelName);
 	void modifyMode(char c, char sign);
 

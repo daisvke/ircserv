@@ -888,7 +888,13 @@ void Commands::kick(void)
  *************************************************************/
 void Commands::privmsg(bool isNoticeCmd)
 {
-	if (isNoticeCmd == false && checkParamNbr(3) == _ERROR) return;
+	if (!(_user->isPwdVerified() && _user->isRegistered()))
+		return ;
+	if (_params.size() < 3)
+	{
+		std::string message = isNoticeCmd == false ? _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]) : "";
+		return _server->sendMessage(_user->getFd(), _server->getName(), message);
+	}
 
 	std::vector<std::string> names = ircSplit(_params[1], ',');
 	std::string errMessage;
@@ -904,14 +910,13 @@ void Commands::privmsg(bool isNoticeCmd)
 			Channel *channel = _server->findChannel(name);
 			if (!channel)
 			{
-				errMessage = _ERR_NOSUCHCHANNEL(userNick, name);
+				errMessage = isNoticeCmd == false ? _ERR_NOSUCHCHANNEL(userNick, name) : "";
 				return _server->sendMessage(userFd, _server->getName(), errMessage);
 			}
-			if (isNoticeCmd == false
-				&& ((channel->isModerated() && !(_user->isOperator() || channel->hasVoice(userNick)))
-				|| (channel->isInternalOnly() && channel->isMember(userNick) == false)))
+			if ((channel->isModerated() && !(_user->isOperator() || channel->hasVoice(userNick)))
+				|| (channel->isInternalOnly() && channel->isMember(userNick) == false))
 			{
-				errMessage = _ERR_CANNOTSENDTOCHAN(userNick, name);
+				errMessage = isNoticeCmd == false ? _ERR_CANNOTSENDTOCHAN(userNick, name) : "";
 				return _server->sendMessage(userFd, _server->getName(), errMessage);
 			}
 			broadcastToChannel(channel, message, _PRIV);
@@ -921,11 +926,8 @@ void Commands::privmsg(bool isNoticeCmd)
 			User *target = _server->findUserByNick(names[i]);
 			if (!target)
 			{
-				if (isNoticeCmd == false)
-				{
-					errMessage = _ERR_NOSUCHNICK(names[i]);
+					errMessage = isNoticeCmd == false ? _ERR_NOSUCHNICK(names[i]) : "";
 					return _server->sendMessage(userFd, _server->getName(), errMessage);
-				}
 			}
 			else
 			{

@@ -75,11 +75,11 @@ int main(int ac, char **av)
 /set dcc_autoaccept_lowports ON
 /set dcc_autoget ON
 
-/set dcc_download_path "/home/mint/Documents/42/ircserv/"
+/set dcc_download_path "/home/mint/Documents/42/ircserv/dcc_public"
 /set dcc_file_create_mode 644
 /set dcc_upload_path "/home/mint/Documents/42/ircserv/dcc_public"
 
-/dcc send u2 "/home/mint/Documents/42/ircserv/dcc_public/coucou.txt"
+/dcc send u1 "/home/mint/Documents/42/ircserv/dcc_public/coucou.txt"
 
 */
 

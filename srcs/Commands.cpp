@@ -103,11 +103,10 @@ void Commands::broadcastToChannel(Channel *channel, std::string msg, bool isPriv
 	{
 		if ((*it).first != _user)
 		{
-			msg = isPriv ? "PRIVMSG " + channel->getName() + " " + msg : msg;
+			std::string	tmpMsg = isPriv ? "PRIVMSG " + channel->getName() + " " + msg : msg;
 			int userFd = (*it).first->getFd();
 			std::string userId = _user->getId();
-
-			_server->sendMessage(userFd, userId, msg);
+			_server->sendMessage(userFd, userId, tmpMsg);
 		}
 	}
 }

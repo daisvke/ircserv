@@ -492,7 +492,7 @@ void Commands::part(void)
 		if (it == users->end())
 		{
 			std::string message = _ERR_NOTONCHANNEL(_user->getNickName(), channel->getName());
-			return _server->sendMessage(_user->getFd(), _server->getName(), message);
+			_server->sendMessage(_user->getFd(), _server->getName(), message);
 		}
 	}
 }
@@ -931,21 +931,15 @@ void Commands::privmsg(bool isNoticeCmd)
 			}
 			else
 			{
-				// std::string test = "test";
-				// std::cout << "size test = " << test.size() << std::endl;
-				// std::cout << "size params[2] = " << _params[2].size() << std::endl;
-				// std::cout << "params[2] = " << "["<< _params[2] << "]" << std::endl;
- 				if (_params[2].size() == 5 && _params[2].find("DCC") != std::string::npos){
+ 				if (_params[2].size() == 5 && _params[2].find("DCC") != std::string::npos)
 					message = "PRIVMSG " + target->getNickName() + " " + message;
-									// std::cout << "WE ARE IN CASE DCC " 	<<message << "<==================================" << std::endl;
-				}
 
-				// std::cout << " ===================>"<< message << "params[2] =" << _params[2]<<"<=============" << std::endl;
-
+				if (isNoticeCmd == false)
+					message = "PRIVMSG " + target->getNickName() + " " + message;
  				_server->sendMessage(target->getFd(), _user->getId(), message);
 			}
 		}
-	}
+}
 }
 
 void Commands::kill(void)

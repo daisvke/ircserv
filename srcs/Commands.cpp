@@ -648,12 +648,9 @@ void Commands::mode(void)
 		if (_params.size() > 2 && _params[2][0] == '-' && _params[2][1] == 'o')
 			_user->unSetAsOperator();
 		// If no modestring is given, print current modes
-		if (_params.size() < 3)
-		{
 			mode = _user->isOperator() ? "o" : "";
 			message = _RPL_UMODEIS(userNick, mode);
 			return _server->sendMessage(userFd, _server->getName(), message);
-		}
 	}
 }
 

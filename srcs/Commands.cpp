@@ -377,7 +377,7 @@ void Commands::join(void)
 		if (!(channel = _server->findChannel(channelName)))
 		{
 			channel = _server->addChannel(channelName, channelKeys[i]);
-			_user->setAsOperator();
+			channel->modifyUserMode('o', userNick, '+');
 			isOper = true;
 		}
 

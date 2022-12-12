@@ -402,12 +402,6 @@ void Commands::join(void)
 				}
 				else
 					_user->useInvitation(channelName);
-		
-			}
-			if (channel->isBanMode() && channel->isBanned(userNick))
-			{
-				message = _ERR_BANNEDFROMCHAN(userNick, channelName);
-				return _server->sendMessage(userFd, _server->getName(), message);
 			}
 		}
 		else if (channel->isLimited() == true && channel->countUsers() >= channel->getUserLimit())

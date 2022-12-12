@@ -36,7 +36,6 @@ class Channel
 		bool modifyModes(char mode, std::string params, char sign);
 		void modifyUserMode(char c, std::string target, char sign);
 		bool setChannelMode(char c, std::string params);
-		void banUser(std::string user);
 
 		// getters
 		std::string getName(void) const;
@@ -58,9 +57,7 @@ class Channel
 		bool isLimited(void) const;
 		bool isOper(std::string name);
 		bool hasVoice(std::string name);
-		bool isBanMode(void) const;
-		bool isBanned(std::string user);
-
+		
 		bool isEmpty(void) const;
 		bool isMember(std::string nick);
 

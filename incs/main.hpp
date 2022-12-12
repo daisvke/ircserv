@@ -7,7 +7,7 @@
 
 # define _USERMODES			"o"
 # define _CHANMODES			"timnslkb"
-# define _CHAN_PARAM_MODES	"lkb"
+# define _CHAN_PARAM_MODES	"lk"
 
 enum    e_search { _NOT_FOUND, _FOUND };
 

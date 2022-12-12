@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/12 15:38:34 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/12 17:26:16 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -445,14 +445,16 @@ void Commands::finalizeJoin(User *user, Channel *channel)
 	name(channel, user);
 }
 
+
 /*************************************************************
  * The user leaves all the channels given as parameters.
  * If no parameter is given, the current channel is left.
+ * Unlike JOIN chan1,chan2,chan3, PART needs the channel names
+ * 	to beign with #.
  *************************************************************/
 void Commands::part(void)
 {
-	if (checkParamNbr(2) == _ERROR)
-		return;
+	if (checkParamNbr(2) == _ERROR) return;
 
 	std::string message;
 	std::vector<std::string> channelNames = ircSplit(_params[1], ',');
@@ -486,8 +488,8 @@ void Commands::part(void)
 				users->erase((*it).first);
 
 				if (channel->isEmpty())
-					_server->deleteChannel(channel->getName());
-				break;
+					_server->deleteChannel(channelName);
+				break ;
 			}
 			++it;
 		}
@@ -495,6 +497,7 @@ void Commands::part(void)
 		{
 			std::string message = _ERR_NOTONCHANNEL(_user->getNickName(), channel->getName());
 			_server->sendMessage(_user->getFd(), _server->getName(), message);
+
 		}
 	}
 }
@@ -583,7 +586,9 @@ void Commands::mode(void)
 						continue;
 					}
 					// Save validated mode with its sign
-					if ((channel->getModes().find(modes[i]) == std::string::npos && sign == '+') || (channel->getModes().find(modes[i]) != std::string::npos && sign == '-') || (channel->getModes().find(modes[i]) != std::string::npos && needsParam == true))
+					if ((channel->getModes().find(modes[i]) == std::string::npos && sign == '+')
+						|| (channel->getModes().find(modes[i]) != std::string::npos && sign == '-')
+						|| (channel->getModes().find(modes[i]) != std::string::npos && needsParam == true))
 						foundModes[modes[i]] = sign;
 					++i;
 				}
@@ -648,9 +653,9 @@ void Commands::mode(void)
 		if (_params.size() > 2 && _params[2][0] == '-' && _params[2][1] == 'o')
 			_user->modifyMode('o', '-');
 		// If no modestring is given, print current modes
-			mode = _user->isOperator() ? "o" : "";
-			message = _RPL_UMODEIS(userNick, mode);
-			return _server->sendMessage(userFd, _server->getName(), message);
+		mode = _user->isOperator() ? "o" : "";
+		message = _RPL_UMODEIS(userNick, mode);
+		return _server->sendMessage(userFd, _server->getName(), message);
 	}
 }
 

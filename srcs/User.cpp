@@ -6,13 +6,13 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 18:47:19 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/01 17:47:00 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/12 17:01:47 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "User.hpp"
 
-User::User() : _fd(), _isPwdVerified(false), _isRegistered(false), _isOper(false) {}
+User::User() : _fd(), _isPwdVerified(false), _isRegistered(false) {}
 User::~User() {}
 
 /*************************************************************

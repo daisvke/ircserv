@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/12 15:04:57 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/12 16:24:05 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,6 @@ Server::Server()
 {
 	ircMemset((void *)_buffer, 0, sizeof(_buffer));
 	ircMemset((void *)_fds, 0, sizeof(_fds));
-	// std::cout << _creationTime << "Server constructor called" << std::endl;
-	// std::cout << "password = " << _password << std::endl;
-	// std::cout << "port = " << _port << std::endl;
 }
 
 Server::Server(int port, std::string pwd)
@@ -35,9 +32,6 @@ Server::Server(int port, std::string pwd)
 {
 	ircMemset((void *)_buffer, 0, sizeof(_buffer));
 	ircMemset((void *)_fds, 0, sizeof(_fds));
-	// std::cout << _creationTime << " Server constructor called" << std::endl;
-	// std::cout << "password = " << _password << std::endl;
-	// std::cout << "port = " << _port << std::endl;
 }
 
 Server::~Server()
@@ -71,8 +65,10 @@ int Server::setSocketopt()
 {
 	socklen_t	val = 1;
 
-	if (setsockopt(_listenSd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &val, sizeof(socklen_t)) == -1)
+	if (setsockopt(_listenSd, SOL_SOCKET, SO_REUSEADDR /*| SO_REUSEPORT*/, &val, sizeof(socklen_t)) == -1) //uncomment to let multi port connection
 		return (E_SETSOCKOPT_ERR);
+	/*else if (fcntl(_listenSd, F_SETFL, O_NONBLOCK) == -1)	//uncomment for portability on mac os
+		return (E_SETSOCKOPT_ERR);*/
 	std::cout << "2. socketopt success" << std::endl;
 	return (E_SOCK_SUCCESS);
 }
@@ -98,7 +94,7 @@ int Server::setNonBlocking()
 int Server::bindSocket()
 {
 	_sockAddr.sin_family = AF_INET;
-	_sockAddr.sin_addr.s_addr = INADDR_ANY;//inet_addr(LOCAL_HOST);
+	_sockAddr.sin_addr.s_addr = INADDR_ANY;// if connection are only local : inet_addr(LOCAL_HOST);
 	_sockAddr.sin_port = htons(_port);
 	if (bind(_listenSd, (sockaddr *)&_sockAddr, _addrlen) == -1)
 		return (E_BIND_ERR);
@@ -127,9 +123,9 @@ void Server::initServer()
 	std::string names[5] = {
 		"socket",
 		"socketopt",
-		"setNonBlocking"
+		"setNonBlocking",
 		"bind",
-		"listen",
+		"listen"
 	};
 	int (Server::*funkTab[5])() = {
 		&Server::setSocket,

@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 18:47:16 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/11/29 22:56:41 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/12 17:01:30 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,6 @@ private:
 	int _fd;
 	bool _isPwdVerified;
 	bool _isRegistered;
-	bool _isOper;
 	std::string _modes;
 	std::string _id;
 	std::string _nickName;

@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/10 20:46:49 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/12 11:55:45 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -848,7 +848,7 @@ void Commands::kick(void)
 		message = _ERR_NOSUCHCHANNEL(userNick, _params[1]);
 		return _server->sendMessage(userFd, _server->getName(), message);
 	}
-	
+
 	std::string channelName = channel->getName();
 	if (channel->isMember(userNick) == false && setToTrue(&error))
 		message = _ERR_NOTONCHANNEL(userNick, channelName);
@@ -928,7 +928,20 @@ void Commands::privmsg(bool isNoticeCmd)
 				}
 			}
 			else
-				_server->sendMessage(target->getFd(), _user->getId(), message);
+			{
+				// std::string test = "test";
+				// std::cout << "size test = " << test.size() << std::endl;
+				// std::cout << "size params[2] = " << _params[2].size() << std::endl;
+				// std::cout << "params[2] = " << "["<< _params[2] << "]" << std::endl;
+ 				if (_params[2].size() == 5 && _params[2].find("DCC") != std::string::npos){
+					message = "PRIVMSG " + target->getNickName() + " " + message;
+									// std::cout << "WE ARE IN CASE DCC " 	<<message << "<==================================" << std::endl;
+				}
+
+				// std::cout << " ===================>"<< message << "params[2] =" << _params[2]<<"<=============" << std::endl;
+
+ 				_server->sendMessage(target->getFd(), _user->getId(), message);
+			}
 		}
 	}
 }
@@ -979,7 +992,7 @@ void Commands::ping(void)
 void Commands::pong(void)
 {
 	if (checkParamNbr(2) == _ERROR) return;
-	
+
 	std::string message = "PONG";
 	_server->sendMessage(_user->getFd(), _server->getName(), message);
 }

@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/12 11:05:13 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/12 11:38:31 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -450,6 +450,10 @@ void Server::deleteChannel(std::string name)
 	}
 }
 
+// :i2!lchan@localhost :DCC SEND coucou.txt 2130706433 38675 0
+
+// :i2!lchan@:127.0.0.1 PRIVMSG i3 :DCC SEND coucou.txt 2130706433 35809 0
+// :i2!lchan@localhost 			:DCC SEND coucou.txt 2130706433 45103 0
 void Server::setName(std::string name) { _name = name; }
 std::string Server::getName(void) const { return _name; }
 std::string Server::getPassword(void) const { return _password; }

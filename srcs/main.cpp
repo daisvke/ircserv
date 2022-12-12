@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 15:55:19 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/10 19:08:56 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/12 11:59:06 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,8 @@ int main(int ac, char **av)
 /set dcc_download_path "/home/mint/Documents/42/ircserv/dcc_public"
 /set dcc_file_create_mode 644
 /set dcc_upload_path "/home/mint/Documents/42/ircserv/dcc_public"
+
+/set dcc_upload_path "/mnt/nfs/homes/lchan/Documents/projet/ft_irc/dcc_public"
 
 /dcc send u1 "/home/mint/Documents/42/ircserv/dcc_public/coucou.txt"
 

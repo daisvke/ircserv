@@ -936,6 +936,8 @@ void Commands::privmsg(bool isNoticeCmd)
 
 				if (isNoticeCmd == false)
 					message = "PRIVMSG " + target->getNickName() + " " + message;
+				else
+					message = "NOTICE " + target->getNickName() + " " + message;
  				_server->sendMessage(target->getFd(), _user->getId(), message);
 			}
 		}

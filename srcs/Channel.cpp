@@ -29,7 +29,7 @@ Channel::~Channel() {}
 
 void Channel::setTopic(std::string name) { _topic = name; }
 
-void Channel::modifyUserMode(char c, std::string target, char sign)
+void Channel::modifyModeMode(char c, std::string target, char sign)
 {
 	userDirectory::iterator it = _users.begin();
 
@@ -49,48 +49,48 @@ void Channel::modifyUserMode(char c, std::string target, char sign)
 
 bool Channel::setChannelMode(char c, std::string params)
 {
-	bool	changed = true;
+	bool changed = true;
 
 	switch (c)
 	{
-		case 'l':
+	case 'l':
+	{
+		if (ircIsAlNum(params) == E_FALSE)
+			return false;
+
+		int limit = atoi(params.c_str());
+		if (limit < 0)
+			return false;
+
+		if ((size_t)limit != _userLimit)
 		{
-			if (ircIsAlNum(params) == E_FALSE)
-				return false;
-
-			int limit = atoi(params.c_str());
-			if (limit < 0)
-				return false;
-
-			if ((size_t)limit != _userLimit)
-			{
-				_userLimit = (size_t)limit;
-				_modes += c;
-				return true;
-			}
-			else
-				changed = false;;
-			break;
+			_userLimit = (size_t)limit;
+			_modes += c;
+			return true;
 		}
-		case 'k':
-			if (_key != params)
-			{
-				_key = params;
-				_modes += c;
-				return true;
-			}
-			else
-				changed = false;
+		else
+			changed = false;
+		;
+		break;
+	}
+	case 'k':
+		if (_key != params)
+		{
+			_key = params;
+			_modes += c;
+			return true;
+		}
+		else
+			changed = false;
 	}
 
-	if (checkMode(c) == _NOT_FOUND)
+	if (checkMode(_modes, c) == _NOT_FOUND)
 		_modes += c;
 	else
 		changed = false;
 
 	return changed;
 }
-
 
 /*************************************************************
  * Getters
@@ -112,13 +112,13 @@ std::string *Channel::getUserMode(std::string name)
 	return 0;
 }
 
-bool Channel::isKeyProtected(void) const { return checkMode('k'); }
-bool Channel::isTopicProtected(void) const { return checkMode('t'); }
-bool Channel::isModerated(void) const { return checkMode('m'); }
-bool Channel::isInviteOnly(void) const { return checkMode('i'); }
-bool Channel::isSecret(void) const { return checkMode('s'); }
-bool Channel::isInternalOnly(void) const { return checkMode('n'); }
-bool Channel::isLimited(void) const { return checkMode('l'); }
+bool Channel::isKeyProtected(void) const { return checkMode(_modes, 'k'); }
+bool Channel::isTopicProtected(void) const { return checkMode(_modes, 't'); }
+bool Channel::isModerated(void) const { return checkMode(_modes, 'm'); }
+bool Channel::isInviteOnly(void) const { return checkMode(_modes, 'i'); }
+bool Channel::isSecret(void) const { return checkMode(_modes, 's'); }
+bool Channel::isInternalOnly(void) const { return checkMode(_modes, 'n'); }
+bool Channel::isLimited(void) const { return checkMode(_modes, 'l'); }
 bool Channel::isEmpty(void) const { return _users.size() == 0; }
 
 bool Channel::isOper(std::string name)
@@ -196,11 +196,11 @@ bool Channel::modifyModes(char c, std::string params, char sign)
 {
 	//	std::string channelModes = "lktmnspib";
 	std::string channelModes = _CHANMODES;
-	bool		changed = true;
+	bool changed = true;
 
 	// User modes
 	if (c == 'o' || c == 'v')
-		modifyUserMode(c, params, sign);
+		modifyModeMode(c, params, sign);
 	else
 	{
 		// Channel modes
@@ -214,11 +214,4 @@ bool Channel::modifyModes(char c, std::string params, char sign)
 		}
 	}
 	return changed;
-}
-
-bool Channel::checkMode(char c) const
-{
-	if (_modes.find(c) != std::string::npos)
-		return _FOUND;
-	return _NOT_FOUND;
 }

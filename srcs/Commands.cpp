@@ -72,7 +72,8 @@ void Commands::routeCmd()
 {
 	cmdMap::iterator it;
 
-	if (_params.size() < 1) return;
+	if (_params.size() < 1)
+		return;
 
 	std::string cmd = _params[0];
 	if (cmd == "PRIVMSG")
@@ -103,7 +104,7 @@ void Commands::broadcastToChannel(Channel *channel, std::string msg, bool isPriv
 	{
 		if ((*it).first != _user)
 		{
-			std::string	tmpMsg = isPriv ? "PRIVMSG " + channel->getName() + " " + msg : msg;
+			std::string tmpMsg = isPriv ? "PRIVMSG " + channel->getName() + " " + msg : msg;
 			int userFd = (*it).first->getFd();
 			std::string userId = _user->getId();
 			_server->sendMessage(userFd, userId, tmpMsg);
@@ -378,7 +379,7 @@ void Commands::join(void)
 		if (!(channel = _server->findChannel(channelName)))
 		{
 			channel = _server->addChannel(channelName, channelKeys[i]);
-			channel->modifyUserMode('o', userNick, '+');
+			channel->modifyModeMode('o', userNick, '+');
 			isOper = true;
 		}
 
@@ -514,7 +515,9 @@ void Commands::mode(void)
 
 	if (checkParamNbr(2) == _ERROR)
 		return;
-	if (_params[1][0] == '#') // channel modes
+
+	// channel modes
+	if (_params[1][0] == '#')
 	{
 		Channel *channel = _server->findChannel(_params[1]);
 		if (!channel)
@@ -788,7 +791,8 @@ void Commands::invite(void)
 	int userFd = _user->getFd();
 	std::string message;
 
-	if (checkParamNbr(3) == _ERROR) return;
+	if (checkParamNbr(3) == _ERROR)
+		return;
 
 	std::string guestNick = _params[1];
 	User *guest = _server->findUserByNick(guestNick);
@@ -838,13 +842,14 @@ void Commands::invite(void)
  *************************************************************/
 void Commands::kick(void)
 {
-	if (checkParamNbr(3) == _ERROR) return;
+	if (checkParamNbr(3) == _ERROR)
+		return;
 
-	std::string	userNick = _user->getNickName();
-	int			userFd = _user->getFd();
+	std::string userNick = _user->getNickName();
+	int userFd = _user->getFd();
 	std::string message, targetNick = _params[2];
-	User 		*target;
-	bool		error = false;
+	User *target;
+	bool error = false;
 
 	Channel *channel;
 	if (!(channel = _server->findChannel(_params[1])) && setToTrue(&error))
@@ -893,7 +898,7 @@ void Commands::kick(void)
 void Commands::privmsg(bool isNoticeCmd)
 {
 	if (!(_user->isPwdVerified() && _user->isRegistered()))
-		return ;
+		return;
 	if (_params.size() < 3)
 	{
 		std::string message = isNoticeCmd == false ? _ERR_NEEDMOREPARAMS(_user->getNickName(), _params[0]) : "";
@@ -917,8 +922,7 @@ void Commands::privmsg(bool isNoticeCmd)
 				errMessage = isNoticeCmd == false ? _ERR_NOSUCHCHANNEL(userNick, name) : "";
 				return _server->sendMessage(userFd, _server->getName(), errMessage);
 			}
-			if ((channel->isModerated() && !(_user->isOperator() || channel->hasVoice(userNick)))
-				|| (channel->isInternalOnly() && channel->isMember(userNick) == false))
+			if ((channel->isModerated() && !(_user->isOperator() || channel->hasVoice(userNick))) || (channel->isInternalOnly() && channel->isMember(userNick) == false))
 			{
 				errMessage = isNoticeCmd == false ? _ERR_CANNOTSENDTOCHAN(userNick, name) : "";
 				return _server->sendMessage(userFd, _server->getName(), errMessage);
@@ -930,27 +934,28 @@ void Commands::privmsg(bool isNoticeCmd)
 			User *target = _server->findUserByNick(names[i]);
 			if (!target)
 			{
-					errMessage = isNoticeCmd == false ? _ERR_NOSUCHNICK(names[i]) : "";
-					return _server->sendMessage(userFd, _server->getName(), errMessage);
+				errMessage = isNoticeCmd == false ? _ERR_NOSUCHNICK(names[i]) : "";
+				return _server->sendMessage(userFd, _server->getName(), errMessage);
 			}
 			else
 			{
- 				if (_params[2].size() == 5 && _params[2].find("DCC") != std::string::npos)
+				if (_params[2].size() == 5 && _params[2].find("DCC") != std::string::npos)
 					message = "PRIVMSG " + target->getNickName() + " " + message;
 
 				if (isNoticeCmd == false)
 					message = "PRIVMSG " + target->getNickName() + " " + message;
 				else
 					message = "NOTICE " + target->getNickName() + " " + message;
- 				_server->sendMessage(target->getFd(), _user->getId(), message);
+				_server->sendMessage(target->getFd(), _user->getId(), message);
 			}
 		}
-}
+	}
 }
 
 void Commands::kill(void)
 {
-	if (checkParamNbr(3) == _ERROR) return;
+	if (checkParamNbr(3) == _ERROR)
+		return;
 
 	std::string userNick = _user->getNickName();
 	std::string message;
@@ -979,13 +984,14 @@ void Commands::kill(void)
 	message = _RPL_KILLSUCCESS(targetNick);
 	_server->sendMessage(userFd, _user->getId(), message);
 
-	std::string	cmd = "QUIT";
-	Commands	quitCmd(_server, target, cmd);
+	std::string cmd = "QUIT";
+	Commands quitCmd(_server, target, cmd);
 }
 
 void Commands::ping(void)
 {
-	if (checkParamNbr(2) == _ERROR) return;
+	if (checkParamNbr(2) == _ERROR)
+		return;
 
 	std::string message = "PING ", token = _params[1];
 	_server->sendMessage(_user->getFd(), _server->getName(), message + token);
@@ -993,7 +999,8 @@ void Commands::ping(void)
 
 void Commands::pong(void)
 {
-	if (checkParamNbr(2) == _ERROR) return;
+	if (checkParamNbr(2) == _ERROR)
+		return;
 
 	std::string message = "PONG";
 	_server->sendMessage(_user->getFd(), _server->getName(), message);
@@ -1001,17 +1008,18 @@ void Commands::pong(void)
 
 /*************************************************************
  * This command disconnects a server from the network.
-*************************************************************/
+ *************************************************************/
 void Commands::squit(void)
 {
-	if (checkParamNbr(3) == _ERROR) return;
+	if (checkParamNbr(3) == _ERROR)
+		return;
 
-	std::string	server = _server->getName();
-	std::string	userNick = _user->getNickName();
-	std::string	message;
-	std::string	comment = concatArrayStrs(_params, 2);
-	comment =  comment[0] == ':' ? comment.erase(0, 1) : comment;
-	bool		error =false;
+	std::string server = _server->getName();
+	std::string userNick = _user->getNickName();
+	std::string message;
+	std::string comment = concatArrayStrs(_params, 2);
+	comment = comment[0] == ':' ? comment.erase(0, 1) : comment;
+	bool error = false;
 
 	if (_params[1] != server && setToTrue(&error))
 		message = _ERR_NOSUCHSERVER(userNick, server);

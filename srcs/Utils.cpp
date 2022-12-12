@@ -117,3 +117,10 @@ std::string	concatArrayStrs(std::vector<std::string> array, size_t index)
 }
 
 int	setToTrue(bool	*res) { *res = true; return 1; }
+
+bool checkMode(std::string mode, char c)
+{
+	if (mode.find(c) != std::string::npos)
+		return _FOUND;
+	return _NOT_FOUND;
+}

@@ -21,6 +21,8 @@
 # include <sstream>
 # include <iostream>
 
+# include "main.hpp"
+
 enum e_return{
 	E_TRUE = 0,
 	E_FALSE = 1
@@ -30,11 +32,13 @@ int	                    	setToTrue(bool	*res);
 int							ircStoi(std::string input);
 bool						ircIsAlNum(std::string &s);
 bool						ircIsAllPrintable(std::string &s);
+bool                        checkMode(std::string modes, char c);
 void						*ircMemset(void *s, int c, size_t n);
 std::vector<std::string>	ircSplit(std::string str, char c);
 std::string					ircTime(void);
 std::string					getTimeStr(void);
 std::string					concatArrayStrs(std::vector<std::string> array, size_t index);
+
 
 template<typename T>
 std::string toString(const T& value)

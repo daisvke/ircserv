@@ -10,63 +10,68 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# ifndef USER_HPP
-# define USER_HPP
+#ifndef USER_HPP
+#define USER_HPP
 
-# include <vector>
-# include <string>
-# include <iostream>
+#include <vector>
+#include <string>
+#include <iostream>
+#include <algorithm>
+
+#include "main.hpp"
+#include "Utils.hpp"
 
 class User
 {
-	public:
+public:
+	User();
+	~User();
 
-		User();
-		~User();
+	// setters
+	void setFd(int fd);
+	void setId(std::string id);
+	void setAsPwdVerified(void);
+	void setAsRegistered(void);
+	void setNickName(std::string nick);
+	void setUserName(std::string user);
+	void setHostName(std::string host);
+	void setRealName(std::string real);
+	void setAsOperator(void);
+	void unSetAsOperator(void);
+	void addChanInvitation(std::string channelName);
+	void modifyMode(char c, char sign);
 
-		// setters
-		void	setFd(int fd);
-		void	setId(std::string id);
-		void	setAsPwdVerified(void);
-		void	setAsRegistered(void);
-		void	setNickName(std::string nick);
-		void	setUserName(std::string user);
-		void	setHostName(std::string host);
-		void	setRealName(std::string real);
-		void	setAsOperator(void);
-		void	unSetAsOperator(void);
-		void	addChanInvitation(std::string channelName);
+	// getters
+	int getFd(void) const;
+	std::string getId(void) const;
+	std::string getNickName(void) const;
+	std::string getUserName(void) const;
+	std::string getHostName(void) const;
+	std::string getRealName(void) const;
 
-		// getters
-		int			getFd(void) const;
-		std::string	getId(void) const;
-		std::string	getNickName(void) const;
-		std::string	getUserName(void) const;
-		std::string	getHostName(void) const;
-		std::string	getRealName(void) const;
+	bool isOperator(void) const;
+	bool isInvisible(void) const;
+	bool isPwdVerified(void) const;
+	bool isRegistered(void) const;
+	bool isInvited(std::string channelName) const;
 
-		bool		isOperator(void) const;
-		bool		isPwdVerified(void) const;
-		bool		isRegistered(void) const;
-		bool		isInvited(std::string channelName) const;
+	void useInvitation(std::string channelName);
 
-		void		useInvitation(std::string channelName);
-
-	private:
-
-		int							_fd;
-		bool						_isPwdVerified;
-		bool						_isRegistered;
-		bool						_isOper;
-		std::string					_id;
-		std::string					_nickName;
-		std::string					_userName;
-		std::string					_hostName;
-		std::string					_realName;
-		std::vector<std::string>	_channelInvitations;
+private:
+	int _fd;
+	bool _isPwdVerified;
+	bool _isRegistered;
+	bool _isOper;
+	std::string _modes;
+	std::string _id;
+	std::string _nickName;
+	std::string _userName;
+	std::string _hostName;
+	std::string _realName;
+	std::vector<std::string> _channelInvitations;
 };
 
 /* debug overload to delete*/
-std::ostream& operator<<(std::ostream& o,  User *const & rhs);
+std::ostream &operator<<(std::ostream &o, User *const &rhs);
 
 #endif

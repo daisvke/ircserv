@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/12 11:38:31 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/12 15:04:57 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ Server::~Server()
 int Server::setSocket()
 {
 	_listenSd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if (_listenSd == ERROR)
+	if (_listenSd == -1)
 		return (E_SOCKET_ERR);
 	else
 		std::cout << "1. socket success" << std::endl;
@@ -71,7 +71,7 @@ int Server::setSocketopt()
 {
 	socklen_t	val = 1;
 
-	if (setsockopt(_listenSd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &val, sizeof(socklen_t)) == ERROR)
+	if (setsockopt(_listenSd, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &val, sizeof(socklen_t)) == -1)
 		return (E_SETSOCKOPT_ERR);
 	std::cout << "2. socketopt success" << std::endl;
 	return (E_SOCK_SUCCESS);
@@ -100,7 +100,7 @@ int Server::bindSocket()
 	_sockAddr.sin_family = AF_INET;
 	_sockAddr.sin_addr.s_addr = INADDR_ANY;//inet_addr(LOCAL_HOST);
 	_sockAddr.sin_port = htons(_port);
-	if ((bind(_listenSd, (sockaddr *)&_sockAddr, _addrlen)) == ERROR)
+	if (bind(_listenSd, (sockaddr *)&_sockAddr, _addrlen) == -1)
 		return (E_BIND_ERR);
 	std::cout << "4. bind success" << std::endl;
 	return (E_SOCK_SUCCESS);
@@ -111,7 +111,7 @@ int Server::bindSocket()
  *************************************************************/
 int Server::setListenSocket()
 {
-	if (listen(_listenSd, MAX_CLIENT) == ERROR)
+	if (listen(_listenSd, MAX_CLIENT) == -1)
 		return (E_LISTEN_ERR);
 	_fds[0].fd = _listenSd;
 	_fds[0].events = POLLIN;
@@ -139,7 +139,7 @@ void Server::initServer()
 		&Server::setListenSocket};
 
 	for (int i = 0; i < 5; i++)
-		if ((this->*funkTab[i])() == ERROR)
+		if ((this->*funkTab[i])() != E_SOCK_SUCCESS)
 			throw std::invalid_argument(names[i] + " error");
 	_status = ON_STATUS;
 	_nfds++;
@@ -315,7 +315,7 @@ void Server::startServer()
 void Server::closeConn(int index)
 {
 	int fd = _fds[index].fd;
-
+	std::cout << "closing fd: " << fd << std::endl;
 	if (fd > -1)
 	{
 		deleteUser(fd);

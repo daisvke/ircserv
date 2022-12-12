@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/14 15:55:19 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/12 11:59:06 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/12 12:09:57 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ int main(int ac, char **av)
 
 
 // irssi -w pass -n irssiLuc -p 6667 -c localhost
-//nc -C localhost 6667
 //CONNECT localhost 6667 pass mike
 
 

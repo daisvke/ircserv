@@ -125,8 +125,7 @@ void Commands::pass(void)
 	if (_params[1] != _server->getPassword())
 	{
 		std::string message = _ERR_PASSWDMISMATCH(_user->getNickName());
-		_server->sendMessage(userFd, _server->getName(), message);
-		_server->closeFd(userFd);
+		return _server->sendMessage(userFd, _server->getName(), message);
 	}
 	else
 		_user->setAsPwdVerified();
@@ -162,8 +161,7 @@ void Commands::nick(void)
 	}
 	if (error == true)
 	{
-		_server->sendMessage(_user->getFd(), _server->getName(), message);
-		return _server->closeFd(_user->getFd());
+		return _server->sendMessage(_user->getFd(), _server->getName(), message);
 	}
 	// Set nickname if no error occured
 	_user->setNickName(_params[1]);

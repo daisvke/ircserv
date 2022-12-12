@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/21 05:54:12 by dtanigaw          #+#    #+#             */
-/*   Updated: 2022/12/12 17:26:16 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/12 18:00:33 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,11 +56,9 @@ void Commands::setupMap()
 		_cmdMap["INVITE"] = &Commands::invite;
 		_cmdMap["KICK"] = &Commands::kick;
 		_cmdMap["KILL"] = &Commands::kill;
-		_cmdMap["kill"] = &Commands::kill;
 		_cmdMap["PING"] = &Commands::ping;
 		_cmdMap["PONG"] = &Commands::pong;
 		_cmdMap["SQUIT"] = &Commands::squit;
-		_cmdMap["squit"] = &Commands::squit;
 	}
 }
 
@@ -76,6 +74,8 @@ void Commands::routeCmd()
 		return;
 
 	std::string cmd = _params[0];
+	std::transform(cmd.begin(), cmd.end(),cmd.begin(), ::toupper);
+
 	if (cmd == "PRIVMSG")
 		privmsg(false);
 	else if (cmd == "NOTICE")
@@ -314,7 +314,9 @@ void Commands::oper(void)
  *************************************************************/
 void Commands::quit(void)
 {
-	std::string lastWords = _params[1].empty() ? "" : _params[1].erase(0, 1);
+	std::string lastWords;
+	if (_params.size() > 1)
+		lastWords = _params[1].erase(0, 1);
 	std::vector<Channel *> *channels = _server->getChannels();
 
 	for (size_t i(0); i < channels->size(); ++i)
@@ -329,6 +331,9 @@ void Commands::quit(void)
 				(*channels)[i]->part((*it).first);
 				if (lastWords.empty() == false)
 					broadcastToChannel((*channels)[i], lastWords, _PRIV);
+				// Tell all users that a user has left the channel
+				std::string	message = "PART " + (*channels)[i]->getName();
+				broadcastToChannel((*channels)[i], message, _NOT_PRIV);
 				break;
 			}
 		}
@@ -986,7 +991,7 @@ void Commands::kill(void)
 	message = _RPL_KILLSUCCESS(targetNick);
 	_server->sendMessage(userFd, _user->getId(), message);
 
-	std::string cmd = "QUIT";
+	std::string cmd = "QUIT ";
 	Commands quitCmd(_server, target, cmd);
 }
 

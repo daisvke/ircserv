@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/03 11:20:36 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/10 18:24:37 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/12 11:05:13 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -300,6 +300,7 @@ void Server::startServer()
 	try
 	{
 		initServer();
+		signal(SIGINT, &Server::sigIntOffServer);
 		waitForConn();
 	}
 	catch (std::exception &e)
@@ -392,6 +393,11 @@ void	Server::setServerStatus(int status)
 	_status = status;
 }
 
+void	Server::sigIntOffServer(int sig)
+{
+	if (sig == SIGINT)
+		throw std::invalid_argument("\n server ended with a SIGINT\n");
+}
 
 /******************************************
 	Server Utils

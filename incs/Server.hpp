@@ -6,7 +6,7 @@
 /*   By: lchan <lchan@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 13:37:24 by lchan             #+#    #+#             */
-/*   Updated: 2022/12/10 20:26:43 by lchan            ###   ########.fr       */
+/*   Updated: 2022/12/12 11:05:00 by lchan            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,6 +141,7 @@ class Server
 		void	NarrowArray(void);
 		void	deleteUser(int fd);
 		int		turnOffServer(std::string str);
+		static void	sigIntOffServer(int sig);
 		/*visual utils*/
 		void	PrintInfo(void);
 };

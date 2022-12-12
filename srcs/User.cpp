@@ -27,6 +27,7 @@ void	User::setUserName(std::string user) { _userName = user; }
 void	User::setHostName(std::string host) { _hostName = host; }
 void	User::setRealName(std::string real) { _realName = real; }
 void	User::setAsOperator(void) { _isOper = true; }
+void	User::unSetAsOperator(void) { _isOper = false; }
 
 void	User::addChanInvitation(std::string channelName)
 {

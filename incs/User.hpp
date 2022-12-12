@@ -34,6 +34,7 @@ class User
 		void	setHostName(std::string host);
 		void	setRealName(std::string real);
 		void	setAsOperator(void);
+		void	unSetAsOperator(void);
 		void	addChanInvitation(std::string channelName);
 
 		// getters

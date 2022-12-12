@@ -640,6 +640,9 @@ void Commands::mode(void)
 			message = _ERR_USERSDONTMATCH(userNick);
 			return _server->sendMessage(_user->getFd(), _server->getName(), message);
 		}
+
+		if (_params.size() > 2 && _params[2][0] == '-' && _params[2][1] == 'o')
+			_user->unSetAsOperator();
 		// If no modestring is given, print current modes
 		if (_params.size() < 3)
 		{

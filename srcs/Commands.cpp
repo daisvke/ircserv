@@ -334,6 +334,7 @@ void Commands::quit(void)
 		if ((*channels)[i]->isEmpty())
 			_server->deleteChannel((*channels)[i]->getName());
 	}
+	_server->closeFd(_user->getFd());
 }
 
 /*************************************************************
@@ -978,8 +979,8 @@ void Commands::kill(void)
 	message = _RPL_KILLSUCCESS(targetNick);
 	_server->sendMessage(userFd, _user->getId(), message);
 
-	quit();
-	_server->closeFd(targetFd);
+	std::string	cmd = "QUIT";
+	Commands	quitCmd(_server, target, cmd);
 }
 
 void Commands::ping(void)

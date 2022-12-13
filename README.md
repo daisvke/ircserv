@@ -104,5 +104,5 @@ lk
 </p>
 
 ## Links
-https://modern.ircdocs.horse/
+https://modern.ircdocs.horse/<br />
 http://chi.cs.uchicago.edu/chirc/irc_examples.html

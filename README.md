@@ -96,3 +96,8 @@ timnslk
 // Channel param modes
 lk
 ```
+
+## Screenshots
+<p align="center">
+  <img src="/screenshots/7-clients.png" width="80%" />
+</p>

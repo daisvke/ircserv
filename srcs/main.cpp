@@ -87,12 +87,3 @@ int main(int ac, char **av)
 //dcc send irssiLuc2 "/Documents/coucou.txt"
 
 //dcc get irssiLuc "coucou.txt"
-
-
-/*************** Done */
-// channel name are 50 size
-// channel begin with #
-// NOT TO DO quand /part --> name is still in user list
-// DONE segfault a chaque fois que des utilisateurs ne sont pas connu ?
-// DONE join avec ,
-// DONE quand notice coucou coucou, segfault

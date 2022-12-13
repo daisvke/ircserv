@@ -39,6 +39,7 @@ void Commands::setupMap()
 	_cmdMap["PASS"] = &Commands::pass;
 	_cmdMap["NICK"] = &Commands::nick;
 	_cmdMap["USER"] = &Commands::user;
+
 	// These commands are forbidden to clients that didn't
 	//	complete the registration process
 	if (_user->isPwdVerified() && _user->isRegistered())
@@ -61,6 +62,7 @@ void Commands::setupMap()
 		_cmdMap["SQUIT"] = &Commands::squit;
 	}
 }
+
 
 /*************************************************************
  * Looks for the command on the cmdMap.
@@ -93,6 +95,7 @@ void Commands::routeCmd()
 	}
 }
 
+
 /*************************************************************
  * Sends channel message to one or more members of the channel
  *************************************************************/
@@ -112,6 +115,7 @@ void Commands::broadcastToChannel(Channel *channel, std::string msg, bool isPriv
 	}
 }
 
+
 /*************************************************************
  * When launched with 'irssi -w <pwd>', a PASS message is sent to ircserv.
  * This function will check if the given pwd is correct.
@@ -130,6 +134,7 @@ void Commands::pass(void)
 	else
 		_user->setAsPwdVerified();
 }
+
 
 /*************************************************************
  * Changes the user's nickname online
@@ -285,6 +290,7 @@ void Commands::who(void)
 	return _server->sendMessage(_user->getFd(), _server->getName(), message);
 }
 
+
 /*************************************************************
  * Used by a user to get oper privileges
  *************************************************************/
@@ -306,6 +312,7 @@ void Commands::oper(void)
 	std::string message = _RPL_YOUREOPER(userNick);
 	_server->sendMessage(user->getFd(), _server->getName(), message);
 }
+
 
 /*************************************************************
  * The user quits the network, which makes him leave all the channels as well
@@ -340,6 +347,7 @@ void Commands::quit(void)
 	}
 	_server->closeFd(_user->getFd());
 }
+
 
 /*************************************************************
  * The user begins listening to a channel
@@ -505,6 +513,7 @@ void Commands::part(void)
 	}
 }
 
+
 /*************************************************************
  * MODE <target> [<modestring> [<mode arguments>...]]
  * Used by a channel oper to change the mode of the channel.
@@ -662,6 +671,7 @@ void Commands::mode(void)
 	}
 }
 
+
 /*************************************************************
  * If a topic name is given: changes the topic name of a channel,
  *	or adds one if no topic has been set
@@ -703,6 +713,7 @@ void Commands::topic(void)
 		_server->sendMessage(userFd, _server->getName(), message);
 	}
 }
+
 
 /*************************************************************
  * This command is built-in on our reference client Irssi
@@ -944,9 +955,6 @@ void Commands::privmsg(bool isNoticeCmd)
 			}
 			else
 			{
-				if (_params[2].size() == 5 && _params[2].find("DCC") != std::string::npos)
-					message = "PRIVMSG " + target->getNickName() + " " + message;
-
 				if (isNoticeCmd == false)
 					message = "PRIVMSG " + target->getNickName() + " " + message;
 				else
@@ -1047,6 +1055,7 @@ bool Commands::checkParamNbr(size_t nbr)
 	}
 	return _OK;
 }
+
 
 /*************/
 /* to delete */

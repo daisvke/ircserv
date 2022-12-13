@@ -24,7 +24,7 @@
 #include "Server.hpp"
 
 // authentification
-#define _RPL_WELCOME(nick, user) "001 " + nick + " :Welcome to the " + _NETWORKNAME + " Network, " + user
+#define _RPL_WELCOME(nick, user)"001 " + nick + " :Welcome to the " + _NETWORKNAME + " Network, " + user
 #define _RPL_YOURHOST(nick, server) "002 " + nick + " :Your host is " + server + ", running version " + _SERVERVERSION
 #define _RPL_CREATED(nick, datetime) "003 " + nick + " :This server was created " + datetime
 #define _RPL_MYINFO(nick, server) "004 " + nick + " " + server + " " + _SERVERVERSION + " " + _USERMODES + " " + _CHANMODES + " " + _CHAN_PARAM_MODES
@@ -92,6 +92,7 @@
 #define _ERR_NOPRIVILEGES(nick) "481 " + nick + " :Permission Denied- You're not an IRC operator"
 #define _RPL_KILLSUCCESS(target) target + " has been killed"
 
+
 class Server;
 
 class Commands
@@ -99,6 +100,7 @@ class Commands
 	typedef std::map<std::string, void (Commands::*)(void)> cmdMap;
 
 public:
+
 	enum e_isPriv
 	{
 		_NOT_PRIV,
@@ -118,7 +120,9 @@ public:
 	Commands(Server *server, User *user, std::string &str);
 	~Commands();
 
+
 private:
+
 	void pass(void);
 	void nick(void);
 	void user(void);

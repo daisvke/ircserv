@@ -65,6 +65,7 @@ typedef std::map<int, std::string>	cmdMap;
 class Server
 {
 	public:
+
 		Server();
 		Server(int port, std::string pwd);
 		~Server();
@@ -75,40 +76,40 @@ class Server
 		std::string				getPassword(void) const;
 		void					setName(std::string name);
 		//user
-		User	*findUserByNick(std::string name);
-		User	*findUserByName(std::string name);
+		User					*findUserByNick(std::string name);
+		User					*findUserByName(std::string name);
 		//channel
 		Channel					*findChannel(std::string name);
 		std::vector<Channel *> *getChannels(void);
 		Channel					*addChannel(std::string name, std::string key);
 		void					deleteChannel(std::string name);
 		//send
-		void	sendMessage(int fd, std::string id, std::string msg);
-		void	sendToAllUser(std::string &msg);
+		void					sendMessage(int fd, std::string id, std::string msg);
+		void					sendToAllUser(std::string &msg);
 		//close
-		void	closeFd(int targetFd);
-		void	closeAllConn(void);
-		void	closeAllChannel(void);
-		void	setServerStatus(int status);
+		void					closeFd(int targetFd);
+		void					closeAllConn(void);
+		void					closeAllChannel(void);
+		void					setServerStatus(int status);
 
 
 	private:
-		int			_port;
-		std::string	_password;
-		std::string	_name;
-		std::string	_creationTime;
-
-		/*poll*/
-		struct sockaddr_in	_sockAddr;
-		int					_addrlen;
-		int					_listenSd;
-		bool				_status;
-		bool				_condenceArrayFlag;
-		char				_buffer[BUFFER_SIZE + 1];
-		int					_opt;
-		int					_nfds;
-		int					_newSd;
-		struct pollfd		_fds[MAX_CLIENT];
+			
+		int						_port;
+		std::string				_password;
+		std::string				_name;
+		std::string				_creationTime;			
+		/*poll*/	
+		struct sockaddr_in		_sockAddr;
+		int						_addrlen;
+		int						_listenSd;
+		bool					_status;
+		bool					_condenceArrayFlag;
+		char					_buffer[BUFFER_SIZE + 1];
+		int						_opt;
+		int						_nfds;
+		int						_newSd;
+		struct pollfd			_fds[MAX_CLIENT];
 		/*user/chann maps and vectors*/
 		userMap					_userMap;
 		cmdMap					_cmdMap;
@@ -116,33 +117,33 @@ class Server
 		std::vector<Channel *>	_channels;
 
 		/*init the server */
-		void	initServer();
-		int		setSocket();
-		int		setSocketopt();
-		int		setNonBlocking();
-		int		bindSocket();
-		int		setListenSocket();
+		void		initServer();
+		int			setSocket();
+		int			setSocketopt();
+		int			setNonBlocking();
+		int			bindSocket();
+		int			setListenSocket();
 		/*poll management */
-		int		checkPollRet(int ret);
-		int		findReadableFd();
-		int		acceptNewSd();
-		void	readExistingFds(int fd);
-		void	reactToEvent(int index);
-		void	waitForConn();
+		int			checkPollRet(int ret);
+		int			findReadableFd();
+		int			acceptNewSd();
+		void		readExistingFds(int fd);
+		void		reactToEvent(int index);
+		void		waitForConn();
 		/*react to cmd */
-		void	updateServerMaps(int fd);
-		void	cmdMaker(int fd);
-		void	execCmd(int key, std::string &str);
-		void	handleCmd(int fd);
+		void		updateServerMaps(int fd);
+		void		cmdMaker(int fd);
+		void		execCmd(int key, std::string &str);
+		void		handleCmd(int fd);
 		/*react management Utils */
 		template <typename T>
-		void	serverPrint(T &str) { std::cout << "[+] " << str << std::endl; }
-		void	closeConn(int index);
-		void	NarrowArray(void);
-		void	deleteUser(int fd);
-		int		turnOffServer(std::string str);
+		void		serverPrint(T &str) { std::cout << "[+] " << str << std::endl; }
+		void		closeConn(int index);
+		void		NarrowArray(void);
+		void		deleteUser(int fd);
+		int			turnOffServer(std::string str);
 		static void	sigIntOffServer(int sig);
 		/*visual utils*/
-		void	PrintInfo(void);
+		void		PrintInfo(void);
 };
 #endif

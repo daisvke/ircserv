@@ -193,10 +193,7 @@ int Server::acceptNewSd()
 	_newSd = accept(_listenSd, NULL, NULL); // ckeck on man to see if other argument are necessary or not
 
 	if (_newSd < 0)
-	{
-		if (errno != EWOULDBLOCK)
-			return (turnOffServer("accept() failed"));
-	}
+		return (turnOffServer("accept() failed"));
 	else
 	{
 		_fds[_nfds].fd = _newSd; // we can directly use _nfds as an index coz we compressArray at each single connexion
@@ -220,11 +217,8 @@ void Server::readExistingFds(int index)
 	recvRet = recv(_fds[index].fd, _buffer, sizeof(_buffer), 0);
 	if (recvRet < 0)
 	{
-		if (errno != EWOULDBLOCK)
-		{
-			serverPrint("recv() failed");
-			closeConn(index);
-		}
+		std::cerr << "recv() failed" << std::endl;
+		closeConn(index);
 	}
 	else if (recvRet == 0) // not sure about this one.
 		closeConn(index);

@@ -62,14 +62,7 @@ int main(int ac, char **av)
 }
 
 
-// irssi -w pass -n irssiLuc -p 6667 -c localhost
-//CONNECT localhost 6667 pass mike
-
-
-/*************** to do list */
-//TODO : max size of message = 210;
-//TODO : channel name are case insensitive
-/*
+/*************** to do list 
 
 /set dcc_autoaccept_lowports ON
 /set dcc_autoget ON

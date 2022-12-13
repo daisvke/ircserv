@@ -167,12 +167,9 @@ void	Bot::readBuffer()
 	recvRet = recv(_listenBSd, _buffer, sizeof(_buffer), 0);
 	if (recvRet < 0)
 	{
-		if (errno != EWOULDBLOCK)
-		{
-			std::cout << "recv() failed" << std::endl;
-			_status = OFF_STATUS;
-			return ;
-		}
+		std::cerr << "recv() failed" << std::endl;
+		_status = OFF_STATUS;
+		return ;
 	}
 	else if (recvRet == 0)
 		_status = OFF_STATUS;

@@ -102,3 +102,7 @@ lk
   <img src="/screenshots/7-clients.png" />
   Play from <i>Lady Windermere's Fan</i>, by Oscar Wilde.
 </p>
+
+## Links
+https://modern.ircdocs.horse/
+http://chi.cs.uchicago.edu/chirc/irc_examples.html

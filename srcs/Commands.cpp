@@ -303,7 +303,7 @@ void Commands::oper(void)
 	User *user = _server->findUserByNick(_params[1]);
 	if (!user)
 		return;
-	if (_params[2] != _server->getPassword())
+	if (_params[2] != _OPERPWD)
 	{
 		std::string message = _ERR_PASSWDMISMATCH(userNick);
 		return _server->sendMessage(_user->getFd(), _server->getName(), message);

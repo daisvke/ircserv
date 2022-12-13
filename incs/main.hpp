@@ -5,6 +5,8 @@
 # define _SERVERVERSION		"2.0.1"
 # define _SERVER_INFO		"ircserv, by dtanigaw & lchan, Paris, France"
 
+# define _OPERPWD			"operpass"
+
 # define _USERMODES			"o"
 # define _CHANMODES			"timnslk"
 # define _CHAN_PARAM_MODES	"lk"

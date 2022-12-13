@@ -1,5 +1,5 @@
 # ircserv
-This project is about creating our own IRC server in C++.
+This project is about creating our own IRC server in C++.<br />
 Clients can register on the server and chat with each other.
 
 ## Commands
@@ -19,7 +19,8 @@ PASS <password>
 NICK <nickname>
 USER <username> <hostname> <servername> <realname>
 
-Ex.: nc -C localhost 6667
+Ex.:
+nc -C localhost 6667
 PASS pass
 NICK myNick
 User a b c d
@@ -27,6 +28,7 @@ User a b c d
 // To use Irssi (our reference client)
 irssi -p <port> -c <servername> -n <nickname> -w <password>
 Ex.: irssi -p 6667 -c localhost -n myNick -w pass
+
 // To connect from another computer at 42 school
 irssi -p <port> -c <computer name> -n <nickname> -w <password>
 Ex.: irssi -p 6667 -c e1r2p5 -n myNick -w pass
@@ -52,7 +54,6 @@ Ex.: /set dcc_download_path /mnt/nfs/homes/daisvke/Documents/ircserv/
 /* SENDER */
 
 // Send file to the destination
-/dcc send
 /dcc send <recipient nick> <path to the file>
 Ex.: /dcc send luc /mnt/nfs/homes/luc/Documents/file_to_send
 ```

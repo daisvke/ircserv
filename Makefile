@@ -6,7 +6,7 @@ NAME			=	ircserv
 # C X X  F L A G S #
 
 CXX				=	c++
-CXXFLAGS		=	-Wall -Wextra -std=c++98  #-Werror
+CXXFLAGS		=	-Wall -Wextra -Werror -std=c++98
 DEBUG			=	-g3
 
 
@@ -55,8 +55,10 @@ $(NAME): $(OBJS)
 
 $(OBJS_DIR)%.o: $(SRCS_DIR)%.cpp $(INCS)
 		mkdir -p $(OBJS_DIR)
-		$(CXX) $(INC) $(CXXFLAGS) $(DEBUG) -c $< -o $@
+		$(CXX) $(INC) $(CXXFLAGS) -c $< -o $@
 
+debug: $(OBJS)
+		$(CXX) $(DEBUG) -o $@ $(OBJS)
 
 # C L E A N  &  O T H E R  R U L E S #
 
@@ -64,6 +66,6 @@ clean:
 	rm -rf $(OBJS_DIR)
 
 fclean: clean
-	rm -f $(NAME)
+	rm -f $(NAME) debug
 
 re: fclean all

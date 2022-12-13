@@ -100,4 +100,5 @@ lk
 ## Screenshots
 <p align="center">
   <img src="/screenshots/7-clients.png" />
+  Play from <i>Lady Windermere's Fan</i>, by Oscar Wilde.
 </p>

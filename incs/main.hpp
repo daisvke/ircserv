@@ -2,7 +2,7 @@
 # define MAIN_HPP
 
 # define _NETWORKNAME		"IRC-LCHAN-DTANIGAWcom"
-# define _SERVERVERSION		"1.0.2"
+# define _SERVERVERSION		"2.0.1"
 # define _SERVER_INFO		"ircserv, by dtanigaw & lchan, Paris, France"
 
 # define _USERMODES			"o"

@@ -1,5 +1,6 @@
 # ircserv
-This project is about creating our own IRC server.
+This project is about creating our own IRC server in C++.
+Clients can register on the server and chat with each other.
 
 ## Commands
 * ircserv
@@ -26,10 +27,15 @@ User a b c d
 // To use Irssi (our reference client)
 irssi -p <port> -c <servername> -n <nickname> -w <password>
 Ex.: irssi -p 6667 -c localhost -n myNick -w pass
+// To connect from another computer at 42 school
+irssi -p <port> -c <computer name> -n <nickname> -w <password>
+Ex.: irssi -p 6667 -c e1r2p5 -n myNick -w pass
 ```
 
-* To set up and use DCC to transfer files between clients
+* To set up and use DCC to transfer files between clients with Irssi
 ```
+/* RECIPIENT CONFIGURATION */
+
 // Accept low ports
 /set dcc_autoaccept_lowports ON
 
@@ -43,16 +49,15 @@ Ex.: /set dcc_download_path /mnt/nfs/homes/daisvke/Documents/ircserv/
 // Allow file creation when copying the received file
 /set dcc_file_create_mode 644
 
+/* SENDER */
+
 // Send file to the destination
 /dcc send
-Ex.: /dcc send u1 /mnt/nfs/homes/daisvke/Documents/file_to_send
-
-dcc send irssiLuc2 "/Documents/coucou.txt"
-
-dcc get irssiLuc "coucou.txt"
+/dcc send <recipient nick> <path to the file>
+Ex.: /dcc send luc /mnt/nfs/homes/luc/Documents/file_to_send
 ```
 
-Handled commands:<br />
+* Handled commands:
 ```
 PASS
 NICK
@@ -72,4 +77,16 @@ KICK
 KILL
 PING
 PONG
+```
+
+* Handled modes:
+```
+// User modes
+o
+
+// Channel modes
+timnslk
+
+// Channel param modes
+lk
 ```

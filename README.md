@@ -32,6 +32,11 @@ Ex.: irssi -p 6667 -c localhost -n myNick -w pass
 // To connect from another computer at 42 school
 irssi -p <port> -c <computer name> -n <nickname> -w <password>
 Ex.: irssi -p 6667 -c e1r2p5 -n myNick -w pass
+
+// Some useful Irssi commands
+/reconnect => reconnect to server
+/clear => clear tab
+CTRL + N => toggle between tabs
 ```
 
 * To set up and use DCC to transfer files between clients with Irssi

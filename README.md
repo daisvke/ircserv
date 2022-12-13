@@ -99,5 +99,5 @@ lk
 
 ## Screenshots
 <p align="center">
-  <img src="/screenshots/7-clients.png" width="80%" />
+  <img src="/screenshots/7-clients.png" />
 </p>

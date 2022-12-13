@@ -46,7 +46,7 @@ CTRL + N => toggle between tabs
 // Accept low ports
 /set dcc_autoaccept_lowports ON
 
-// Automatically download files and received
+// Automatically accept and download received files
 /set dcc_autoget ON
 
 // Set download path
